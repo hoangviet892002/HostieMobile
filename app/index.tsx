@@ -40,7 +40,7 @@ const index = () => {
             <TouchableOpacity
               className="bg-green-600 p-2 m-2 rounded-full h-20 w-20 flex justify-center items-center"
               onPress={() => {
-                router.navigate("LoginScreen");
+                router.navigate("Authentication");
               }}
             >
               <Text className="text-white text-2xl font-bold">Start</Text>

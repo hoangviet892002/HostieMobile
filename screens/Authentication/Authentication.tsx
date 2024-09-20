@@ -1,44 +1,49 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import * as Animatable from "react-native-animatable";
+import { Size } from "@/constants/Size";
+import LoginForm from "./LoginForm";
+import Register from "./Register";
+import LoginWithGoogle from "./LoginWithGoogle";
 
-const LoginScreen = () => {
+const Authentication = () => {
   const optionLogin = [
     {
-      title: "Email",
+      title: "Sign in",
       onPress: () => {
         setOption(optionLogin[0]);
       },
     },
     {
-      title: "Phone",
+      title: "Sign up",
       onPress: () => {
         setOption(optionLogin[1]);
       },
     },
   ];
+
   const [option, setOption] = useState(optionLogin[0]);
   const renderForm = () => {
-    return (
-      <Animatable.View delay={120} animation="slideInDown">
-        <Text>{option.title}</Text>
-      </Animatable.View>
-    );
+    if (option.title === "Sign in") {
+      return <LoginForm />;
+    } else {
+      return <Register />;
+    }
   };
   return (
-    <View className="flex items-center justify-center h-full">
+    <View className="flex justify-center h-full p-10">
       <Animatable.View className="" delay={120} animation="slideInDown">
-        <Text>Hello</Text>
-        <Text>Wellcome back to Hostie</Text>
+        <Text style={{ fontSize: Size.font45 }}>Hello</Text>
+        <Text style={{ fontSize: Size.font10 }}>Wellcome back to Hostie</Text>
       </Animatable.View>
 
       <Animatable.View
-        className="flex flex-row m-4 p-2 bg-black rounded-3xl justify-between"
+        className="flex flex-row p-2 my-2 bg-black rounded-3xl justify-between"
         style={{ width: wp(80) }}
         delay={120}
         animation="slideInDown"
@@ -64,19 +69,9 @@ const LoginScreen = () => {
         ))}
       </Animatable.View>
       {renderForm()}
-      <Animatable.View delay={120} animation="slideInDown">
-        <TouchableOpacity
-          className="bg-black p-2 rounded-3xl items-center justify-center"
-          style={{ width: wp(80) }}
-          onPress={() => {
-            router.navigate("HomeScreen");
-          }}
-        >
-          <Text className="text-white text-2xl font-bold">Login</Text>
-        </TouchableOpacity>
-      </Animatable.View>
+      <LoginWithGoogle />
     </View>
   );
 };
 
-export default LoginScreen;
+export default Authentication;
