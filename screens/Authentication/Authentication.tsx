@@ -10,17 +10,19 @@ import { Size } from "@/constants/Size";
 import LoginForm from "./LoginForm";
 import Register from "./Register";
 import LoginWithGoogle from "./LoginWithGoogle";
+import { useTranslation } from "react-i18next";
 
 const Authentication = () => {
+  const { t } = useTranslation();
   const optionLogin = [
     {
-      title: "Sign in",
+      title: t("Sign in"),
       onPress: () => {
         setOption(optionLogin[0]);
       },
     },
     {
-      title: "Sign up",
+      title: t("Sign up"),
       onPress: () => {
         setOption(optionLogin[1]);
       },
@@ -29,7 +31,7 @@ const Authentication = () => {
 
   const [option, setOption] = useState(optionLogin[0]);
   const renderForm = () => {
-    if (option.title === "Sign in") {
+    if (option.title === t("Sign in")) {
       return <LoginForm />;
     } else {
       return <Register />;
@@ -39,7 +41,9 @@ const Authentication = () => {
     <View className="flex justify-center h-full p-10">
       <Animatable.View className="" delay={120} animation="slideInDown">
         <Text style={{ fontSize: Size.font45 }}>Hello</Text>
-        <Text style={{ fontSize: Size.font10 }}>Wellcome back to Hostie</Text>
+        <Text style={{ fontSize: Size.font10 }}>
+          {t("Wellcome back to Hostie")}
+        </Text>
       </Animatable.View>
 
       <Animatable.View

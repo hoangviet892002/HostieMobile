@@ -10,8 +10,10 @@ import {
   View,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
+import { useTranslation } from "react-i18next";
 
 const index = () => {
+  const { t } = useTranslation();
   return (
     <View className="flex-1">
       <ImageBackground source={banner} resizeMode="cover" className="flex-1">
@@ -21,12 +23,16 @@ const index = () => {
             delay={120}
             animation="slideInDown"
           >
-            <Text className="text-black text-5xl font-bold p-2">Doorways</Text>
+            <Text className="text-black text-5xl font-bold p-2">
+              {t("Doorways")}
+            </Text>
 
             <Text className="bg-green-600 text-white font-bold text-5xl p-2 shadow-lg rounded-3xl">
-              to Dream
+              {t("to Dream")}
             </Text>
-            <Text className="text-black text-5xl font-bold p-2">Stays</Text>
+            <Text className="text-black text-5xl font-bold p-2">
+              {t("Stays")}
+            </Text>
           </Animatable.View>
 
           <Animatable.View
@@ -35,7 +41,7 @@ const index = () => {
             animation="slideInDown"
           >
             <Text className="text-white text-2xl font-bold p-2 w-2/3 ">
-              Streamlines where reservation with a wide range hassle
+              {t("Streamlines where reservation with a wide range hassle")}
             </Text>
             <TouchableOpacity
               className="bg-green-600 p-2 m-2 rounded-full h-20 w-20 flex justify-center items-center"
@@ -43,7 +49,9 @@ const index = () => {
                 router.navigate("Authentication");
               }}
             >
-              <Text className="text-white text-2xl font-bold">Start</Text>
+              <Text className="text-white text-2xl font-bold">
+                {t("Start")}
+              </Text>
             </TouchableOpacity>
           </Animatable.View>
         </SafeAreaView>

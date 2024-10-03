@@ -8,8 +8,9 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-
+import { useTranslation } from "react-i18next";
 const Register = () => {
+  const { t } = useTranslation();
   const [registerForm, setRegisterForm] = useState({
     fullName: "",
     email: "",
@@ -30,14 +31,14 @@ const Register = () => {
           <TextInput
             className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
             value={registerForm.fullName}
-            placeholder="Full Name"
+            placeholder={t("Full Name")}
             onChangeText={(text) => handleChange("fullName", text)}
           />
 
           <TextInput
             className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
             value={registerForm.email}
-            placeholder="Email"
+            placeholder={t("Email")}
             onChangeText={(text) => handleChange("email", text)}
           />
 
@@ -45,20 +46,20 @@ const Register = () => {
             secureTextEntry={true}
             className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
             value={registerForm.password}
-            placeholder="Password"
+            placeholder={t("Password")}
             onChangeText={(text) => handleChange("password", text)}
           />
           <TextInput
             secureTextEntry={true}
             className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
             value={registerForm.confirmPassword}
-            placeholder="Confirm Password"
+            placeholder={t("Confirm Password")}
             onChangeText={(text) => handleChange("confirmPassword", text)}
           />
         </View>
         <View className="py-4">
           <CheckBox
-            title="I agree to Terms and Privacy Policy "
+            title={t("I agree to Terms and Privacy Policy")}
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
             checked={checked}
@@ -75,7 +76,7 @@ const Register = () => {
             router.navigate("(tabs)");
           }}
         >
-          <Text className="text-white text-2xl font-bold">Register</Text>
+          <Text className="text-white text-2xl font-bold">{t("Register")}</Text>
         </TouchableOpacity>
       </Animatable.View>
     </View>

@@ -6,8 +6,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 
 const LoginForm = () => {
+  const { t } = useTranslation();
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: "",
@@ -30,7 +32,7 @@ const LoginForm = () => {
             secureTextEntry={true}
             className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
             value={loginForm.password}
-            placeholder="Password"
+            placeholder={t("Password")}
             onChangeText={(text) => handleChange("password", text)}
           />
         </View>
@@ -43,7 +45,7 @@ const LoginForm = () => {
             router.navigate("(tabs)");
           }}
         >
-          <Text className="text-white text-2xl font-bold">Login</Text>
+          <Text className="text-white text-2xl font-bold"> {t("Login")} </Text>
         </TouchableOpacity>
       </Animatable.View>
     </View>
