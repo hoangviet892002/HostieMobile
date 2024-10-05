@@ -9,4 +9,6 @@ export interface VillaType {
   location: string;
   type: string;
   category: CategoryType[];
+  images?: string[];
+  description?: string;
 }

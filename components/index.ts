@@ -1,3 +1,5 @@
 import { DateRangePicker } from "./DatePickerCustom";
 import VillaCard from "./VillaCard";
-export { DateRangePicker, VillaCard };
+import BackButton from "./BackButton";
+import ImageCustom from "./ImagesCustom";
+export { DateRangePicker, VillaCard, BackButton, ImageCustom };

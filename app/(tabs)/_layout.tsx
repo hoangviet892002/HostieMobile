@@ -21,8 +21,8 @@ const TabArr = [
     type: Icons.Feather,
     icon: "search",
     component: "Tab2",
-    color: Colors.green,
-    alphaClr: Colors.greenAlpha,
+    color: Colors.primary,
+    alphaClr: Colors.primaryAlpha,
   },
   {
     route: "Add",
@@ -30,8 +30,8 @@ const TabArr = [
     type: Icons.Feather,
     icon: "plus-square",
     component: "Tab3",
-    color: Colors.red,
-    alphaClr: Colors.redAlpha,
+    color: Colors.primary,
+    alphaClr: Colors.primaryAlpha,
   },
   {
     route: "Account",
@@ -39,8 +39,8 @@ const TabArr = [
     type: Icons.FontAwesome,
     icon: "user-circle-o",
     component: "Tab4",
-    color: Colors.purple,
-    alphaClr: Colors.purpleAlpha,
+    color: Colors.primary,
+    alphaClr: Colors.primaryAlpha,
   },
 ];
 interface TabButtonProps {

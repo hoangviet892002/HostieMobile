@@ -1,6 +1,7 @@
 import { VillaCard } from "@/components";
 import { DateRangePicker } from "@/components/DatePickerCustom";
 import Icon, { Icons } from "@/components/Icons";
+import { Colors } from "@/constants/Colors";
 import { VillaType } from "@/types";
 import { parseDate } from "@/utils/parseDate";
 import React, { useState } from "react";
@@ -71,8 +72,9 @@ const Home = () => {
   const DisplayDate = () => {
     return (
       <TouchableOpacity
-        className="bg-white w-[450px] rounded-lg border-solid border-2 border-indigo-600 p-3 flex flex-row justify-center items-center"
+        className="bg-white w-[450px] rounded-lg p-3 flex flex-row justify-center items-center"
         onPress={() => setState({ ...state, modalVisible: true })}
+        style={{ borderBlockColor: Colors.primary, borderWidth: 1 }}
       >
         <Text>{parseDate(state.fromDate.toISOString())}</Text>
         <Text> - </Text>
@@ -81,17 +83,48 @@ const Home = () => {
       </TouchableOpacity>
     );
   };
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
 
   const RenderCategory = () => {
     return (
-      <View className="h-[100px]">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <View className="h-[50px]">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="flex mr-3"
+          contentContainerStyle={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           {categories.map((category, index) => (
             <TouchableOpacity
               key={index}
-              className="bg-white w-[100px] h-[100px] m-2 rounded-lg flex items-center justify-center"
+              onPress={() => {
+                if (selectedCategory.includes(category.name)) {
+                  setSelectedCategory(
+                    selectedCategory.filter((item) => item !== category.name)
+                  );
+                } else {
+                  setSelectedCategory([...selectedCategory, category.name]);
+                }
+              }}
+              style={{
+                backgroundColor: selectedCategory.includes(category.name)
+                  ? Colors.primary
+                  : "white",
+              }}
+              className="p-2 rounded-lg m-2"
             >
-              <Text>{category.name}</Text>
+              <Text
+                style={{
+                  color: selectedCategory.includes(category.name)
+                    ? "white"
+                    : Colors.primary,
+                }}
+              >
+                {category.name}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -100,6 +133,60 @@ const Home = () => {
   };
   // mock villa
   const villas: VillaType[] = [
+    {
+      category: [
+        {
+          id: "1",
+          name: "Category 1",
+        },
+        {
+          id: "2",
+          name: "Category 2",
+        },
+        {
+          id: "3",
+          name: "Category 3",
+        },
+        {
+          id: "4",
+          name: "Category 4",
+        },
+      ],
+      id: "1",
+      location: "Location 1",
+      maximumGuests: 10,
+      name: "Villa 1",
+      standardGuests: 5,
+      thumbnail: "https://picsum.photos/200/300",
+      type: "Type 1",
+    },
+    {
+      category: [
+        {
+          id: "1",
+          name: "Category 1",
+        },
+        {
+          id: "2",
+          name: "Category 2",
+        },
+        {
+          id: "3",
+          name: "Category 3",
+        },
+        {
+          id: "4",
+          name: "Category 4",
+        },
+      ],
+      id: "1",
+      location: "Location 1",
+      maximumGuests: 10,
+      name: "Villa 1",
+      standardGuests: 5,
+      thumbnail: "https://picsum.photos/200/300",
+      type: "Type 1",
+    },
     {
       category: [
         {
@@ -145,7 +232,7 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView className="h-full p-5">
+    <SafeAreaView className="h-full p-5 pb-24">
       <RenderModal />
       <DisplayDate />
       <RenderCategory />

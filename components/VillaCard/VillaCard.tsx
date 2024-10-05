@@ -1,17 +1,20 @@
+import { Animations } from "@/constants/Animations";
 import { Colors } from "@/constants/Colors";
 import { VillaType } from "@/types";
-import { Button } from "@rneui/base";
+import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import Icon, { Icons } from "../Icons";
 import * as Animatable from "react-native-animatable";
-import { Animations } from "@/constants/Animations";
-
+import Icon, { Icons } from "../Icons";
+import { useNavigation } from "@react-navigation/native";
 interface VillaCardProps {
   villa: VillaType;
 }
 
 export const VillaCard: React.FC<VillaCardProps> = ({ villa }) => {
+  const navigate = useNavigation<any>();
+  const { t } = useTranslation();
   const randomAnimation =
     Animations[Math.floor(Math.random() * Animations.length)];
   return (
@@ -45,11 +48,11 @@ export const VillaCard: React.FC<VillaCardProps> = ({ villa }) => {
         <View className="flex flex-row justify-between items-center mt-4">
           <View className="flex flex-col mt-4">
             <View className="flex flex-row justify-between">
-              <Text className="text-xs">Standard Guests: </Text>
+              <Text className="text-xs">{t("Standard Guests")}: </Text>
               <Text className="text-xs font-bold">{villa.standardGuests}</Text>
             </View>
             <View className="flex flex-row">
-              <Text className="text-xs">Maximum Guests: </Text>
+              <Text className="text-xs">{t("Maximum Guests")}: </Text>
               <Text className="text-xs font-bold">{villa.maximumGuests}</Text>
             </View>
           </View>
@@ -71,8 +74,11 @@ export const VillaCard: React.FC<VillaCardProps> = ({ villa }) => {
             width: "100%",
             height: 50,
           }}
+          onPress={() => {
+            (navigate as any).navigate("VillaDetail", { itemId: villa.id });
+          }}
         >
-          <Text className="text-sm text-white">Book Now</Text>
+          <Text className="text-sm text-white">{t("Book Now")}</Text>
         </TouchableOpacity>
       </View>
     </Animatable.View>

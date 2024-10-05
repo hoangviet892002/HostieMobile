@@ -9,6 +9,8 @@ export default function RootLayout() {
         <Stack.Screen name="Authentication" options={{ headerShown: false }} />
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="VillaDetail" options={{ headerShown: false }} />
+        <Stack.Screen name="CalendarDetail" options={{ headerShown: false }} />
       </Stack>
     </Provider>
   );
