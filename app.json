@@ -21,6 +21,7 @@
         "backgroundColor": "#ffffff"
       }
     },
+    "permissions": ["CAMERA", "CAMERA_ROLL"],
     "web": {
       "bundler": "metro",
       "output": "static",

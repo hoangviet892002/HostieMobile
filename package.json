@@ -15,6 +15,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "^6.7.3",
     "@expo/vector-icons": "^14.0.2",
     "@react-navigation/native": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.7",
@@ -54,10 +55,12 @@
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
     "xdate": "^0.8.3",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "expo-image": "1.13.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "@types/react-native-vector-icons": "^6.4.18",

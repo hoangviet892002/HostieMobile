@@ -1,8 +1,9 @@
 import { Colors } from "@/constants/Colors";
 import { RenderInputProps } from "@/types/props/RenderInputProps";
-import { Formik, useField } from "formik";
+import { Formik } from "formik";
 import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+
 interface PickAddressProps {
   setStep: (step: number) => void;
   formData: {
@@ -49,11 +50,11 @@ const PickAddress: React.FC<PickAddressProps> = ({
   const RenderInput = ({ label, value, onChange, error }: RenderInputProps) => {
     return (
       <View className="mx-5">
-        <Text>{label}</Text>
+        <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
         <TextInput
-          placeholder={label}
-          value={value}
-          onChangeText={onChange}
+          placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+          onChangeText={onChange} // Gọi hàm onChange được truyền vào
+          value={String(value)}
           autoCapitalize="none"
           style={{
             borderWidth: 1,
@@ -64,19 +65,22 @@ const PickAddress: React.FC<PickAddressProps> = ({
           }}
         />
 
-        {
-          // Show error if it exist
-          error && <Text style={{ color: "red" }}>{error}</Text>
-        }
+        {error && <Text style={{ color: "red" }}>{error}</Text>}
       </View>
     );
   };
+
   return (
     <View>
       <Formik
         initialValues={formData}
+        enableReinitialize={false}
         onSubmit={(values) => {
-          setStep(2);
+          onChange("provide", values.provide);
+          onChange("district", values.district);
+          onChange("ward", values.ward);
+          onChange("street", values.street);
+          setStep(3);
         }}
         validate={(values) => {
           const errors: any = {};
@@ -95,23 +99,39 @@ const PickAddress: React.FC<PickAddressProps> = ({
           return errors;
         }}
       >
-        {({ handleSubmit, errors }) => (
+        {({
+          handleSubmit,
+          errors,
+          handleBlur,
+          handleChange: formikHandleChange,
+          values,
+        }) => (
           <View>
             {element.map((item, index) => (
-              <RenderInput
-                key={index}
-                {...item}
-                error={
-                  errors[item.label as keyof typeof errors]
-                    ? errors[item.label as keyof typeof errors]
-                    : null
-                }
-              />
+              <>
+                <RenderInput
+                  key={index}
+                  label={item.label}
+                  value={values[item.label as keyof typeof values]}
+                  onChange={(text) => {
+                    formikHandleChange(item.label as keyof typeof values)(text); // Cập nhật Formik
+                  }}
+                  error={errors[item.label as keyof typeof errors]}
+                  type="text"
+                />
+              </>
             ))}
+
             <View className="flex flex-row justify-between m-4">
               <TouchableOpacity
                 className="flex items-center justify-center"
-                onPress={() => setStep(1)}
+                onPress={() => {
+                  onChange("provide", values.provide);
+                  onChange("district", values.district);
+                  onChange("ward", values.ward);
+                  onChange("street", values.street);
+                  setStep(1);
+                }}
                 style={{
                   backgroundColor: Colors.gray,
                   padding: 10,
@@ -123,9 +143,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
               </TouchableOpacity>
               <TouchableOpacity
                 className="flex items-center justify-center"
-                onPress={() => {
-                  handleSubmit();
-                }}
+                onPress={() => handleSubmit()}
                 style={{
                   backgroundColor: Colors.primary,
                   padding: 10,
