@@ -11,6 +11,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="VillaDetail" options={{ headerShown: false }} />
         <Stack.Screen name="CalendarDetail" options={{ headerShown: false }} />
+        <Stack.Screen name="AddVilla" options={{ headerShown: false }} />
       </Stack>
     </Provider>
   );

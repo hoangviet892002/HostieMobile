@@ -10,8 +10,8 @@ const languageSlice = createSlice({
     availableLanguages: ["en", "vi"],
   },
   reducers: {
-    changeLanguage(state, action) {
-      state.currentLanguage = action.payload;
+    changeLanguage: (state) => {
+      state.currentLanguage = state.currentLanguage === "en" ? "vi" : "en";
     },
   },
 });

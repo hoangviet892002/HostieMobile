@@ -21,5 +21,13 @@
   "Standard Guests": "Số lượng khách chuẩn",
   "Maximum Guests": "Số lượng khách tối đa",
   "Description": "Mô tả",
-  "Utilities": "Tiện ích"
+  "Utilities": "Tiện ích",
+  "Wallet": "Ví tiền",
+  "House": "Nhà",
+  "Change Password": "Đổi mật khẩu",
+  "Logout": "Đăng xuất",
+  "Change Language": "Đổi ngôn ngữ",
+  "Change Theme": "Đổi chủ đề",
+  "Managers": "Quản lý villa",
+  "Add Villa": "Thêm villa"
 }

@@ -26,5 +26,9 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
 });
+store.subscribe(() => {
+  const currentLanguage = selectCurrentLanguage(store.getState());
+  i18n.changeLanguage(currentLanguage);
+});
 
 export default i18n;

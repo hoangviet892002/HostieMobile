@@ -1,11 +1,8 @@
 import { Text, View } from "react-native";
 import React, { Component } from "react";
+import { Setting } from "@/screens";
 
 const tabComponents = () => {
-  return (
-    <View className="h-full bg-green-500 flex justify-center items-center">
-      <Text className="text-white text-2xl">Tab Components</Text>
-    </View>
-  );
+  return <Setting />;
 };
 export default tabComponents;

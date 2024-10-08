@@ -21,5 +21,13 @@
   "Standard Guests": "Standard Guests",
   "Maximum Guests": "Maximum Guests",
   "Description": "Description",
-  "Utilities": "Utilities"
+  "Utilities": "Utilities",
+  "Wallet": "Wallet",
+  "House": "House",
+  "Change Password": "Change Password",
+  "Logout": "Logout",
+  "Change Language": "Change Language",
+  "Change Theme": "Change Theme",
+  "Managers": "Managers villa",
+  "Add Villa": "Add Villa"
 }
