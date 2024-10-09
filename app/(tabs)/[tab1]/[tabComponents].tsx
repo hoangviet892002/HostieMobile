@@ -4,7 +4,7 @@ import Home from "@/screens/Home";
 
 const tabComponents = () => {
   return (
-    <View className="h-fullflex justify-center items-center">
+    <View className="h-full flex justify-center items-center">
       <Home />
     </View>
   );
