@@ -25,6 +25,12 @@ export default function RootLayout() {
     {
       name: "Conversation",
     },
+    {
+      name: "housekeeper",
+    },
+    {
+      name: "ViewDetailBookingHouseKeepper",
+    },
   ];
   return (
     <Provider store={store}>

@@ -42,7 +42,7 @@ const LoginForm = () => {
           className="bg-black p-2 rounded-3xl items-center justify-center"
           style={{ width: wp(80) }}
           onPress={() => {
-            router.navigate("/(tabs)");
+            router.navigate("/housekeeper");
           }}
         >
           <Text className="text-white text-2xl font-bold"> {t("Login")} </Text>
