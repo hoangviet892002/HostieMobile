@@ -1,8 +1,11 @@
 import { Stack } from "expo-router";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import store from "@/redux/stores";
 import "@/resources/translate";
-export default function RootLayout() {
+import { useEffect } from "react";
+import { connectSocket, disconnectSocket } from "@/redux/actions/socketActions";
+
+const AppWrapper = () => {
   const element = [
     {
       name: "Authentication",
@@ -31,18 +34,35 @@ export default function RootLayout() {
     {
       name: "ViewDetailBookingHouseKeepper",
     },
+    {
+      name: "SchedulerBooking",
+    },
   ];
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(connectSocket());
+
+    return () => {
+      dispatch(disconnectSocket());
+    };
+  }, [dispatch]);
+  return (
+    <Stack>
+      {element.map((item, index) => (
+        <Stack.Screen
+          key={index}
+          name={item.name}
+          options={{ headerShown: false }}
+        />
+      ))}
+    </Stack>
+  );
+};
+export default function RootLayout() {
   return (
     <Provider store={store}>
-      <Stack>
-        {element.map((item, index) => (
-          <Stack.Screen
-            key={index}
-            name={item.name}
-            options={{ headerShown: false }}
-          />
-        ))}
-      </Stack>
+      <AppWrapper />
     </Provider>
   );
 }

@@ -2,12 +2,14 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { VillaType } from "@/types";
 import { Colors } from "@/constants/Colors";
+import { useNavigation } from "expo-router";
 
 interface VillaCardProps {
   villa: VillaType;
 }
 
 const VillaCard = (props: VillaCardProps) => {
+  const navigation = useNavigation();
   return (
     <View
       style={{
@@ -50,6 +52,9 @@ const VillaCard = (props: VillaCardProps) => {
           borderRadius: 5,
           marginTop: 10,
           borderBlockColor: "#ddd",
+        }}
+        onPress={() => {
+          navigation.navigate("SchedulerBooking");
         }}
       >
         <Text style={{ textAlign: "center" }}>View Booking</Text>

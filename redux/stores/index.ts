@@ -2,6 +2,9 @@
 
 import { createStore, applyMiddleware } from "redux";
 import languageSlice from "../slices/languageSlice";
+import socketSlice from "../slices/socketSlice";
+import { socketMiddleware } from "../middleware/socketMiddleware";
+import thunk from "redux-thunk";
 import {
   Action,
   combineReducers,
@@ -11,11 +14,10 @@ import {
 
 const rootReducer = combineReducers({
   language: languageSlice,
+  socket: socketSlice,
 });
 
-const store = configureStore({
-  reducer: rootReducer,
-});
+const store = createStore(rootReducer, applyMiddleware(socketMiddleware));
 
 export type RootState = ReturnType<typeof rootReducer>;
 

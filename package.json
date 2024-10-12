@@ -15,8 +15,8 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@react-native-community/datetimepicker": "^6.7.3",
     "@expo/vector-icons": "^14.0.2",
+    "@react-native-community/datetimepicker": "^6.7.3",
     "@react-navigation/native": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.7",
     "@rneui/base": "^4.0.0-rc.8",
@@ -27,6 +27,8 @@
     "expo": "~51.0.22",
     "expo-constants": "~16.0.2",
     "expo-font": "~12.0.10",
+    "expo-image": "1.13.0",
+    "expo-image-picker": "^15.0.7",
     "expo-linking": "~6.3.1",
     "expo-router": "~3.5.18",
     "expo-splash-screen": "~0.27.5",
@@ -54,9 +56,9 @@
     "react-native-web": "^0.19.12",
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
+    "socket.io-client": "^4.8.0",
     "xdate": "^0.8.3",
-    "yup": "^1.4.0",
-    "expo-image": "1.13.0"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
