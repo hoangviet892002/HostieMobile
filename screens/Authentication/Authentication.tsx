@@ -1,6 +1,12 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -34,7 +40,11 @@ const Authentication = () => {
     if (option.title === t("Sign in")) {
       return <LoginForm />;
     } else {
-      return <Register />;
+      return (
+        <ScrollView>
+          <Register />
+        </ScrollView>
+      );
     }
   };
   return (
@@ -73,7 +83,6 @@ const Authentication = () => {
         ))}
       </Animatable.View>
       {renderForm()}
-      <LoginWithGoogle />
     </View>
   );
 };

@@ -28,7 +28,7 @@ export const socketMiddleware: Middleware<{}, RootState> =
         }
 
         // Khởi tạo socket
-        socket = io("", {
+        socket = io("jhkhk", {
           transports: ["websocket"],
         });
 

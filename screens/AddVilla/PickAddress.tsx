@@ -114,7 +114,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
                   label={item.label}
                   value={values[item.label as keyof typeof values]}
                   onChange={(text) => {
-                    formikHandleChange(item.label as keyof typeof values)(text); // Cập nhật Formik
+                    formikHandleChange(item.label as keyof typeof values)(text);
                   }}
                   error={errors[item.label as keyof typeof errors]}
                   type="text"

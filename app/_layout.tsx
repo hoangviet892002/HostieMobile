@@ -4,6 +4,10 @@ import store from "@/redux/stores";
 import "@/resources/translate";
 import { useEffect } from "react";
 import { connectSocket, disconnectSocket } from "@/redux/actions/socketActions";
+import { LogBox } from "react-native";
+import Toast from "react-native-toast-message";
+
+LogBox.ignoreAllLogs(true);
 
 const AppWrapper = () => {
   const element = [
@@ -63,6 +67,7 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <AppWrapper />
+      <Toast />
     </Provider>
   );
 }
