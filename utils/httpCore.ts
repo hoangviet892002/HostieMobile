@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { endPoint, baseURL } from "./endPoint";
+import { endPoint, coreURL } from "./endPoint";
 
 interface Response {
   result: any;
@@ -29,13 +29,13 @@ const processQueue = (error: any, token: string | null | undefined = null) => {
 };
 
 //
-const axiosClient = axios.create({
-  baseURL: baseURL,
+const axiosCore = axios.create({
+  baseURL: coreURL,
   timeout: 10000,
 });
 
 //
-axiosClient.interceptors.request.use(async (request) => {
+axiosCore.interceptors.request.use(async (request) => {
   const session = await AsyncStorage.getItem("session");
   if (session) {
     const sessionData = JSON.parse(session);
@@ -60,15 +60,13 @@ const handleError = (error: { response: { data: any } }) => {
     return { result: null, message: "Server error" };
   }
 };
-axiosClient.interceptors.response.use(
+axiosCore.interceptors.response.use(
   (response) => {
     return handleResponse(response);
   },
   (error) => {
-    console.log("error", error);
-    AsyncStorage.removeItem("session");
     return handleError(error);
   }
 );
 
-export default axiosClient;
+export default axiosCore;

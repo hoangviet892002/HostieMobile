@@ -1,101 +1,410 @@
+import { getDistricts, getProvinces, getWards } from "@/apis/region";
 import { Colors } from "@/constants/Colors";
-import { RenderInputProps } from "@/types/props/RenderInputProps";
-import { Formik } from "formik";
-import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { RegionType } from "@/types";
 
+import { useFocusEffect } from "expo-router";
+import { Formik } from "formik";
+import { use } from "i18next";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+interface AddressType {
+  provide: {
+    label: string;
+    value: string;
+  };
+  district: {
+    label: string;
+    value: string;
+  };
+  ward: {
+    label: string;
+    value: string;
+  };
+  address: string;
+  phones: string[];
+}
 interface PickAddressProps {
   setStep: (step: number) => void;
-  formData: {
-    provide: string;
-    district: string;
-    ward: string;
-    street: string;
-  };
-  onChange: (key: string, value: string) => void;
+  formData: AddressType;
+  setData: (data: any) => void;
 }
-
+interface RenderInputProps {
+  label: string;
+  value: any;
+  onChange: (value: any) => void;
+  error?: string;
+  type: "text" | "select" | "number" | "area" | "multiInput";
+}
 const PickAddress: React.FC<PickAddressProps> = ({
   setStep,
   formData,
-  onChange,
+  setData,
 }) => {
+  const [data] = useState<AddressType>(formData);
+
+  const [optionProvide, setOptionProvide] = useState<RegionType[]>([]);
+  const [optionDistrict, setOptionDistrict] = useState<RegionType[]>([]);
+  const [optionWard, setOptionWard] = useState<RegionType[]>([]);
+  const fetchRegion = async () => {
+    const response = await getProvinces();
+    if (response.data) {
+      setOptionProvide(response.data);
+      setOptionDistrict([]);
+      setOptionWard([]);
+    }
+  };
+  const fetchDistricts = async (codeProvide: string) => {
+    const response = await getDistricts(codeProvide);
+    if (response.data) {
+      setOptionDistrict(response.data);
+      setOptionWard([]);
+    }
+  };
+  const fetchWards = async (codeDistrict: string) => {
+    const response = await getWards(codeDistrict);
+    if (response.data) {
+      setOptionWard(response.data);
+    }
+  };
+  useEffect(() => {
+    fetchRegion();
+  }, []);
+
+  useEffect(() => {
+    const fetchRegion = async () => {
+      if (formData.district.value) {
+        const response = await getDistricts(formData.district.value);
+        if (response.data) {
+          setOptionWard(response.data);
+        }
+      }
+    };
+    fetchRegion();
+  }, [formData.district]);
   const element: RenderInputProps[] = [
     {
       label: "provide",
       value: formData.provide,
-      type: "text",
-      onChange: (text) => onChange("provide", text),
+      type: "select",
+      onChange: (value) => {},
     },
     {
       label: "district",
       value: formData.district,
-      type: "text",
-      onChange: (text) => onChange("district", text),
+      type: "select",
+      onChange: (value) => {
+        fetchDistricts(value.value);
+      },
     },
     {
       label: "ward",
       value: formData.ward,
-      type: "text",
-      onChange: (text) => onChange("ward", text),
+      type: "select",
+
+      onChange: (value) => {},
     },
     {
-      label: "street",
-      value: formData.street,
+      label: "address",
+      value: formData.address,
       type: "text",
-      onChange: (text) => onChange("street", text),
+      onChange: (value) => {},
+    },
+
+    {
+      label: "phones",
+      value: formData.phones,
+      type: "multiInput",
+      onChange: (value) => {},
     },
   ];
 
-  const RenderInput = ({ label, value, onChange, error }: RenderInputProps) => {
-    return (
-      <View className="mx-5">
-        <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
-        <TextInput
-          placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
-          onChangeText={onChange} // Gọi hàm onChange được truyền vào
-          value={String(value)}
-          autoCapitalize="none"
-          style={{
-            borderWidth: 1,
-            borderColor: "gray",
-            borderRadius: 5,
-            padding: 10,
-            marginBottom: 10,
-          }}
-        />
+  const RenderInput = ({
+    label,
+    value,
+    onChange,
+    error,
+    type,
+    setFieldValue,
+  }: RenderInputProps & {
+    setFieldValue: (field: string, value: any) => void;
+  }) => {
+    switch (type) {
+      case "text":
+        return (
+          <View className="mx-5">
+            <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+            <TextInput
+              placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+              onChangeText={onChange}
+              value={value}
+              autoCapitalize="none"
+              style={{
+                borderWidth: 1,
+                borderColor: "gray",
+                borderRadius: 5,
+                padding: 10,
+                marginBottom: 10,
+              }}
+            />
+            {error && <Text style={{ color: "red" }}>{error}</Text>}
+          </View>
+        );
 
-        {error && <Text style={{ color: "red" }}>{error}</Text>}
-      </View>
-    );
+      case "select":
+        const [modalVisible, setModalVisible] = useState(false);
+        return (
+          // will open a modal to select
+
+          <>
+            <View className="mx-5">
+              <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(true);
+                }}
+                style={{
+                  borderWidth: 1,
+                  borderColor: "gray",
+                  borderRadius: 5,
+                  padding: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <Text>{value.label}</Text>
+              </TouchableOpacity>
+
+              {error && <Text style={{ color: "red" }}>{error}</Text>}
+            </View>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgba(0,0,0,0.5)",
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor: "white",
+                    padding: 20,
+                    borderRadius: 10,
+                    width: 300,
+                  }}
+                >
+                  <Text>Select</Text>
+                  {
+                    // will render list of option
+                    <ScrollView>
+                      {label === "provide" &&
+                        optionProvide.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={() => {
+                              const value = {
+                                label: item.full_name,
+                                value: item.code,
+                              };
+                              onChange(value);
+                              fetchDistricts(item.code);
+                              // set value for ward and district to empty
+                              setFieldValue("district", {
+                                label: "",
+                                value: "",
+                              });
+                              setFieldValue("ward", { label: "", value: "" });
+                              setModalVisible(false);
+                            }}
+                            style={{
+                              padding: 10,
+                              borderBottomWidth: 1,
+                              borderBottomColor: "gray",
+                            }}
+                          >
+                            <Text>{item.full_name}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      {label === "district" &&
+                        optionDistrict.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={() => {
+                              const value = {
+                                label: item.full_name,
+                                value: item.code,
+                              };
+                              onChange(value);
+                              // set value for ward
+                              fetchWards(item.code);
+                              setModalVisible(false);
+                            }}
+                            style={{
+                              padding: 10,
+                              borderBottomWidth: 1,
+                              borderBottomColor: "gray",
+                            }}
+                          >
+                            <Text>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      {label === "ward" &&
+                        optionWard.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={() => {
+                              const value = {
+                                label: item.full_name,
+                                value: item.code,
+                              };
+                              onChange(value);
+                              setModalVisible(false);
+                            }}
+                            style={{
+                              padding: 10,
+                              borderBottomWidth: 1,
+                              borderBottomColor: "gray",
+                            }}
+                          >
+                            <Text>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))}
+
+                      <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        style={{
+                          padding: 10,
+                          borderBottomWidth: 1,
+                          borderBottomColor: "gray",
+                        }}
+                      >
+                        <Text>Close</Text>
+                      </TouchableOpacity>
+                    </ScrollView>
+                  }
+                </View>
+              </View>
+            </Modal>
+          </>
+        );
+      case "multiInput":
+        return (
+          <View className="mx-5">
+            <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+            {value.map((item: string, index: number) => (
+              <View key={index} className="flex flex-row">
+                <TextInput
+                  className="w-4/5"
+                  placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+                  onChangeText={(text) => {
+                    const newPhones = [...value];
+                    newPhones[index] = text;
+                    onChange(newPhones);
+                  }}
+                  value={item}
+                  autoCapitalize="none"
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 5,
+                    padding: 10,
+                    marginBottom: 10,
+                  }}
+                />
+                <TouchableOpacity
+                  className="w-1/5 flex items-center"
+                  onPress={() => {
+                    const newPhones = [...value];
+                    newPhones.splice(index, 1);
+                    onChange(newPhones);
+                  }}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 5,
+                    padding: 10,
+                    marginBottom: 10,
+                  }}
+                >
+                  <Text>-</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity
+              onPress={() => {
+                onChange([...value, ""]);
+              }}
+              style={{
+                borderWidth: 1,
+                borderColor: "gray",
+                borderRadius: 5,
+                padding: 10,
+                marginBottom: 10,
+              }}
+            >
+              <Text>+</Text>
+            </TouchableOpacity>
+            {error && <Text style={{ color: "red" }}>{error}</Text>}
+          </View>
+        );
+
+      default:
+        return <Text>Not found</Text>;
+    }
   };
 
   return (
     <View>
       <Formik
-        initialValues={formData}
+        initialValues={{
+          provide: data.provide,
+          district: data.district,
+          ward: data.ward,
+          address: data.address,
+          phones: data.phones,
+        }}
         enableReinitialize={false}
         onSubmit={(values) => {
-          onChange("provide", values.provide);
-          onChange("district", values.district);
-          onChange("ward", values.ward);
-          onChange("street", values.street);
+          setData((prevData) => ({
+            ...prevData,
+            address: {
+              provide: values.provide,
+              district: values.district,
+              ward: values.ward,
+              address: values.address,
+              phones: values.phones,
+            },
+          }));
           setStep(3);
         }}
         validate={(values) => {
           const errors: any = {};
-          if (!values.provide) {
+          if (!values.provide.value) {
             errors.provide = "Provide is required";
           }
-          if (!values.district) {
+          if (!values.district.value) {
             errors.district = "District is required";
           }
-          if (!values.ward) {
+          if (!values.ward.value) {
             errors.ward = "Ward is required";
           }
-          if (!values.street) {
-            errors.street = "Street is required";
+          if (!values.address) {
+            errors.address = "address is required";
           }
+
           return errors;
         }}
       >
@@ -105,6 +414,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
           handleBlur,
           handleChange: formikHandleChange,
           values,
+          setFieldValue,
         }) => (
           <View>
             {element.map((item, index) => (
@@ -112,12 +422,22 @@ const PickAddress: React.FC<PickAddressProps> = ({
                 <RenderInput
                   key={index}
                   label={item.label}
-                  value={values[item.label as keyof typeof values]}
-                  onChange={(text) => {
-                    formikHandleChange(item.label as keyof typeof values)(text);
+                  value={
+                    values[item.label as keyof typeof values] ||
+                    (Array.isArray(item.value) ? item.value : item.value.value)
+                    // or value is a array
+                  }
+                  onChange={(value) => {
+                    setFieldValue(item.label, value);
                   }}
-                  error={errors[item.label as keyof typeof errors]}
-                  type="text"
+                  setFieldValue={setFieldValue}
+                  error={
+                    typeof errors[item.label as keyof typeof errors] ===
+                    "string"
+                      ? (errors[item.label as keyof typeof errors] as string)
+                      : undefined
+                  }
+                  type={item.type}
                 />
               </>
             ))}
@@ -126,10 +446,6 @@ const PickAddress: React.FC<PickAddressProps> = ({
               <TouchableOpacity
                 className="flex items-center justify-center"
                 onPress={() => {
-                  onChange("provide", values.provide);
-                  onChange("district", values.district);
-                  onChange("ward", values.ward);
-                  onChange("street", values.street);
                   setStep(1);
                 }}
                 style={{

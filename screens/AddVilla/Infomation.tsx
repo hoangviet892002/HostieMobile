@@ -1,78 +1,81 @@
 import { View, Text, TouchableOpacity, TextInput, Modal } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors } from "@/constants/Colors";
 import { Formik } from "formik";
-import { RenderInputProps } from "@/types/props/RenderInputProps";
+import { Type } from "@/types";
+import { getTypes } from "@/apis/type";
 
+interface InterfaceType {
+  name: string;
+  num_bath_room: number;
+  num_bed_room: number;
+  num_of_beds: number;
+  max_guests: number;
+  type: Type;
+}
 interface InfomationProps {
   setStep: (step: number) => void;
-  data: {
-    title: string;
-    description: string;
-    email: string;
-    website: string;
-    type: string;
-    maxGuest: number;
-    bedRoom: number;
-    standardGuest: number;
-  };
-  onChange: (key: string, value: string) => void;
+  data: InterfaceType;
+  setData: (data: any) => void;
+}
+interface RenderInputProps {
+  label: string;
+  value: any;
+  onChange: (value: any) => void;
+  error?: string;
+  type: "text" | "select" | "number" | "area";
 }
 
-const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
+const Infomation: React.FC<InfomationProps> = ({ setStep, data, setData }) => {
   const initialValues = data;
   const element: RenderInputProps[] = [
     {
-      label: "title",
+      label: "name",
       type: "text",
-      onChange: (text) => onChange("title", text),
-      value: data.title,
-    },
-
-    {
-      label: "description",
-      type: "area",
-      onChange: (text) => onChange("description", text),
-      value: data.description,
-    },
-    {
-      label: "email",
-      type: "text",
-      onChange: (text) => onChange("email", text),
-      value: data.email,
-    },
-    {
-      label: "website",
-      type: "text",
-      onChange: (text) => onChange("website", text),
-      value: data.website,
+      onChange: (value) => {},
+      value: data.name,
     },
     {
       label: "type",
       type: "select",
-      onChange: (text) => onChange("type", text),
+      onChange: (value) => {},
       value: data.type,
     },
     {
-      label: "maxGuest",
+      label: "num_bath_room",
       type: "number",
-      onChange: (text) => onChange("maxGuest", text),
-      value: data.maxGuest.toString(),
+      onChange: (value) => {},
+      value: data.num_bath_room,
     },
     {
-      label: "bedRoom",
+      label: "num_bed_room",
       type: "number",
-      onChange: (text) => onChange("bedRoom", text),
-      value: data.bedRoom.toString(),
+      onChange: (value) => {},
+      value: data.num_bed_room,
     },
     {
-      label: "standardGuest",
+      label: "num_of_beds",
       type: "number",
-      onChange: (text) => onChange("standardGuest", text),
-      value: data.standardGuest.toString(),
+      onChange: (value) => {},
+      value: data.num_of_beds,
+    },
+    {
+      label: "max_guests",
+      type: "number",
+      onChange: (value) => {},
+      value: data.max_guests,
     },
   ];
-  const optionSelect = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+  const [optionSelect, setOptionSelect] = useState<Type[]>([]);
+  const fetchType = async () => {
+    const response = await getTypes();
+    if (response.data) {
+      setOptionSelect(response.data);
+    }
+  };
+  useEffect(() => {
+    fetchType();
+  }, []);
 
   const RenderInput = ({
     label,
@@ -80,7 +83,13 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
     onChange,
     error,
     type,
-  }: RenderInputProps) => {
+    setFieldValue,
+  }: RenderInputProps & {
+    setFieldValue: (field: string, value: any) => void;
+  }) => {
+    // Di chuyển useState lên đầu component
+    const [modalVisible, setModalVisible] = useState(false);
+
     switch (type) {
       case "text":
         return (
@@ -88,7 +97,7 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
             <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
-              onChangeText={onChange} // Gọi hàm onChange được truyền vào
+              onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
               style={{
@@ -99,7 +108,6 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
                 marginBottom: 10,
               }}
             />
-
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
         );
@@ -109,7 +117,7 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
             <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
-              onChangeText={onChange} // Gọi hàm onChange được truyền vào
+              onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
               multiline
@@ -122,7 +130,6 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
                 marginBottom: 10,
               }}
             />
-
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
         );
@@ -132,7 +139,7 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
             <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
-              onChangeText={onChange} // Gọi hàm onChange được truyền vào
+              onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
               keyboardType="numeric"
@@ -144,15 +151,11 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
                 marginBottom: 10,
               }}
             />
-
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
         );
       case "select":
-        const [modalVisible, setModalVisible] = useState(false);
         return (
-          // will open a modal to select
-
           <>
             <View className="mx-5">
               <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
@@ -168,9 +171,8 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
                   marginBottom: 10,
                 }}
               >
-                <Text>{value}</Text>
+                <Text>{value.description}</Text>
               </TouchableOpacity>
-
               {error && <Text style={{ color: "red" }}>{error}</Text>}
             </View>
             <Modal
@@ -202,11 +204,16 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
                     <TouchableOpacity
                       key={index}
                       onPress={() => {
-                        onChange(item);
+                        const value: Type = {
+                          description: item.description,
+                          id: item.id,
+                          name: item.name,
+                        };
+                        onChange(value);
                         setModalVisible(false);
                       }}
                     >
-                      <Text>{item}</Text>
+                      <Text>{item.name}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -218,48 +225,39 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
         return <Text>Not found</Text>;
     }
   };
+
   return (
     <View>
       <Formik
         initialValues={initialValues}
         onSubmit={(values) => {
-          onChange("title", values.title);
-          onChange("description", values.description);
-          onChange("email", values.email);
-          onChange("website", values.website);
-          onChange("type", values.type);
-          onChange("maxGuest", values.maxGuest.toString());
-          onChange("bedRoom", values.bedRoom.toString());
-          onChange("standardGuest", values.standardGuest.toString());
-
+          setData((prevData) => ({
+            ...prevData,
+            infomation: values,
+          }));
           setStep(2);
         }}
         validate={(values) => {
           const errors: any = {};
-          if (!values.title || values.title === "") {
-            errors.title = "Required";
+          if (!values.name) {
+            errors.name = "Name is required";
           }
-          if (!values.description || values.description === "") {
-            errors.description = "Required";
+          if (!values.type || values.type.id === "") {
+            errors.type = "Type is required";
           }
-          if (!values.email || values.email === "") {
-            errors.email = "Required";
+          if (!values.num_bath_room) {
+            errors.num_bath_room = "Number of bath room is required";
           }
-          if (!values.website || values.website === "") {
-            errors.website = "Required";
+          if (!values.num_bed_room) {
+            errors.num_bed_room = "Number of bed room is required";
           }
-          if (!values.type || values.type === "") {
-            errors.type = "Required";
+          if (!values.num_of_beds) {
+            errors.num_of_beds = "Number of beds is required";
           }
-          if (!values.maxGuest || values.maxGuest === 0) {
-            errors.maxGuest = "Required";
+          if (!values.max_guests) {
+            errors.max_guests = "Max guests is required";
           }
-          if (!values.bedRoom || values.bedRoom === 0) {
-            errors.bedRoom = "Required";
-          }
-          if (!values.standardGuest || values.standardGuest === 0) {
-            errors.standardGuest = "Required";
-          }
+
           return errors;
         }}
       >
@@ -267,8 +265,9 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
           handleSubmit,
           errors,
           handleBlur,
-          handleChange: formikHandleChange,
+          handleChange,
           values,
+          setFieldValue,
         }) => (
           <View>
             {element.map((item, index) => (
@@ -276,19 +275,22 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, onChange }) => {
                 key={index}
                 label={item.label}
                 value={values[item.label as keyof typeof values]}
-                onChange={(text) => {
-                  formikHandleChange(item.label as keyof typeof values)(text); // Cập nhật Formik
+                onChange={(value) => {
+                  setFieldValue(item.label, value);
                 }}
-                error={errors[item.label as keyof typeof errors]}
+                setFieldValue={setFieldValue}
+                error={
+                  typeof errors[item.label as keyof typeof errors] === "string"
+                    ? (errors[item.label as keyof typeof errors] as string)
+                    : undefined
+                }
                 type={item.type}
               />
             ))}
             <View className="flex flex-row justify-end m-4">
               <TouchableOpacity
                 className="flex items-center justify-center"
-                onPress={() => {
-                  handleSubmit();
-                }}
+                onPress={() => handleSubmit()}
                 style={{
                   backgroundColor: Colors.primary,
                   padding: 10,

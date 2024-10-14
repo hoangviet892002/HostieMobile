@@ -1,15 +1,21 @@
-import { RegisterRequest } from "@/types";
+import { LoginResponse, RegisterRequest, SignInRequest } from "@/types";
 import { endPoint } from "@/utils/endPoint";
 import axiosClient from "@/utils/httpClient";
 
-interface UserInfoResponse {
-  result: any;
+interface UserInfoResponse<T> {
+  result: T;
 }
 
 //authentication
 const registerApi = async (
   payload: RegisterRequest
-): Promise<UserInfoResponse> => {
+): Promise<UserInfoResponse<any>> => {
   return await axiosClient.post(endPoint.user.signUp, payload);
 };
-export { registerApi };
+
+const signInApi = async (
+  payload: SignInRequest
+): Promise<UserInfoResponse<LoginResponse>> => {
+  return await axiosClient.post(endPoint.user.signIn, payload);
+};
+export { registerApi, signInApi };

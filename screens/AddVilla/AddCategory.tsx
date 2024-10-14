@@ -1,8 +1,8 @@
-import { View, Text, SectionList, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import { getIcons } from "@/apis/icon";
 import { CategoryType } from "@/types/CategoryType";
+import React, { useEffect, useState } from "react";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import Icon, { Icons } from "@/components/Icons";
 
 interface AddCategoryProps {
   setStep: (step: number) => void;
@@ -14,89 +14,18 @@ const AddCategory: React.FC<AddCategoryProps> = ({
   utilities,
   handleChange,
 }) => {
-  const options: CategoryType[] = [
-    {
-      id: "1",
-      name: "Bể bơi",
-      iconName: "droplet",
-    },
-    {
-      id: "2",
-      name: "Thú cưng",
-      iconName: "activity",
-    },
-    {
-      id: "3",
-      name: "Karaoke",
-      iconName: "music",
-    },
-    {
-      id: "4",
-      name: "BBQ",
-      iconName: "coffee",
-    },
-    {
-      id: "5",
-      name: "Wifi",
-      iconName: "wifi",
-    },
-    {
-      id: "6",
-      name: "TV",
-      iconName: "tv",
-    },
-    {
-      id: "7",
-      name: "Điều hòa",
-      iconName: "wind",
-    },
-    {
-      id: "8",
-      name: "Bếp",
-      iconName: "home",
-    },
-    {
-      id: "9",
-      name: "Máy giặt",
-      iconName: "refresh-cw",
-    },
-    {
-      id: "10",
-      name: "Phòng tập",
-      iconName: "activity",
-    },
+  const [options, setOptions] = useState<CategoryType[]>([]);
 
-    {
-      id: "12",
-      name: "Nhà hàng",
-      iconName: "menu",
-    },
-    {
-      id: "13",
-      name: "Bar",
-      iconName: "coffee",
-    },
-    {
-      id: "14",
-      name: "Spa",
-      iconName: "sun",
-    },
-    {
-      id: "15",
-      name: "Sân golf",
-      iconName: "flag",
-    },
-    {
-      id: "16",
-      name: "Sân tennis",
-      iconName: "target",
-    },
-    {
-      id: "22",
-      name: "Sân đấu võ",
-      iconName: "activity",
-    },
-  ];
+  const fetchIcon = async () => {
+    const response = await getIcons();
+    if (response) {
+      setOptions(response.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchIcon();
+  }, []);
   const [selectedOptions, setSelectedOptions] =
     useState<CategoryType[]>(utilities);
   // Render input for add type for list
@@ -121,12 +50,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
           margin: 5,
         }}
       >
-        <Icon
-          name={item.iconName ?? "default-icon"}
-          type={Icons.Feather}
-          size={30}
-          color={isSelected ? "white" : "black"}
-        />
+        <Image source={{ uri: item.icon }} style={{ width: 50, height: 50 }} />
         <Text>{item.name}</Text>
       </TouchableOpacity>
     );

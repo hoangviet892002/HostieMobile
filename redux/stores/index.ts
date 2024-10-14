@@ -3,6 +3,7 @@
 import { createStore, applyMiddleware } from "redux";
 import languageSlice from "../slices/languageSlice";
 import socketSlice from "../slices/socketSlice";
+import authSlice from "../slices/authSlice";
 import { socketMiddleware } from "../middleware/socketMiddleware";
 import thunk from "redux-thunk";
 import {
@@ -15,6 +16,7 @@ import {
 const rootReducer = combineReducers({
   language: languageSlice,
   socket: socketSlice,
+  auth: authSlice,
 });
 
 const store = createStore(rootReducer, applyMiddleware(socketMiddleware));

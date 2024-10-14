@@ -1,7 +1,11 @@
 type InputType = "text" | "password" | "select" | "area" | "number";
-export interface RenderInputProps {
+interface labelValue {
   label: string;
   value: string | number;
+}
+export interface RenderInputProps {
+  label: string;
+  value: string | number | labelValue;
   type: InputType;
   optionSelect?: string[];
   onChange: (text: string) => void;

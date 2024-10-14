@@ -11,94 +11,108 @@ import SettingPrice from "./SettingPrice";
 import { PriceType } from "@/types/PriceType";
 import AddImages from "./AddImages";
 import Infomation from "./Infomation";
+import { Type } from "@/types";
 
 /**
  * AddVilla Screen
  *  */
+interface AddressType {
+  provide: {
+    label: string;
+    value: string;
+  };
+  district: {
+    label: string;
+    value: string;
+  };
+  ward: {
+    label: string;
+    value: string;
+  };
+  address: string;
+  phones: string[];
+}
 
+interface informationType {
+  name: string;
+  num_bath_room: number;
+  num_bed_room: number;
+  num_of_beds: number;
+  max_guests: number;
+  type: Type;
+}
+
+interface PriceType {
+  price_default: number;
+  price_weekend: { day: string; price: string }[];
+  price_weeknd_delete: number[];
+  price_special: { day: string; price: string }[];
+  price_special_delete: number[];
+  price_season: { start_date: string; end_date: string; price: string }[];
+  price_season_delete: number[];
+}
 const AddVilla = () => {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<{
-    address: {
-      provide: string;
-      district: string;
-      ward: string;
-      street: string;
-    };
+    address: AddressType;
     utilities: CategoryType[];
     price: PriceType;
     images: File[];
-    information: {
-      title: string;
-      description: string;
-      email: string;
-      website: string;
-      type: string;
-      maxGuest: number;
-      bedRoom: number;
-      standardGuest: number;
-    };
+    information: informationType;
   }>({
     address: {
-      provide: "",
-      district: "",
-      ward: "",
-      street: "",
+      provide: {
+        label: "",
+        value: "",
+      },
+      district: {
+        label: "",
+        value: "",
+      },
+      ward: {
+        label: "",
+        value: "",
+      },
+      address: "",
+      phones: ["sdadsa"],
     },
     utilities: [],
     price: {
-      defaultPrice: 0,
-      priceHoliday: [],
-      priceSeason: [],
-      priceWeekend: [],
+      price_default: 0,
+      price_season: [],
+      price_season_delete: [],
+      price_special: [],
+      price_special_delete: [],
+      price_weekend: [],
+      price_weeknd_delete: [],
     },
     images: [],
     information: {
-      title: "",
-      description: "",
-      email: "",
-      website: "",
-      type: "",
-      maxGuest: 0,
-      bedRoom: 0,
-      standardGuest: 0,
+      max_guests: 2,
+      name: "x",
+      num_bath_room: 2,
+      num_bed_room: 2,
+      num_of_beds: 2,
+      type: {
+        id: "",
+        name: "",
+        description: "",
+      },
     },
   });
 
   const RenderStep1 = () => {
-    const handleChange = (key: string, value: string) => {
-      setData((prevData) => ({
-        ...prevData,
-        information: {
-          ...prevData.information,
-          [key]: value,
-        },
-      }));
-    };
     return (
-      <Infomation
-        setStep={setStep}
-        data={data.information}
-        onChange={handleChange}
-      />
+      <Infomation setStep={setStep} data={data.information} setData={setData} />
     );
   };
   // Render Step 2
   const RenderStep2 = () => {
-    const handleChange = (key: string, value: string) => {
-      setData((prevData) => ({
-        ...prevData,
-        address: {
-          ...prevData.address,
-          [key]: value,
-        },
-      }));
-    };
     return (
       <PickAddress
+        setStep={setStep}
         formData={data.address}
-        onChange={handleChange}
-        setStep={setStep as any as (step: number) => void}
+        setData={setData}
       />
     );
   };

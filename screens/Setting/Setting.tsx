@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AccountInformation } from "@/types";
 import { Colors } from "@/constants/Colors";
@@ -11,7 +11,12 @@ import {
   languageActions,
   selectCurrentLanguage,
 } from "@/redux/slices/languageSlice";
+import { authActions, selectIsAuthenticated } from "@/redux/slices/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router, useNavigation } from "expo-router";
 
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 interface menu {
   title: string;
   icon: string;
@@ -21,6 +26,17 @@ const Setting = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const currentLanguage = useSelector(selectCurrentLanguage);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const navigation = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!isAuthenticated) {
+        navigation.navigate("Authentication");
+      }
+    }, [isAuthenticated])
+  );
+
   const Account: AccountInformation = {
     name: "John Doe",
     email: "sdad",
@@ -55,7 +71,10 @@ const Setting = () => {
     {
       title: t("Logout"),
       icon: "log-out",
-      handle: () => {},
+      handle: () => {
+        AsyncStorage.removeItem("session");
+        dispatch(authActions.logout());
+      },
     },
   ];
 

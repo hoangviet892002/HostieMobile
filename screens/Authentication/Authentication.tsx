@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   ScrollView,
   Text,
@@ -17,8 +17,21 @@ import LoginForm from "./LoginForm";
 import Register from "./Register";
 import LoginWithGoogle from "./LoginWithGoogle";
 import { useTranslation } from "react-i18next";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { selectIsAuthenticated } from "@/redux/slices/authSlice";
 const Authentication = () => {
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthenticated) {
+        router.replace("/(tabs)");
+      }
+    }, [isAuthenticated])
+  );
+
   const { t } = useTranslation();
   const optionLogin = [
     {
