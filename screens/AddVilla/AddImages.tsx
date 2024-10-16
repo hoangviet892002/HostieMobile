@@ -9,12 +9,17 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { ResidencesStep5 } from "@/types/request/ResidencesRequest";
+import { postResidence } from "@/apis/residences";
+import Toast from "react-native-toast-message";
 
 interface AddImagesProps {
   setStep: (step: number) => void;
+  setId: (id: string) => void;
+  id: string;
 }
 
-const AddImages: React.FC<AddImagesProps> = ({ setStep }) => {
+const AddImages: React.FC<AddImagesProps> = ({ setStep, id, setId }) => {
   const [images, setImages] = useState<string[]>([]); // Lưu trữ đường dẫn ảnh
 
   // Yêu cầu quyền truy cập thư viện ảnh
@@ -55,6 +60,26 @@ const AddImages: React.FC<AddImagesProps> = ({ setStep }) => {
     const updatedImages = images.filter((_, idx) => idx !== index);
     setImages(updatedImages);
   };
+  const solveApi = async (dataPost: ResidencesStep5) => {
+    if (id !== "") {
+      dataPost.id = id;
+      setId(id);
+    }
+    const res = await postResidence(dataPost);
+
+    if (res.success) {
+      console.log(res.data);
+      setId(res.data.id);
+      Alert.alert("Thành công", "Thêm ảnh thành công.");
+    } else {
+      console.log(res);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: res.msg,
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -86,12 +111,28 @@ const AddImages: React.FC<AddImagesProps> = ({ setStep }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navButton}
-          onPress={() => {
+          onPress={async () => {
             if (images.length === 0) {
               Alert.alert("Không có ảnh", "Vui lòng chọn ít nhất một ảnh.");
               return;
             }
-            setStep(3);
+            const postData: ResidencesStep5 = {
+              files: await Promise.all(
+                images.map(async (image) => {
+                  const response = await fetch(image);
+                  const blob = await response.blob();
+                  return new File(
+                    [blob],
+                    image.split("/").pop() || "image.jpg",
+                    { type: "image/jpeg" }
+                  );
+                })
+              ),
+              id: id,
+              step: 5,
+            };
+
+            solveApi(postData);
           }}
         >
           <Text style={styles.navButtonText}>Next</Text>

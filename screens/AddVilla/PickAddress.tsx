@@ -1,6 +1,11 @@
 import { getDistricts, getProvinces, getWards } from "@/apis/region";
+import { postResidence } from "@/apis/residences";
 import { Colors } from "@/constants/Colors";
 import { RegionType } from "@/types";
+import {
+  ResidencesStep1,
+  ResidencesStep2,
+} from "@/types/request/ResidencesRequest";
 
 import { useFocusEffect } from "expo-router";
 import { Formik } from "formik";
@@ -14,6 +19,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 interface AddressType {
   provide: {
     label: string;
@@ -34,6 +40,8 @@ interface PickAddressProps {
   setStep: (step: number) => void;
   formData: AddressType;
   setData: (data: any) => void;
+  setId: (id: string) => void;
+  id: string;
 }
 interface RenderInputProps {
   label: string;
@@ -46,6 +54,8 @@ const PickAddress: React.FC<PickAddressProps> = ({
   setStep,
   formData,
   setData,
+  id,
+  setId,
 }) => {
   const [data] = useState<AddressType>(formData);
 
@@ -365,7 +375,26 @@ const PickAddress: React.FC<PickAddressProps> = ({
         return <Text>Not found</Text>;
     }
   };
+  const solveApi = async (dataPost: ResidencesStep2) => {
+    if (id !== "") {
+      dataPost.id = id;
+      setId(id);
+    }
+    const res = await postResidence(dataPost);
 
+    if (res.success) {
+      console.log(res.data);
+      setId(res.data.id);
+      setStep(3);
+    } else {
+      console.log(res);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: res.msg,
+      });
+    }
+  };
   return (
     <View>
       <Formik
@@ -388,7 +417,17 @@ const PickAddress: React.FC<PickAddressProps> = ({
               phones: values.phones,
             },
           }));
-          setStep(3);
+          const dataPost: ResidencesStep2 = {
+            address: values.address,
+            district_code: values.district.value,
+            id: id,
+            phones: values.phones,
+            province_code: values.provide.value,
+            step: 2,
+            ward_code: values.ward.value,
+          };
+          console.log(dataPost);
+          solveApi(dataPost);
         }}
         validate={(values) => {
           const errors: any = {};
@@ -404,6 +443,21 @@ const PickAddress: React.FC<PickAddressProps> = ({
           if (!values.address) {
             errors.address = "address is required";
           }
+          if (values.phones.length === 0) {
+            errors.phones = "Phone is required";
+          }
+          // check phone is valid
+          values.phones.forEach((item: string, index: number) => {
+            if (!item) {
+              errors.phones = "Phone is required";
+            }
+          });
+          // check format phone
+          values.phones.forEach((item: string, index: number) => {
+            if (!/^\d{10}$/.test(item)) {
+              errors.phones = "Phone is invalid";
+            }
+          });
 
           return errors;
         }}

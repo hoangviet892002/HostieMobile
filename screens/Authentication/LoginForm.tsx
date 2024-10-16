@@ -40,6 +40,7 @@ const LoginForm = () => {
         text2: response.message,
         position: "top",
       });
+      router.push("/housekeeper");
     }
   };
 

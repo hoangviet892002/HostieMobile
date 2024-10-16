@@ -9,6 +9,7 @@ import HomeHouseKeeper from "./HouseKeeper/Home";
 import VillasHouseKeeper from "./HouseKeeper/ManagerVilla";
 import DetailBookingHouseKeeper from "./HouseKeeper/DetailBooking";
 import Schedulerbooking from "./SchedulerBooking";
+import HostDetailVilla from "./HostDetailVilla";
 export {
   VillaDetail,
   CalendarDetail,
@@ -21,4 +22,5 @@ export {
   VillasHouseKeeper,
   DetailBookingHouseKeeper,
   Schedulerbooking,
+  HostDetailVilla,
 };

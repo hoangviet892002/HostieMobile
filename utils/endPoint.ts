@@ -1,3 +1,5 @@
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+
 const baseURL = "http://34.81.244.146:8080";
 const coreURL = "http://34.81.244.146:5005";
 const endPoint = {
@@ -27,6 +29,18 @@ const endPoint = {
   },
   icon: {
     getIcons: `/amenities/icon`,
+  },
+  residences: {
+    post: "/residences",
+    get: (page_size: number, page: number) =>
+      `/residences?page_size=${page_size}&page=${page}`,
+    getResidenceById: (id: string) => `/residences/${id}`,
+    getImages: (id: string) => `/residences/${id}/images`,
+    getPrice: (id: string) => `/residences/${id}/prices`,
+    delete: `/residences`,
+  },
+  booking: {
+    hold: "/booking/hold",
   },
 };
 

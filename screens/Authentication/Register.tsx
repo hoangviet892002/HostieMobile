@@ -21,14 +21,14 @@ const Register = () => {
   const [registerForm, setRegisterForm] = useState<
     RegisterRequest & { checked: boolean }
   >({
-    email: "hostvietx@example.com",
-    password: "hostvietx",
-    reference_code: "3FKNT",
-    retype_password: "hostvietx",
+    email: "hostvietx@example.comx",
+    password: "hostviet111x",
+    reference_code: "5LLYP",
+    retype_password: "hostviet111x",
     social_urls: [
       { social_name: "Facebook", url: "https://facebook.com/user1" },
     ],
-    username: "hostvietx",
+    username: "hostvietsadsax",
     checked: false,
   });
   // const [checked, setChecked] = useState(false);

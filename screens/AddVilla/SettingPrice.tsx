@@ -1,20 +1,22 @@
 // SettingPrice.tsx
 
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  Platform,
-  Alert,
-} from "react-native";
-import React, { useState } from "react";
 import { Colors } from "@/constants/Colors";
+import React, { useState } from "react";
+import {
+  Alert,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import { Formik } from "formik";
-import { DateTimePicker, DateRangePicker } from "@/components";
+import { postResidence } from "@/apis/residences";
+import { DateRangePicker, DateTimePicker } from "@/components";
+import { ResidencesStep4 } from "@/types/request/ResidencesRequest";
 import { parseDate } from "@/utils/parseDate";
+import { Formik } from "formik";
+import Toast from "react-native-toast-message";
 
 interface PriceType {
   price_default: number;
@@ -36,13 +38,37 @@ interface SettingPriceProps {
   setStep: (step: number) => void;
   price: PriceType;
   setData: (data: any) => void;
+  setId: (id: string) => void;
+  id: string;
 }
 
 const SettingPrice: React.FC<SettingPriceProps> = ({
   setStep,
   price,
   setData,
+  id,
+  setId,
 }) => {
+  const solveApi = async (dataPost: ResidencesStep4) => {
+    if (id !== "") {
+      dataPost.id = id;
+      setId(id);
+    }
+    const res = await postResidence(dataPost);
+
+    if (res.success) {
+      console.log(res.data);
+      setId(res.data.id);
+      setStep(5);
+    } else {
+      console.log(res);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: res.msg,
+      });
+    }
+  };
   const data: PriceType = price;
   const RenderInput = ({
     label,
@@ -84,7 +110,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
               onChangeText={onChange}
-              value={value}
+              value={String(value)}
               keyboardType="numeric"
               style={{
                 borderWidth: 1,
@@ -112,8 +138,11 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                   justifyContent: "space-between",
                 }}
               >
-                {label === "Giá cuối tuần" && (
-                  <View style={{ flexDirection: "row" }} className="flex">
+                {label === "price_weekend" && (
+                  <View
+                    style={{ flexDirection: "row", elevation: 3 }}
+                    className="flex bg-white rounded-2xl w-full p-4 my-2 justify-between"
+                  >
                     <TextInput
                       placeholder="Ngày"
                       onChangeText={(text) => {
@@ -122,7 +151,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                         onChange(newValue);
                       }}
                       keyboardType="numeric"
-                      value={item.day}
+                      value={String(item.day)}
                       autoCapitalize="none"
                       style={{
                         borderWidth: 1,
@@ -140,7 +169,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                         newValue[index].price = text;
                         onChange(newValue);
                       }}
-                      value={item.price}
+                      value={String(item.price)}
                       keyboardType="numeric"
                       style={{
                         borderWidth: 1,
@@ -158,16 +187,18 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                         onChange(newValue);
                       }}
                       style={{
+                        borderWidth: 1,
                         backgroundColor: "red",
-                        padding: 10,
                         borderRadius: 5,
+                        padding: 10,
+                        marginBottom: 10,
                       }}
                     >
                       <Text style={{ color: "white" }}>Xóa</Text>
                     </TouchableOpacity>
                   </View>
                 )}
-                {label === "Giá theo mùa" && (
+                {label === "price_season" && (
                   <View
                     className="bg-white rounded-2xl w-full p-4 my-2"
                     style={{
@@ -200,7 +231,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                           newValue[index].price = text;
                           onChange(newValue);
                         }}
-                        value={value[index].price}
+                        value={String(value[index].price)}
                         keyboardType="numeric"
                         style={{
                           borderWidth: 1,
@@ -290,7 +321,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                     </View>
                   </View>
                 )}
-                {label === "Giá đặc biệt" && (
+                {label === "price_special" && (
                   <View
                     className="bg-white rounded-2xl w-full p-4 my-2"
                     style={{
@@ -403,9 +434,9 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                 )}
                 {/* another label */}
 
-                {label !== "Giá cuối tuần" &&
-                  label !== "Giá theo mùa" &&
-                  label !== "Giá đặc biệt" && (
+                {label !== "price_weekend" &&
+                  label !== "price_season" &&
+                  label !== "price_special" && (
                     <View className="flex w-full flex-row justify-between">
                       <TextInput
                         className="w-1/2"
@@ -472,43 +503,43 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
   };
   const element: RenderInputProps[] = [
     {
-      label: "Giá mặc định",
+      label: "price_default",
       value: data.price_default,
       onChange: (value) => {},
       type: "number",
     },
     {
-      label: "Giá cuối tuần",
+      label: "price_weekend",
       value: data.price_weekend,
       onChange: (value) => {},
       type: "multiInput",
     },
     {
-      label: "Giá cuối tuần xóa",
+      label: "price_weeknd_delete",
       value: data.price_weeknd_delete,
       onChange: (value) => {},
       type: "multiInput",
     },
     {
-      label: "Giá đặc biệt",
+      label: "price_special",
       value: data.price_special,
       onChange: (value) => {},
       type: "multiInput",
     },
     {
-      label: "Giá đặc biệt xóa",
+      label: "price_special_delete",
       value: data.price_special_delete,
       onChange: (value) => {},
       type: "multiInput",
     },
     {
-      label: "Giá theo mùa",
+      label: "price_season",
       value: data.price_season,
       onChange: (value) => {},
       type: "multiInput",
     },
     {
-      label: "Giá theo mùa xóa",
+      label: "price_season_delete",
       value: data.price_season_delete,
       onChange: (value) => {},
       type: "multiInput",
@@ -520,11 +551,47 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
         initialValues={data}
         enableReinitialize={false}
         onSubmit={(values) => {
-          setStep(5);
+          setData((prevData) => ({
+            ...prevData,
+            price: values,
+          }));
+
+          // parseInt all value number
+
+          const dataPost: ResidencesStep4 = {
+            step: 4,
+            id: id,
+            price_default: parseInt(values.price_default.toString()),
+            price_weekend: values.price_weekend.map((item) => ({
+              day: parseInt(item.day.toString()),
+              price: parseInt(item.price.toString()),
+            })),
+            price_weeknd_delete: values.price_weeknd_delete,
+            price_special: values.price_special.map((item) => ({
+              day: item.day,
+              price: parseInt(item.price.toString()),
+            })),
+            price_special_delete: values.price_special_delete,
+            price_season: values.price_season.map((item) => ({
+              start_date: item.start_date,
+              end_date: item.end_date,
+              price: parseInt(item.price.toString()),
+            })),
+            price_season_delete: values.price_season_delete,
+          };
+
+          console.log(dataPost);
+          solveApi(dataPost);
         }}
         validate={(values) => {
           const errors: any = {};
-          data.price_default = values.price_default;
+          if (!values.price_default) {
+            errors.price_default = "Price default is required";
+          }
+          if (values.price_default <= 0) {
+            errors.price_default = "Price default must be greater than 0";
+          }
+
           return errors;
         }}
       >
@@ -538,28 +605,24 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
         }) => (
           <View>
             {element.map((item, index) => (
-              <>
-                <RenderInput
-                  key={index}
-                  label={item.label}
-                  value={
-                    values[item.label as keyof typeof values] ||
-                    // or value is a array
-                    (Array.isArray(item.value) ? item.value : item.value.value)
-                  }
-                  onChange={(value) => {
-                    setFieldValue(item.label, value);
-                  }}
-                  setFieldValue={setFieldValue}
-                  error={
-                    typeof errors[item.label as keyof typeof errors] ===
-                    "string"
-                      ? (errors[item.label as keyof typeof errors] as string)
-                      : undefined
-                  }
-                  type={item.type}
-                />
-              </>
+              <RenderInput
+                key={index}
+                label={item.label}
+                value={
+                  values[item.label as keyof typeof values] ||
+                  (Array.isArray(item.value) ? item.value : item.value.value)
+                }
+                onChange={(value) => {
+                  setFieldValue(item.label, value);
+                }}
+                setFieldValue={setFieldValue}
+                error={
+                  typeof errors[item.label as keyof typeof errors] === "string"
+                    ? (errors[item.label as keyof typeof errors] as string)
+                    : undefined
+                }
+                type={item.type}
+              />
             ))}
 
             <View className="flex flex-row justify-between m-4">

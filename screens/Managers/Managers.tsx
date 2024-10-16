@@ -1,70 +1,76 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { VillaType } from "@/types";
 import { VillaManageCard } from "@/components";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { router, useNavigation } from "expo-router";
+import { router, useFocusEffect, useNavigation } from "expo-router";
+import { Residence } from "@/types/response/Residences";
+import { getResidences } from "@/apis/residences";
 
 const Managers = () => {
   const { t } = useTranslation();
   const navigate = useNavigation<any>();
+  const [page, setPage] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
 
-  const villas: VillaType[] = [
-    {
-      category: [],
-      description:
-        " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullatincidunt, nisl eget vestibulum ultricies, mi nunc ultricies erat, eget fermentum nunc nisl ut justo. Integer sit amet purus eget mauris.",
-      id: "1",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-      location: "Location 1",
-      maximumGuests: 2,
-      name: "Villa 1",
-      standardGuests: 1,
-      thumbnail: "https://picsum.photos/200/300",
-      type: "Type 1",
-    },
-    {
-      category: [],
-      description:
-        " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullatincidunt, nisl eget vestibulum ultricies, mi nunc ultricies erat, eget fermentum nunc nisl ut justo. Integer sit amet purus eget mauris.",
-      id: "2",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-      location: "Location 2",
-      maximumGuests: 2,
-      name: "Villa 2",
-      standardGuests: 1,
-      thumbnail: "https://picsum.photos/200/300",
-      type: "Type 2",
-    },
-    {
-      category: [],
-      description:
-        " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullatincidunt, nisl eget vestibulum ultricies, mi nunc ultricies erat, eget fermentum nunc nisl ut justo. Integer sit amet purus eget mauris.",
-      id: "3",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-      location: "Location 3",
-      maximumGuests: 2,
-      name: "Villa 3",
-      standardGuests: 1,
-      thumbnail: "https://picsum.photos/200/300",
-      type: "Type 3",
-    },
-  ];
+  const [villas, setVillas] = useState<Residence[]>([]);
+  const fetchVillas = async () => {
+    const res = await getResidences(10, page);
+    if (res.success) {
+      setTotalPage(res.data.total_pages);
+      setVillas(res.data.residences);
+    }
+  };
 
+  useFocusEffect(
+    useCallback(() => {
+      setPage(0);
+      setTotalPage(0);
+      fetchVillas();
+    }, [])
+  );
+  useEffect(() => {
+    fetchVillas();
+    console.log("page", page);
+  }, [page]);
+
+  const RenderPagination = () => {
+    return (
+      <View className="flex flex-row justify-between mb-4 w-full">
+        <TouchableOpacity
+          className={`p-2 rounded-lg h-[50px] w-[100px] items-center justify-center`}
+          style={{
+            backgroundColor: page === 0 ? Colors.disabled : Colors.primary,
+          }}
+          onPress={() => {
+            if (page > 0) {
+              setPage(page - 1);
+            }
+          }}
+          disabled={page === 0}
+        >
+          <Text className="text-white font-semibold">{t("Previous")}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="p-2 rounded-lg h-[50px] w-[100px] items-center justify-center"
+          style={{
+            backgroundColor:
+              page >= totalPage - 1 ? Colors.disabled : Colors.primary,
+          }}
+          onPress={() => {
+            if (page < totalPage - 1) {
+              setPage(page + 1);
+            }
+          }}
+          disabled={page >= totalPage - 1}
+        >
+          <Text className="text-white font-semibold">{t("Next")}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
   return (
     <SafeAreaView>
       <View className="flex items-center flex-row justify-center ">
@@ -80,11 +86,12 @@ const Managers = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="m-4">
+      <ScrollView className="">
         <View className="flex justify-center items-center pb-32">
-          {villas.map((villa) => (
-            <VillaManageCard key={villa.id} villa={villa} />
+          {villas.map((villa, index) => (
+            <VillaManageCard key={index} villa={villa} />
           ))}
+          <RenderPagination />
         </View>
       </ScrollView>
     </SafeAreaView>

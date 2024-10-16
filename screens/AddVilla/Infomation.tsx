@@ -1,9 +1,13 @@
 import { View, Text, TouchableOpacity, TextInput, Modal } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Colors } from "@/constants/Colors";
 import { Formik } from "formik";
 import { Type } from "@/types";
 import { getTypes } from "@/apis/type";
+import { ResidencesStep1 } from "@/types/request/ResidencesRequest";
+import { postResidence } from "@/apis/residences";
+import Toast from "react-native-toast-message";
+import { useFocusEffect } from "expo-router";
 
 interface InterfaceType {
   name: string;
@@ -17,6 +21,8 @@ interface InfomationProps {
   setStep: (step: number) => void;
   data: InterfaceType;
   setData: (data: any) => void;
+  setId: (id: string) => void;
+  id: string;
 }
 interface RenderInputProps {
   label: string;
@@ -26,43 +32,84 @@ interface RenderInputProps {
   type: "text" | "select" | "number" | "area";
 }
 
-const Infomation: React.FC<InfomationProps> = ({ setStep, data, setData }) => {
-  const initialValues = data;
+const Infomation: React.FC<InfomationProps> = ({
+  setStep,
+  data,
+  setData,
+  setId,
+  id,
+}) => {
+  const [initialValues, setInitialValues] = useState<InterfaceType>(data);
+  useFocusEffect(
+    useCallback(() => {
+      setInitialValues(data);
+    }, [data])
+  );
   const element: RenderInputProps[] = [
     {
       label: "name",
       type: "text",
-      onChange: (value) => {},
+      onChange: (value) => {
+        setInitialValues((prev) => ({
+          ...prev,
+          name: value,
+        }));
+      },
       value: data.name,
     },
     {
       label: "type",
       type: "select",
-      onChange: (value) => {},
+      onChange: (value) => {
+        setInitialValues((prev) => ({
+          ...prev,
+          type: value,
+        }));
+      },
       value: data.type,
     },
     {
       label: "num_bath_room",
       type: "number",
-      onChange: (value) => {},
+      onChange: (value) => {
+        setInitialValues((prev) => ({
+          ...prev,
+          num_bath_room: value,
+        }));
+      },
       value: data.num_bath_room,
     },
     {
       label: "num_bed_room",
       type: "number",
-      onChange: (value) => {},
+      onChange: (value) => {
+        setInitialValues((prev) => ({
+          ...prev,
+          num_bed_room: value,
+        }));
+      },
       value: data.num_bed_room,
     },
     {
       label: "num_of_beds",
       type: "number",
-      onChange: (value) => {},
+      onChange: (value) => {
+        setInitialValues((prev) => ({
+          ...prev,
+          num_of_beds: value,
+        }));
+      },
       value: data.num_of_beds,
     },
     {
       label: "max_guests",
       type: "number",
-      onChange: (value) => {},
+      onChange: (value) => {
+        setInitialValues((prev) => ({
+          ...prev,
+          max_guests: value,
+        }));
+      },
       value: data.max_guests,
     },
   ];
@@ -226,16 +273,49 @@ const Infomation: React.FC<InfomationProps> = ({ setStep, data, setData }) => {
     }
   };
 
+  const solveApi = async (dataPost: ResidencesStep1) => {
+    if (id !== "") {
+      dataPost.id = id;
+      setId(id);
+    }
+    const res = await postResidence(dataPost);
+
+    if (res.success) {
+      console.log(res.data);
+      setId(res.data.id);
+      setStep(2);
+    } else {
+      console.log(res);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: res.msg,
+      });
+    }
+  };
+
   return (
     <View>
       <Formik
         initialValues={initialValues}
         onSubmit={(values) => {
+          console.log(values);
           setData((prevData) => ({
             ...prevData,
-            infomation: values,
+            information: values,
           }));
-          setStep(2);
+
+          const dataPost: ResidencesStep1 = {
+            name: values.name,
+            type: parseInt(values.type.id),
+            num_bath_room: values.num_bath_room,
+            num_bed_room: values.num_bed_room,
+            num_of_beds: values.num_of_beds,
+            max_guests: values.max_guests,
+            step: 1,
+          };
+          console.log(dataPost);
+          solveApi(dataPost);
         }}
         validate={(values) => {
           const errors: any = {};

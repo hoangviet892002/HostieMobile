@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { connectSocket, disconnectSocket } from "@/redux/actions/socketActions";
 import { LogBox } from "react-native";
 import Toast from "react-native-toast-message";
+import { SocketProvider } from "@/context/SocketProvider";
 
 LogBox.ignoreAllLogs(true);
 
@@ -41,6 +42,9 @@ const AppWrapper = () => {
     {
       name: "SchedulerBooking",
     },
+    {
+      name: "HostVillaDetail",
+    },
   ];
   const dispatch = useDispatch();
 
@@ -66,7 +70,9 @@ const AppWrapper = () => {
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <AppWrapper />
+      <SocketProvider>
+        <AppWrapper />
+      </SocketProvider>
       <Toast />
     </Provider>
   );

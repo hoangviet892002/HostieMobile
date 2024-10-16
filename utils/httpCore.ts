@@ -7,9 +7,8 @@ interface Response {
 }
 
 const defaultHeader = {
-  "Access-Control-Allow-Origin": "*",
-  "Content-Type": "application/json",
   Accept: "application/json",
+  "Content-Type": "application/json",
 };
 
 let isRefreshing = false;
@@ -55,8 +54,9 @@ const handleError = (error: { response: { data: any } }) => {
     const { data } = error.response;
     return data;
   } catch (error) {
+    console.log("error", error);
     // clear session
-    AsyncStorage.removeItem("session");
+    // AsyncStorage.removeItem("session");
     return { result: null, message: "Server error" };
   }
 };

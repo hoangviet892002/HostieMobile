@@ -6,7 +6,9 @@ import { BaseReponse } from "./response/BaseResponse";
 import { LoginResponse } from "./response/LoginReponse";
 import { RegionType } from "./RegionType";
 import { Type } from "./Type";
+import { AmenityType } from "./AmenityType";
 export type {
+  AmenityType,
   VillaType,
   AccountInformation,
   RegisterRequest,
