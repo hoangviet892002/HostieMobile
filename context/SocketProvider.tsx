@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/stores";
+import { coreURL } from "@/utils/endPoint";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -20,7 +21,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
 
   useEffect(() => {
     if (id) {
-      socketRef.current = io("coreAPI", {
+      socketRef.current = io(coreURL, {
         query: {
           userId: id,
         },

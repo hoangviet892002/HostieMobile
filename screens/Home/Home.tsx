@@ -1,242 +1,96 @@
-import { VillaCard } from "@/components";
-import { DateRangePicker } from "@/components/DatePickerCustom";
-import Icon, { Icons } from "@/components/Icons";
+import { Loading, VillaCard } from "@/components";
 import { Colors } from "@/constants/Colors";
 import { VillaType } from "@/types";
-import { parseDate } from "@/utils/parseDate";
-import React, { useState } from "react";
-import {
-  Alert,
-  Modal,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import * as Animatable from "react-native-animatable";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { Pressable, TextInput, View } from "react-native";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import Icon, { Icons } from "@/components/Icons";
+import { Residence } from "@/types/response/Residences";
+import { getResidences } from "@/apis/residences";
 /**
  * Home Screen
  *  */
 const Home = () => {
-  // Mock Category
-  const categories = [
-    {
-      name: "Category 1",
-    },
-    {
-      name: "Category 2",
-    },
-    {
-      name: "Category 3",
-    },
-    {
-      name: "Category 4",
-    },
-    {
-      name: "Category 5",
-    },
-  ];
-  const [state, setState] = useState({
-    fromDate: new Date(),
-    toDate: new Date(new Date().getTime() + 48 * 60 * 60 * 1000),
-    modalVisible: false,
-  });
-
-  const RenderModal = () => {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={state.modalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setState({ ...state, modalVisible: false });
-        }}
-      >
-        <Animatable.View
-          className="flex items-center justify-center"
-          animation="slideInDown"
-        >
-          <DateRangePicker
-            initialRange={[state.fromDate, state.toDate]}
-            onSuccess={(fromDate, toDate) => {
-              setState({ ...state, fromDate, toDate, modalVisible: false });
-            }}
-          />
-        </Animatable.View>
-      </Modal>
-    );
-  };
-  const DisplayDate = () => {
-    return (
-      <TouchableOpacity
-        className="bg-white w-[450px] rounded-lg p-3 flex flex-row justify-center items-center"
-        onPress={() => setState({ ...state, modalVisible: true })}
-        style={{ borderBlockColor: Colors.primary, borderWidth: 1 }}
-      >
-        <Text>{parseDate(state.fromDate.toISOString())}</Text>
-        <Text> - </Text>
-        <Text>{parseDate(state.toDate.toISOString())}</Text>
-        <Icon type={Icons.Feather} name="calendar" />
-      </TouchableOpacity>
-    );
-  };
-  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
-
-  const RenderCategory = () => {
-    return (
-      <View className="h-[50px]">
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="flex mr-3"
-          contentContainerStyle={{
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {categories.map((category, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                if (selectedCategory.includes(category.name)) {
-                  setSelectedCategory(
-                    selectedCategory.filter((item) => item !== category.name)
-                  );
-                } else {
-                  setSelectedCategory([...selectedCategory, category.name]);
-                }
-              }}
-              style={{
-                backgroundColor: selectedCategory.includes(category.name)
-                  ? Colors.primary
-                  : "white",
-              }}
-              className="p-2 rounded-lg m-2"
-            >
-              <Text
-                style={{
-                  color: selectedCategory.includes(category.name)
-                    ? "white"
-                    : Colors.primary,
-                }}
-              >
-                {category.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-    );
-  };
-  // mock villa
-  const villas: VillaType[] = [
-    {
-      category: [
-        {
-          id: "1",
-          name: "Category 1",
-        },
-        {
-          id: "2",
-          name: "Category 2",
-        },
-        {
-          id: "3",
-          name: "Category 3",
-        },
-        {
-          id: "4",
-          name: "Category 4",
-        },
-      ],
-      id: "1",
-      location: "Location 1",
-      maximumGuests: 10,
-      name: "Villa 1",
-      standardGuests: 5,
-      thumbnail: "https://picsum.photos/200/300",
-      type: "Type 1",
-    },
-    {
-      category: [
-        {
-          id: "1",
-          name: "Category 1",
-        },
-        {
-          id: "2",
-          name: "Category 2",
-        },
-        {
-          id: "3",
-          name: "Category 3",
-        },
-        {
-          id: "4",
-          name: "Category 4",
-        },
-      ],
-      id: "1",
-      location: "Location 1",
-      maximumGuests: 10,
-      name: "Villa 1",
-      standardGuests: 5,
-      thumbnail: "https://picsum.photos/200/300",
-      type: "Type 1",
-    },
-    {
-      category: [
-        {
-          id: "1",
-          name: "Category 1",
-        },
-        {
-          id: "2",
-          name: "Category 2",
-        },
-        {
-          id: "3",
-          name: "Category 3",
-        },
-        {
-          id: "4",
-          name: "Category 4",
-        },
-      ],
-      id: "1",
-      location: "Location 1",
-      maximumGuests: 10,
-      name: "Villa 1",
-      standardGuests: 5,
-      thumbnail: "https://picsum.photos/200/300",
-      type: "Type 1",
-    },
-  ];
-  const RenderVilla = () => {
-    return (
-      <ScrollView
-        className="flex "
-        contentContainerStyle={{
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {villas.map((villa, index) => (
-          <VillaCard key={index} villa={villa} />
-        ))}
-      </ScrollView>
-    );
+  const [page, setPage] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [serach, setSearch] = useState<string>("");
+  const [Residences, setResidences] = useState<Residence[]>([]);
+  useFocusEffect(
+    useCallback(() => {
+      setPage(0);
+      setResidences([]);
+      fetchResidences(0);
+    }, [])
+  );
+  useEffect(() => {
+    fetchResidences(page);
+  }, [page]);
+  const fetchResidences = async (pageToFetch = page) => {
+    setLoading(true);
+    const res = await getResidences(10, pageToFetch, serach);
+    if (res.success) {
+      setTotalPage(res.data.total_pages);
+      setResidences((prevResidences) => [
+        ...prevResidences,
+        ...res.data.residences,
+      ]);
+    }
+    setLoading(false);
   };
 
   return (
-    <SafeAreaView className="h-full p-5 pb-24">
-      <RenderModal />
-      <DisplayDate />
-      <RenderCategory />
-      <RenderVilla />
+    <SafeAreaView className="h-full p-5 pb-24 w-[450px]">
+      <Loading loading={loading} />
+      <View className="flex flex-row items-center justify-center">
+        <TextInput
+          className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+          style={{ width: wp(80), borderColor: Colors.primary }}
+          value={serach}
+          placeholder="Search"
+          onChangeText={(text) => {
+            setSearch(text);
+          }}
+        />
+        <Pressable style={{ padding: 10 }}>
+          <Icon
+            type={Icons.Feather}
+            name="search"
+            size={24}
+            color={Colors.primary}
+          />
+        </Pressable>
+      </View>
+      <ScrollView>
+        <View className="flex justify-center items-center">
+          {Residences.map((villa, index) => (
+            <VillaCard key={index} villa={villa} />
+          ))}
+          {/* load more button */}
+          <Pressable
+            className="p-2 rounded-lg h-[50px] w-[100px] items-center justify-center m-2"
+            style={{ backgroundColor: Colors.primary }}
+            onPress={() => {
+              if (page < totalPage) {
+                setPage(page + 1);
+              }
+            }}
+          >
+            <Icon
+              type={Icons.Feather}
+              name="arrow-down"
+              size={24}
+              color="white"
+            />
+          </Pressable>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

@@ -281,11 +281,9 @@ const Infomation: React.FC<InfomationProps> = ({
     const res = await postResidence(dataPost);
 
     if (res.success) {
-      console.log(res.data);
       setId(res.data.id);
       setStep(2);
     } else {
-      console.log(res);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -299,7 +297,6 @@ const Infomation: React.FC<InfomationProps> = ({
       <Formik
         initialValues={initialValues}
         onSubmit={(values) => {
-          console.log(values);
           setData((prevData) => ({
             ...prevData,
             information: values,
@@ -314,7 +311,7 @@ const Infomation: React.FC<InfomationProps> = ({
             max_guests: values.max_guests,
             step: 1,
           };
-          console.log(dataPost);
+
           solveApi(dataPost);
         }}
         validate={(values) => {

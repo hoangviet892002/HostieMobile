@@ -14,6 +14,7 @@ import { statusCode } from "@/constants/StatusCode";
 import { useDispatch } from "react-redux";
 import { authActions } from "@/redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Colors } from "@/constants/Colors";
 
 const LoginForm = () => {
   const { t } = useTranslation();
@@ -48,26 +49,37 @@ const LoginForm = () => {
     <View>
       <Animatable.View delay={120} animation="slideInDown" className="w-full">
         <View className="py-3">
-          <TextInput
-            className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
-            value={loginForm.username}
-            placeholder="User name"
-            onChangeText={(text) => handleChange("username", text)}
-          />
+          <View>
+            <Text className="text-lg font-bold"> {t("User name")} </Text>
+            <TextInput
+              className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+              style={{ width: wp(80), borderColor: Colors.primary }}
+              value={loginForm.username}
+              placeholder="User name"
+              onChangeText={(text) => handleChange("username", text)}
+            />
+          </View>
 
-          <TextInput
-            secureTextEntry={true}
-            className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
-            value={loginForm.password}
-            placeholder={t("Password")}
-            onChangeText={(text) => handleChange("password", text)}
-          />
+          <View>
+            <Text className="text-lg font-bold"> {t("Password")} </Text>
+            <TextInput
+              secureTextEntry={true}
+              className="bg-white p-2 rounded-lg border-2  py-2 my-2"
+              style={{
+                width: wp(80),
+                borderColor: Colors.primary,
+              }}
+              value={loginForm.password}
+              placeholder={t("Password")}
+              onChangeText={(text) => handleChange("password", text)}
+            />
+          </View>
         </View>
       </Animatable.View>
       <Animatable.View delay={120} animation="slideInDown">
         <TouchableOpacity
-          className="bg-black p-2 rounded-3xl items-center justify-center"
-          style={{ width: wp(80) }}
+          className="bg-black p-2 rounded-lg items-center justify-center"
+          style={{ width: wp(80), backgroundColor: Colors.primary }}
           onPress={() => {
             onSubmit();
           }}

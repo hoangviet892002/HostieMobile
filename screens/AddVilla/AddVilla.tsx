@@ -100,7 +100,6 @@ const AddVilla = () => {
           : [],
         price_season_delete: [],
       };
-      console.log("priceMap :", priceMap);
 
       setData((prevData) => ({
         ...prevData,

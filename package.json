@@ -39,6 +39,7 @@
     "formik": "^2.4.6",
     "i18next": "^23.15.1",
     "intl-pluralrules": "^2.0.1",
+    "moment": "^2.30.1",
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-dom": "18.2.0",

@@ -1,3 +1,4 @@
+import { getPrice } from "@/apis/residences";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const baseURL = "http://34.81.244.146:8080";
@@ -38,9 +39,16 @@ const endPoint = {
     getImages: (id: string) => `/residences/${id}/images`,
     getPrice: (id: string) => `/residences/${id}/prices`,
     delete: `/residences`,
+    getCalendar: (ids: string, time: string) =>
+      `/residences/calendar/?ids=${ids}&month=${time}`,
+    getBlocks: (id: string) => `/residences/block/${id}`,
+    postBlock: `/residences/block`,
+    deleteBlock: (id: string) => `/residences/block?ids=${id}`,
   },
   booking: {
+    book: "/booking",
     hold: "/booking/hold",
+    getPrice: `booking/price_quotation`,
   },
 };
 

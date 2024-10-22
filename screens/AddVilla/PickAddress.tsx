@@ -383,11 +383,9 @@ const PickAddress: React.FC<PickAddressProps> = ({
     const res = await postResidence(dataPost);
 
     if (res.success) {
-      console.log(res.data);
       setId(res.data.id);
       setStep(3);
     } else {
-      console.log(res);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -426,7 +424,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
             step: 2,
             ward_code: values.ward.value,
           };
-          console.log(dataPost);
+
           solveApi(dataPost);
         }}
         validate={(values) => {

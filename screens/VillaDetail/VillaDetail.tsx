@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { BackButton, ImageCustom } from "@/components";
+import { BackButton, ImageCustom, Loading } from "@/components";
 import { VillaType } from "@/types";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 
 import Icon, { Icons } from "@/components/Icons";
 import { router } from "expo-router";
+import { getImages, getResidence } from "@/apis/residences";
 
 type RouteParams = {
   params: {
@@ -26,59 +27,114 @@ type RouteParams = {
   };
 };
 
+interface Residence {
+  residence_id: string;
+  residence_name: string;
+  residence_type: string;
+  residence_type_id: string;
+  residence_address: string;
+  province: string;
+  district: string;
+  ward: string;
+  num_of_bathrooms: number;
+  num_of_bedrooms: number;
+  num_of_beds: number;
+  max_guests: number;
+  step: number;
+  amenities: {
+    id: number;
+    name: string;
+    icon: string;
+    description: string;
+  }[];
+
+  phones: {
+    id: number;
+    phone: string;
+  }[];
+}
+
 const { height, width } = Dimensions.get("window");
 const VillaDetail = () => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RouteParams, "params">>();
   const { itemId } = route.params;
-  const villa: VillaType = {
-    id: "1",
-    name: "Villa 1",
-    location: "Location 1",
-    thumbnail: "https://picsum.photos/200/300",
-    type: "Type 1",
-    standardGuests: 1,
-    maximumGuests: 2,
-    category: [
-      { id: "1", name: "align-center" },
-      { id: "2", name: "align-left" },
-      { id: "1", name: "align-center" },
-      { id: "2", name: "align-left" },
-      { id: "1", name: "align-center" },
-      { id: "2", name: "align-left" },
-      { id: "1", name: "align-center" },
-      { id: "2", name: "align-left" },
-    ],
-    images: [
-      "https://picsum.photos/200/300",
-      "https://picsum.photos/200/300",
-      "https://picsum.photos/200/300",
-    ],
-    description:
-      " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullatincidunt, nisl eget vestibulum ultricies, mi nunc ultricies erat, eget fermentum nunc nisl ut justo. Integer sit amet purus eget mauris.",
+  const [villa, setVilla] = useState<Residence>({
+    amenities: [],
+    district: "",
+    max_guests: 0,
+    num_of_bathrooms: 0,
+    num_of_bedrooms: 0,
+    num_of_beds: 0,
+    phones: [],
+    province: "",
+    residence_address: "",
+    residence_id: "",
+    residence_name: "",
+    residence_type: "",
+    residence_type_id: "",
+    step: 0,
+    ward: "",
+  });
+  const fetchVillaDetail = async (id: string) => {
+    getResidence(id).then((res) => {
+      if (res.success) {
+        setVilla(res.data);
+      }
+    });
   };
+  const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState<{ id: string; image: string }[]>([]);
+  const fetchImages = async (id: string) => {
+    getImages(id).then((res) => {
+      if (res.success) {
+        setImages(res.data.images);
+      }
+    });
+  };
+  useEffect(() => {
+    setLoading(true);
+    fetchVillaDetail(itemId);
+    fetchImages(itemId);
+    setLoading(false);
+  }, [itemId]);
 
   const renderUtilities = () => {
     return (
       <View className="flex flex-row flex-wrap">
-        {villa.category.map((category, index) => (
+        {villa.amenities.map((category, index) => (
           <View
             key={index}
             className="bg-white p-2 rounded-lg w-20 flex items-center justify-center m-4"
           >
-            <Icon
-              type={Icons.Feather}
-              name={category.name}
-              size={35}
-              color={Colors.primary}
+            <Image
+              source={{ uri: category.icon }}
+              style={{ width: 35, height: 35 }}
             />
+            <Text className="text-sm">{category.name}</Text>
           </View>
+        ))}
+      </View>
+    );
+  };
+  const RenderPhoneContact = () => {
+    return (
+      <View className="flex ">
+        <Text className="text-base font-semibold mt-4">{t("Contact")}</Text>
+        {villa.phones.map((phone, index) => (
+          <TouchableOpacity
+            key={index}
+            className="bg-white p-2 rounded-lg flex items-center justify-center "
+          >
+            <Text className="text-sm">{phone.phone}</Text>
+          </TouchableOpacity>
         ))}
       </View>
     );
   };
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Loading loading={loading} />
       <Animatable.View
         className="flex flex-row items-center"
         delay={120}
@@ -86,40 +142,63 @@ const VillaDetail = () => {
       >
         <BackButton />
         <View className="flex ">
-          <Text className="text-3xl font-bold ">{villa.name}</Text>
+          <Text className="text-3xl font-bold ">{villa.residence_name}</Text>
         </View>
       </Animatable.View>
-      <ImageCustom images={villa.images || []} />
+      <ImageCustom images={images.map((img) => img.image) || []} />
 
       <ScrollView style={{ padding: 16, margin: 20, flex: 1 }}>
         <Animatable.View delay={120} animation={"slideInUp"}>
-          <Text className="text-3xl font-bold">{villa.name}</Text>
-          <Text className="text-sm text-gray-600">{villa.location}</Text>
+          <Text className="text-3xl font-bold">{villa.residence_name}</Text>
+          <Text className="text-sm text-gray-600">
+            {villa.residence_address}, {villa.ward}, {villa.district},{" "}
+            {villa.province}
+          </Text>
+
           <View className=" bg-white p-2 rounded-lg w-20 flex items-center justify-center m-4">
             <Text className="text-sm" style={{ color: Colors.primary }}>
-              {villa.type}
+              {villa.residence_type}
             </Text>
           </View>
-          <View className="flex flex-row justify-between items-center ">
-            <View className="flex flex-col mt-4">
-              <View className="flex flex-row justify-between">
-                <Text className="text-base">{t("Standard Guests")}: </Text>
-                <Text className="text-base font-bold">
-                  {villa.standardGuests}
-                </Text>
-              </View>
-              <View className="flex flex-row">
-                <Text className="text-base">{t("Maximum Guests")}: </Text>
-                <Text className="text-base font-bold">
-                  {villa.maximumGuests}
-                </Text>
+          <View className=" flex flex-row justify-between">
+            <View className="flex flex-row justify-between items-center ">
+              <View className="flex flex-col mt-4">
+                <View className="flex flex-row justify-between">
+                  <Text className="text-base">{t("Standard Guests")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_bathrooms}
+                  </Text>
+                </View>
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Maximum Guests")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.max_guests}
+                  </Text>
+                </View>
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Bedrooms")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_bedrooms}
+                  </Text>
+                </View>
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Beds")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_beds}
+                  </Text>
+                </View>
+
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Bathrooms")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_bathrooms}
+                  </Text>
+                </View>
               </View>
             </View>
+            <RenderPhoneContact />
           </View>
-          <View className="my-4">
-            <Text className="text-base font-semibold">{t("Description")}</Text>
-            <Text className="text-base text-gray-600">{villa.description}</Text>
-          </View>
+
           <View>
             <Text className="text-base font-semibold">{t("Utilities")}</Text>
             {renderUtilities()}
@@ -132,6 +211,9 @@ const VillaDetail = () => {
                 borderRadius: 16,
                 borderWidth: 1,
               }}
+              onPress={() => {
+                router.push(`/CalendarBooking?ids=${villa.residence_id}`);
+              }}
             >
               <Icon
                 type={Icons.Feather}
@@ -142,13 +224,13 @@ const VillaDetail = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="p-2 rounded-3xl items-center justify-center h-[50px] mb-6 w-3/4"
+              className="p-2 rounded-3xl items-center justify-center h-[50px] mb-6 w-2/4"
               style={{ backgroundColor: Colors.primary }}
               onPress={() => {
-                router.push("/CalendarDetail");
+                router.push(`/CalendarBooking?ids=${villa.residence_id}`);
               }}
             >
-              <Text className="text-base text-white">{t("Book Now")}</Text>
+              <Text className="text-base text-white">{t("Booking")}</Text>
             </TouchableOpacity>
           </View>
         </Animatable.View>

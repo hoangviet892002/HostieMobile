@@ -57,11 +57,9 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
     const res = await postResidence(dataPost);
 
     if (res.success) {
-      console.log(res.data);
       setId(res.data.id);
       setStep(5);
     } else {
-      console.log(res);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -580,7 +578,6 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
             price_season_delete: values.price_season_delete,
           };
 
-          console.log(dataPost);
           solveApi(dataPost);
         }}
         validate={(values) => {

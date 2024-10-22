@@ -7,12 +7,31 @@ interface InfoResponse<T> {
   success: boolean;
   error_code: string | null;
 }
-interface IBooked {
+interface IHold {
   residence_id: number;
   checkin: string;
   checkout: string;
 }
-const holdBookingApi = async (booking: IBooked): Promise<InfoResponse<any>> => {
+interface IPrice {
+  residence_ids: number[];
+  checkin: string;
+  checkout: string;
+}
+interface IBooked {
+  paid_amount: number;
+  residence_id: number;
+  checkin: string;
+  checkout: string;
+}
+const holdBookingApi = async (booking: IHold): Promise<InfoResponse<any>> => {
   return await axiosCore.post(endPoint.booking.hold, booking);
 };
-export { holdBookingApi };
+
+const bookingApi = async (booking: IBooked): Promise<InfoResponse<any>> => {
+  return await axiosCore.post(endPoint.booking.book, booking);
+};
+
+const getPrice = async (data: IPrice): Promise<InfoResponse<any>> => {
+  return await axiosCore.post(`${endPoint.booking.getPrice}`, data);
+};
+export { holdBookingApi, getPrice, bookingApi };

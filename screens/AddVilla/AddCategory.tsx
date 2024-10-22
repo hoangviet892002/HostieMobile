@@ -68,11 +68,9 @@ const AddCategory: React.FC<AddCategoryProps> = ({
     const res = await postResidence(dataPost);
 
     if (res.success) {
-      console.log(res.data);
       setId(res.data.id);
       setStep(4);
     } else {
-      console.log(res);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -91,7 +89,6 @@ const AddCategory: React.FC<AddCategoryProps> = ({
       step: 3,
     };
 
-    console.log(dataPost);
     setData((prevData) => ({
       ...prevData,
       utilities: utilitiesList,

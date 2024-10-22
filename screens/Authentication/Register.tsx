@@ -57,15 +57,16 @@ const Register = () => {
           }
           return errors;
         }}
-        onSubmit={async () => {
+        onSubmit={async (values) => {
           const data: RegisterRequest = {
-            email: registerForm.email,
-            password: registerForm.password,
-            reference_code: registerForm.reference_code,
-            social_urls: registerForm.social_urls,
-            username: registerForm.username,
-            retype_password: registerForm.retype_password,
+            email: values.email,
+            password: values.password,
+            reference_code: values.reference_code,
+            social_urls: values.social_urls,
+            username: values.username,
+            retype_password: values.retype_password,
           };
+
           const res = await registerApi(data);
 
           if (res.result) {
@@ -96,114 +97,159 @@ const Register = () => {
               className="w-full"
             >
               <View className="py-3">
-                <TextInput
-                  className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
-                  value={values.email}
-                  placeholder={t("Email")}
-                  onChangeText={formikHandleChange("email")}
-                  onBlur={handleBlur("email")}
-                />
-                {errors.email && (
-                  <Text className="text-red-500">{errors.email}</Text>
-                )}
+                <View>
+                  <Text className="text-lg font-bold"> {t("Email")} </Text>
+                  <TextInput
+                    className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    value={values.email}
+                    placeholder={t("Email")}
+                    onChangeText={formikHandleChange("email")}
+                    onBlur={handleBlur("email")}
+                  />
+                  {errors.email && (
+                    <Text className="text-red-500">{errors.email}</Text>
+                  )}
+                </View>
+                <View>
+                  <Text className="text-lg font-bold">{t("User name")}</Text>
 
-                <TextInput
-                  className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
-                  value={values.username}
-                  placeholder={t("User name")}
-                  onChangeText={formikHandleChange("username")}
-                  onBlur={handleBlur("username")}
-                />
-                {errors.username && (
-                  <Text className="text-red-500">{errors.username}</Text>
-                )}
-                <TextInput
-                  secureTextEntry={true}
-                  className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
-                  value={values.password}
-                  placeholder={t("Password")}
-                  onChangeText={formikHandleChange("password")}
-                  onBlur={handleBlur("password")}
-                />
-                {errors.password && (
-                  <Text className="text-red-500">{errors.password}</Text>
-                )}
-                <TextInput
-                  secureTextEntry={true}
-                  className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
-                  value={values.retype_password}
-                  placeholder={t("Confirm Password")}
-                  onChangeText={formikHandleChange("retype_password")}
-                  onBlur={handleBlur("retype_password")}
-                />
-                {errors.retype_password && (
-                  <Text className="text-red-500">{errors.retype_password}</Text>
-                )}
+                  <TextInput
+                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
+                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    value={values.username}
+                    placeholder={t("User name")}
+                    onChangeText={formikHandleChange("username")}
+                    onBlur={handleBlur("username")}
+                  />
+                  {errors.username && (
+                    <Text className="text-red-500">{errors.username}</Text>
+                  )}
+                </View>
+                <View>
+                  <Text className="text-lg font-bold">{t("Password")}</Text>
+                  <TextInput
+                    secureTextEntry={true}
+                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
+                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    value={values.password}
+                    placeholder={t("Password")}
+                    onChangeText={formikHandleChange("password")}
+                    onBlur={handleBlur("password")}
+                  />
+                  {errors.password && (
+                    <Text className="text-red-500">{errors.password}</Text>
+                  )}
+                </View>
+                <View>
+                  <Text className="text-lg font-bold">
+                    {t("Retype Password")}
+                  </Text>
+                  <TextInput
+                    secureTextEntry={true}
+                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
+                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    value={values.retype_password}
+                    placeholder={t("Confirm Password")}
+                    onChangeText={formikHandleChange("retype_password")}
+                    onBlur={handleBlur("retype_password")}
+                  />
+                  {errors.retype_password && (
+                    <Text className="text-red-500">
+                      {errors.retype_password}
+                    </Text>
+                  )}
+                </View>
 
-                <TextInput
-                  secureTextEntry={true}
-                  className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2"
-                  value={values.reference_code || ""}
-                  placeholder={t("Reference Code")}
-                  onChangeText={formikHandleChange("reference_code")}
-                  onBlur={handleBlur("reference_code")}
-                />
-
-                {values.social_urls.map((item, index) => (
-                  <View key={index} className=" flex flex-row justify-between">
-                    <TextInput
-                      className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2 w-2/5"
-                      value={item.social_name}
-                      placeholder={t("Social Name")}
-                      onChangeText={(text) => {
-                        const newSocialUrls = [...values.social_urls];
-                        newSocialUrls[index].social_name = text;
-                        setFieldValue("social_urls", newSocialUrls);
-                      }}
-                      onBlur={handleBlur("social_urls")}
-                    />
-                    <TextInput
-                      className="bg-white p-2 rounded-3xl border-2 border-black py-2 my-2 w-2/5"
-                      value={item.url}
-                      placeholder={t("URL")}
-                      onChangeText={(text) => {
-                        const newSocialUrls = [...values.social_urls];
-                        newSocialUrls[index].url = text;
-                        setFieldValue("social_urls", newSocialUrls);
-                      }}
-                      onBlur={handleBlur("social_urls")}
-                    />
-                    {/* minus social */}
-                    <TouchableOpacity
-                      className="  items-center justify-center w-1/5"
-                      onPress={() => {
-                        const newSocialUrls = [...values.social_urls];
-                        newSocialUrls.splice(index, 1);
-                        setFieldValue("social_urls", newSocialUrls);
-                      }}
-                    >
-                      <Icon
-                        type={Icons.Feather}
-                        name="minus"
-                        size={24}
-                        color={Colors.primary}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-                {/* plus button social */}
-                <TouchableOpacity
-                  className="bg-black p-2 rounded-3xl items-center justify-center"
-                  style={{ width: wp(80), backgroundColor: Colors.primary }}
-                  onPress={() => {
-                    setFieldValue("social_urls", [
-                      ...values.social_urls,
-                      { social_name: "", url: "" },
-                    ]);
-                  }}
-                >
-                  <Text>{t("Add more social")}</Text>
-                </TouchableOpacity>
+                <View>
+                  <Text className="text-lg font-bold">
+                    {t("Reference Code")}
+                  </Text>
+                  <TextInput
+                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
+                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    value={values.reference_code || ""}
+                    placeholder={t("Reference Code")}
+                    onChangeText={formikHandleChange("reference_code")}
+                    onBlur={handleBlur("reference_code")}
+                  />
+                </View>
+                <View>
+                  <Text className="text-lg font-bold">{t("Social")}</Text>
+                  {values.social_urls.map((item, index) => (
+                    <View key={index} className=" flex  justify-between">
+                      <View
+                        key={index}
+                        className="flex flex-row justify-between items-center my-2"
+                      >
+                        <TextInput
+                          className="bg-white p-3 rounded-md border-2 border-black w-5/12"
+                          style={{
+                            borderColor: Colors.primary,
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.1,
+                            shadowRadius: 3,
+                          }}
+                          value={item.social_name}
+                          placeholder={t("Social Name")}
+                          onChangeText={(text) => {
+                            const newSocialUrls = [...values.social_urls];
+                            newSocialUrls[index].social_name = text;
+                            setFieldValue("social_urls", newSocialUrls);
+                          }}
+                          onBlur={handleBlur("social_urls")}
+                        />
+                        <TextInput
+                          className="bg-white p-3 rounded-md border-2 border-black w-5/12"
+                          style={{
+                            borderColor: Colors.primary,
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.1,
+                            shadowRadius: 3,
+                          }}
+                          value={item.url}
+                          placeholder={t("URL")}
+                          onChangeText={(text) => {
+                            const newSocialUrls = [...values.social_urls];
+                            newSocialUrls[index].url = text;
+                            setFieldValue("social_urls", newSocialUrls);
+                          }}
+                          onBlur={handleBlur("social_urls")}
+                        />
+                        <TouchableOpacity
+                          className="flex justify-center items-center w-1/12"
+                          onPress={() => {
+                            const newSocialUrls = [...values.social_urls];
+                            newSocialUrls.splice(index, 1);
+                            setFieldValue("social_urls", newSocialUrls);
+                          }}
+                        >
+                          <Icon
+                            type={Icons.Feather}
+                            name="minus"
+                            size={24}
+                            color={Colors.primary}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                  {/* plus button social */}
+                  <TouchableOpacity
+                    className="bg-black p-2 rounded-lg items-center justify-center"
+                    style={{ width: wp(80), backgroundColor: Colors.primary }}
+                    onPress={() => {
+                      setFieldValue("social_urls", [
+                        ...values.social_urls,
+                        { social_name: "", url: "" },
+                      ]);
+                    }}
+                  >
+                    <Text>{t("Add more social")}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               <View className="py-4">
                 <CheckBox
@@ -220,8 +266,8 @@ const Register = () => {
             </Animatable.View>
             <Animatable.View delay={120} animation="slideInDown">
               <TouchableOpacity
-                className="bg-black p-2 rounded-3xl items-center justify-center"
-                style={{ width: wp(80) }}
+                className="bg-black p-2 rounded-lg items-center justify-center"
+                style={{ width: wp(80), backgroundColor: Colors.primary }}
                 onPress={() => {
                   handleSubmit();
                 }}

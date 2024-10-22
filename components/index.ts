@@ -5,6 +5,8 @@ import ImageCustom from "./ImagesCustom";
 import VillaManageCard from "./VillaManageCard";
 import DateTimePicker from "./DateTimePicker/DateTimePicker";
 import Bookings from "./Bookings";
+import MonthNavigator from "./MonthNavigator";
+import Loading from "./Loading";
 export {
   DateRangePicker,
   VillaCard,
@@ -13,4 +15,6 @@ export {
   VillaManageCard,
   DateTimePicker,
   Bookings,
+  MonthNavigator,
+  Loading,
 };

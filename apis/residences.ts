@@ -1,3 +1,4 @@
+import { CalendarResponse } from "@/types";
 import { ResidencesRequest } from "@/types/request/ResidencesRequest";
 import { Residence } from "@/types/response/Residences";
 import { endPoint } from "@/utils/endPoint";
@@ -36,7 +37,6 @@ const postResidence = async (
       formData.append("files", file);
     });
     formData.append("step", "5");
-    console.log("formData", formData);
     return await axiosCore.post(endPoint.residences.post, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -48,7 +48,8 @@ const postResidence = async (
 
 const getResidences = async (
   page_size: number,
-  page: number
+  page: number,
+  search?: string
 ): Promise<InfoResponse<Residences>> => {
   return await axiosCore.get(endPoint.residences.get(page_size, page + 1));
 };
@@ -67,6 +68,23 @@ const deleteResidenc = async (
 ): Promise<InfoResponse<any>> => {
   return await axiosCore.delete(`${endPoint.residences.delete}`);
 };
+
+const getCalendarApi = async (
+  ids: string,
+  time: string
+): Promise<InfoResponse<CalendarResponse>> => {
+  return await axiosCore.get(`${endPoint.residences.getCalendar(ids, time)}`);
+};
+
+const getBlocksApi = async (id: string): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(`${endPoint.residences.getBlocks(id)}`);
+};
+const postBlockApi = async (data: any): Promise<InfoResponse<any>> => {
+  return await axiosCore.post(`${endPoint.residences.postBlock}`, data);
+};
+const deleteBlockApi = async (id: string): Promise<InfoResponse<any>> => {
+  return await axiosCore.delete(`${endPoint.residences.deleteBlock(id)}`);
+};
 export {
   postResidence,
   getResidences,
@@ -74,4 +92,8 @@ export {
   getImages,
   getPrice,
   deleteResidenc,
+  getCalendarApi,
+  getBlocksApi,
+  postBlockApi,
+  deleteBlockApi,
 };

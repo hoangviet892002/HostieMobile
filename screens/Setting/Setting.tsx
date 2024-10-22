@@ -126,18 +126,18 @@ const Setting = () => {
           </View>
         </View>
         <View className="flex flex-row">
-          <View className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-l-xl">
-            <Text className="text-3xl font-semibold mx-2">
-              {moreInfo.wallet}
-            </Text>
-            <Text className="text-lg font-semibold">{t("Wallet")}</Text>
-          </View>
-          <View className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-r-xl">
-            <Text className="text-3xl font-semibold mx-2">
-              {moreInfo.house}
-            </Text>
-            <Text className="text-lg font-semibold">{t("House")}</Text>
-          </View>
+          <TouchableOpacity
+            className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-l-xl"
+            onPress={() => {}}
+          >
+            <Text className="text-lg font-semibold">Booking</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-r-xl"
+            onPress={() => {}}
+          >
+            <Text className="text-lg font-semibold">Hold</Text>
+          </TouchableOpacity>
         </View>
         <View className="flex flex-col mt-8">
           {optionMenu.map((item, index) => (

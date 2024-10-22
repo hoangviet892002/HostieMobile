@@ -7,7 +7,11 @@ import { LoginResponse } from "./response/LoginReponse";
 import { RegionType } from "./RegionType";
 import { Type } from "./Type";
 import { AmenityType } from "./AmenityType";
+import { Calendar } from "./Calendar";
+import { CalendarResponse } from "./response/CalendarReponse";
+import { ResidenceBlock } from "./ResidenceBlock";
 export type {
+  Calendar,
   AmenityType,
   VillaType,
   AccountInformation,
@@ -17,4 +21,6 @@ export type {
   LoginResponse,
   RegionType,
   Type,
+  CalendarResponse,
+  ResidenceBlock,
 };

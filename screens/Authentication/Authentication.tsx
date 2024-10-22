@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
+  Image,
   ScrollView,
   Text,
   TextInput,
@@ -20,6 +21,8 @@ import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { selectIsAuthenticated } from "@/redux/slices/authSlice";
+import { Colors } from "@/constants/Colors";
+import Logo from "@/assets/images/logo.png";
 const Authentication = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -62,33 +65,40 @@ const Authentication = () => {
   };
   return (
     <View className="flex justify-center h-full p-10">
-      <Animatable.View className="" delay={120} animation="slideInDown">
-        <Text style={{ fontSize: Size.font45 }}>Hello</Text>
-        <Text style={{ fontSize: Size.font10 }}>
-          {t("Wellcome back to Hostie")}
-        </Text>
+      <Animatable.View
+        className="flex justify-center items-center"
+        delay={120}
+        animation="slideInDown"
+      >
+        <Image source={Logo} style={{ width: wp(40), height: hp(20) }} />
       </Animatable.View>
 
       <Animatable.View
-        className="flex flex-row p-2 my-2 bg-black rounded-3xl justify-between"
-        style={{ width: wp(80) }}
+        className="flex flex-row p-2 my-2 rounded-lg justify-between"
+        style={{ width: wp(80), backgroundColor: Colors.primary }}
         delay={120}
         animation="slideInDown"
       >
         {optionLogin.map((item, index) => (
           <TouchableOpacity
             key={index}
-            className={`${
-              option.title === item.title ? "bg-yellow-50" : "bg-black"
-            } p-2 rounded-3xl items-center justify-center`}
+            className={` p-2 rounded-lg items-center justify-center`}
             onPress={item.onPress}
-            style={{ width: wp(35) }}
+            style={{
+              width: wp(35),
+              backgroundColor:
+                option.title !== item.title ? Colors.primary : Colors.white,
+            }}
           >
             <Text
               className={`${
                 option.title !== item.title ? "text-white" : "text-black"
               }
             text-2xl font-bold`}
+              style={{
+                color:
+                  option.title !== item.title ? Colors.white : Colors.black,
+              }}
             >
               {item.title}
             </Text>

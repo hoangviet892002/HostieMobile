@@ -10,6 +10,8 @@ import VillasHouseKeeper from "./HouseKeeper/ManagerVilla";
 import DetailBookingHouseKeeper from "./HouseKeeper/DetailBooking";
 import Schedulerbooking from "./SchedulerBooking";
 import HostDetailVilla from "./HostDetailVilla";
+import CalendarsBooking from "./CalendarBooking/CalendarsBooking";
+import BlockResidence from "./BlockResidence";
 export {
   VillaDetail,
   CalendarDetail,
@@ -23,4 +25,6 @@ export {
   DetailBookingHouseKeeper,
   Schedulerbooking,
   HostDetailVilla,
+  CalendarsBooking,
+  BlockResidence,
 };

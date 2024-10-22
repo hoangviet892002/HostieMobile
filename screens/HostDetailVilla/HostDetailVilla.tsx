@@ -10,7 +10,12 @@ import {
   Modal,
 } from "react-native";
 
-import { BackButton, DateRangePicker, ImageCustom } from "@/components";
+import {
+  BackButton,
+  DateRangePicker,
+  ImageCustom,
+  Loading,
+} from "@/components";
 import { VillaType } from "@/types";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -87,6 +92,7 @@ const HostDetailVilla = () => {
       }
     });
   };
+  const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<{ id: string; image: string }[]>([]);
   const fetchImages = async (id: string) => {
     getImages(id).then((res) => {
@@ -96,8 +102,10 @@ const HostDetailVilla = () => {
     });
   };
   useEffect(() => {
+    setLoading(true);
     fetchVillaDetail(itemId);
     fetchImages(itemId);
+    setLoading(false);
   }, [itemId]);
 
   const renderUtilities = () => {
@@ -112,171 +120,13 @@ const HostDetailVilla = () => {
               source={{ uri: category.icon }}
               style={{ width: 35, height: 35 }}
             />
+            <Text className="text-sm">{category.name}</Text>
           </View>
         ))}
       </View>
     );
   };
 
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const RenderModal = () => {
-    const [modalVisibleDateRange, setModalVisibleDateRange] = useState(false);
-    const [startDate, setStartDate] = useState(new Date());
-
-    const [endDate, setEndDate] = useState(
-      new Date(new Date().getTime() + 48 * 60 * 60 * 1000)
-    );
-
-    const solveApi = async () => {
-      const data = {
-        residence_id: parseInt(itemId),
-        checkin: startDate.toISOString(),
-        checkout: endDate.toISOString(),
-      };
-      const res = await holdBookingApi(data);
-      if (res.success) {
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: res.msg,
-        });
-        setModalVisible(!modalVisible);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: res.msg,
-        });
-      }
-    };
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "white",
-              width: width - 40,
-              height: height / 2,
-              borderRadius: 20,
-              padding: 20,
-            }}
-          >
-            <View>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: Colors.primary,
-                  padding: 10,
-                  borderRadius: 10,
-                  marginTop: 10,
-                }}
-                onPress={() => setModalVisibleDateRange(true)}
-              >
-                <Text style={{ color: "white", textAlign: "center" }}>
-                  Select Date Range
-                </Text>
-              </TouchableOpacity>
-
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisibleDateRange}
-                onRequestClose={() => {
-                  setModalVisibleDateRange(!modalVisibleDateRange);
-                }}
-              >
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                  }}
-                >
-                  <View
-                    className=" flex justify-center items-center"
-                    style={{
-                      backgroundColor: "white",
-                      width: width - 40,
-                      height: height / 2,
-                      borderRadius: 20,
-                      padding: 20,
-                    }}
-                  >
-                    <DateRangePicker
-                      initialRange={[startDate, endDate]}
-                      onSuccess={(fromDate, toDate) => {
-                        setStartDate(fromDate);
-                        setEndDate(toDate);
-                        setModalVisibleDateRange(!modalVisibleDateRange);
-                      }}
-                    />
-                  </View>
-                </View>
-              </Modal>
-
-              <View className="p-4 bg-white shadow-md rounded-lg">
-                <Text className="text-gray-600 font-semibold mb-2">
-                  Start Date:
-                </Text>
-                <Text className="text-lg text-gray-900">
-                  {parseDate(startDate.toISOString())}
-                </Text>
-
-                <Text className="text-gray-600 font-semibold mt-4 mb-2">
-                  End Date:
-                </Text>
-                <Text className="text-lg text-gray-900">
-                  {parseDate(endDate.toISOString())}
-                </Text>
-              </View>
-            </View>
-
-            {/* submit button */}
-            <TouchableOpacity
-              style={{
-                backgroundColor: Colors.primary,
-                padding: 10,
-                borderRadius: 10,
-                marginTop: 10,
-              }}
-              onPress={() => {
-                solveApi();
-              }}
-            >
-              <Text style={{ color: "white", textAlign: "center" }}>OK!</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: Colors.primary,
-                padding: 10,
-                borderRadius: 10,
-                marginTop: 10,
-              }}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={{ color: "white", textAlign: "center" }}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
   const handleDelete = async () => {
     const data = {
       id: itemId,
@@ -297,8 +147,24 @@ const HostDetailVilla = () => {
       });
     }
   };
+  const RenderPhoneContact = () => {
+    return (
+      <View className="flex ">
+        <Text className="text-base font-semibold mt-4">{t("Contact")}</Text>
+        {villa.phones.map((phone, index) => (
+          <TouchableOpacity
+            key={index}
+            className="bg-white p-2 rounded-lg flex items-center justify-center "
+          >
+            <Text className="text-sm">{phone.phone}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Loading loading={loading} />
       <Animatable.View
         className="flex flex-row items-center"
         delay={120}
@@ -318,41 +184,49 @@ const HostDetailVilla = () => {
             {villa.residence_address}, {villa.ward}, {villa.district},{" "}
             {villa.province}
           </Text>
+
           <View className=" bg-white p-2 rounded-lg w-20 flex items-center justify-center m-4">
             <Text className="text-sm" style={{ color: Colors.primary }}>
               {villa.residence_type}
             </Text>
           </View>
-          <View className="flex flex-row justify-between items-center ">
-            <View className="flex flex-col mt-4">
-              <View className="flex flex-row justify-between">
-                <Text className="text-base">{t("Standard Guests")}: </Text>
-                <Text className="text-base font-bold">
-                  {villa.num_of_bathrooms}
-                </Text>
-              </View>
-              <View className="flex flex-row">
-                <Text className="text-base">{t("Maximum Guests")}: </Text>
-                <Text className="text-base font-bold">{villa.max_guests}</Text>
-              </View>
-              <View className="flex flex-row">
-                <Text className="text-base">{t("Bedrooms")}: </Text>
-                <Text className="text-base font-bold">
-                  {villa.num_of_bedrooms}
-                </Text>
-              </View>
-              <View className="flex flex-row">
-                <Text className="text-base">{t("Beds")}: </Text>
-                <Text className="text-base font-bold">{villa.num_of_beds}</Text>
-              </View>
+          <View className=" flex flex-row justify-between">
+            <View className="flex flex-row justify-between items-center ">
+              <View className="flex flex-col mt-4">
+                <View className="flex flex-row justify-between">
+                  <Text className="text-base">{t("Standard Guests")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_bathrooms}
+                  </Text>
+                </View>
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Maximum Guests")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.max_guests}
+                  </Text>
+                </View>
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Bedrooms")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_bedrooms}
+                  </Text>
+                </View>
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Beds")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_beds}
+                  </Text>
+                </View>
 
-              <View className="flex flex-row">
-                <Text className="text-base">{t("Bathrooms")}: </Text>
-                <Text className="text-base font-bold">
-                  {villa.num_of_bathrooms}
-                </Text>
+                <View className="flex flex-row">
+                  <Text className="text-base">{t("Bathrooms")}: </Text>
+                  <Text className="text-base font-bold">
+                    {villa.num_of_bathrooms}
+                  </Text>
+                </View>
               </View>
             </View>
+            <RenderPhoneContact />
           </View>
 
           <View>
@@ -367,7 +241,9 @@ const HostDetailVilla = () => {
                 borderRadius: 16,
                 borderWidth: 1,
               }}
-              onPress={() => setModalVisible(true)}
+              onPress={() => {
+                router.push(`/CalendarBooking?ids=${villa.residence_id}`);
+              }}
             >
               <Icon
                 type={Icons.Feather}
@@ -376,9 +252,20 @@ const HostDetailVilla = () => {
                 color={Colors.primary}
               />
             </TouchableOpacity>
+            <TouchableOpacity
+              className="p-2 rounded-3xl items-center justify-center h-[50px] mb-6 w-1/4"
+              style={{ backgroundColor: Colors.yellow }}
+              onPress={() => {
+                router.push(
+                  `/BlockResidence?itemId=${villa.residence_id}&name=${villa.residence_name}`
+                );
+              }}
+            >
+              <Text className="text-base text-white">{t("Lock")}</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
-              className="p-2 rounded-3xl items-center justify-center h-[50px] mb-6 w-2/4"
+              className="p-2 rounded-3xl items-center justify-center h-[50px] mb-6 w-1/4"
               style={{ backgroundColor: Colors.primary }}
               onPress={() => {
                 router.push(`/AddVilla?villa=${JSON.stringify(villa)}`);
@@ -395,7 +282,6 @@ const HostDetailVilla = () => {
             </TouchableOpacity>
           </View>
         </Animatable.View>
-        <RenderModal />
       </ScrollView>
     </SafeAreaView>
   );

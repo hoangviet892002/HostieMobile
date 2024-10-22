@@ -68,11 +68,9 @@ const AddImages: React.FC<AddImagesProps> = ({ setStep, id, setId }) => {
     const res = await postResidence(dataPost);
 
     if (res.success) {
-      console.log(res.data);
       setId(res.data.id);
       Alert.alert("Thành công", "Thêm ảnh thành công.");
     } else {
-      console.log(res);
       Toast.show({
         type: "error",
         text1: "Error",
