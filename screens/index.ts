@@ -12,6 +12,8 @@ import Schedulerbooking from "./SchedulerBooking";
 import HostDetailVilla from "./HostDetailVilla";
 import CalendarsBooking from "./CalendarBooking/CalendarsBooking";
 import BlockResidence from "./BlockResidence";
+import HoldForHost from "./HoldForHost";
+import BookingForHost from "./BookingForHost";
 export {
   VillaDetail,
   CalendarDetail,
@@ -27,4 +29,6 @@ export {
   HostDetailVilla,
   CalendarsBooking,
   BlockResidence,
+  HoldForHost,
+  BookingForHost,
 };

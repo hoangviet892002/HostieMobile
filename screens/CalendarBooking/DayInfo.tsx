@@ -3,7 +3,14 @@ import { Loading } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
 import React, { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
 
 interface DayFormProps {
@@ -115,6 +122,8 @@ const DayInfo = ({
     setLoading(false);
   };
   const RenderBookingForm = () => {
+    const [phone, setPhone] = useState("");
+    const [name, setName] = useState("");
     return (
       <Modal
         animationType="fade"
@@ -221,6 +230,22 @@ const DayInfo = ({
                 </Text>
                 <Text style={{ fontSize: 16, color: "#6c757d" }}>{price}</Text>
               </View>
+
+              <Text className="text-lg font-bold"> Customer Name </Text>
+              <TextInput
+                className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+                style={{ borderColor: Colors.primary }}
+                placeholder="Name"
+                onChangeText={setName}
+              />
+              <Text className="text-lg font-bold"> Customer Phone </Text>
+              <TextInput
+                className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+                style={{ borderColor: Colors.primary }}
+                placeholder="Phone"
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
+              />
 
               {/* Buttons */}
               <View

@@ -396,7 +396,7 @@ const CalendarsBooking = () => {
                         shadowRadius: 5,
                       }}
                       disabled={selectedDay?.is_booked}
-                      onPress={() => handleSelectDay(selectedDay)}
+                      onPress={() => handleSelectDay(selectedDay as Calendar)}
                     >
                       <Text
                         style={{

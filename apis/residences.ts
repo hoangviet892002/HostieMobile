@@ -66,7 +66,8 @@ const getPrice = async (id: string): Promise<InfoResponse<any>> => {
 const deleteResidenc = async (
   data: deleteResidence
 ): Promise<InfoResponse<any>> => {
-  return await axiosCore.delete(`${endPoint.residences.delete}`);
+  console.log(data);
+  return await axiosCore.delete(`${endPoint.residences.delete}`, { data });
 };
 
 const getCalendarApi = async (

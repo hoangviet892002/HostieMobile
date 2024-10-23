@@ -1,5 +1,5 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import React, { useContext, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AccountInformation } from "@/types";
 import { Colors } from "@/constants/Colors";
@@ -14,9 +14,10 @@ import {
 import { authActions, selectIsAuthenticated } from "@/redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useNavigation } from "expo-router";
-
+import { useNotification } from "@/context/NotificationContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { useSocket } from "@/context/SocketProvider";
 interface menu {
   title: string;
   icon: string;
@@ -128,13 +129,17 @@ const Setting = () => {
         <View className="flex flex-row">
           <TouchableOpacity
             className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-l-xl"
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate("BookingForHost");
+            }}
           >
             <Text className="text-lg font-semibold">Booking</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-r-xl"
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate("HoldForHost");
+            }}
           >
             <Text className="text-lg font-semibold">Hold</Text>
           </TouchableOpacity>

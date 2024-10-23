@@ -3,6 +3,7 @@ import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const baseURL = "http://34.81.244.146:8080";
 const coreURL = "http://34.81.244.146:5005";
+const socketURL = "http://34.81.244.146:3333";
 const endPoint = {
   user: {
     updateUserById: (userId: any) => `/v1/api/users/update/${userId}`,
@@ -48,8 +49,11 @@ const endPoint = {
   booking: {
     book: "/booking",
     hold: "/booking/hold",
-    getPrice: `booking/price_quotation`,
+    getPrice: `/booking/price_quotation`,
+    getHoldsForHost: (page: number) => `/booking/hold/host?page=${page}`,
+    getBooksForHost: (page: number) => `/booking/host?page=${page}`,
+    acceptHold: `/booking/hold/accept`,
   },
 };
 
-export { endPoint, baseURL, coreURL };
+export { endPoint, baseURL, coreURL, socketURL };

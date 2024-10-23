@@ -6,6 +6,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+
 import { useTranslation } from "react-i18next";
 import { SignInRequest } from "@/types";
 import { signInApi } from "@/apis/users";
@@ -15,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { authActions } from "@/redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/Colors";
+import { decodeJWT } from "@/utils/decodeJWT";
 
 const LoginForm = () => {
   const { t } = useTranslation();
@@ -32,8 +34,13 @@ const LoginForm = () => {
     const response = await signInApi(loginForm);
     if (response.result) {
       // set async storage
+
       await AsyncStorage.setItem("session", JSON.stringify(response.result));
-      dispatch(authActions.login());
+      // decode token
+
+      const decodedToken = decodeJWT(response.result.token);
+
+      dispatch(authActions.login(decodedToken.user_id));
     } else {
       Toast.show({
         type: "error",

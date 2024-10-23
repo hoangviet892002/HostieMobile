@@ -8,6 +8,7 @@ import { ResidencesStep1 } from "@/types/request/ResidencesRequest";
 import { postResidence } from "@/apis/residences";
 import Toast from "react-native-toast-message";
 import { useFocusEffect } from "expo-router";
+import { Loading } from "@/components";
 
 interface InterfaceType {
   name: string;
@@ -25,6 +26,7 @@ interface InfomationProps {
   id: string;
 }
 interface RenderInputProps {
+  name?: string;
   label: string;
   value: any;
   onChange: (value: any) => void;
@@ -45,8 +47,10 @@ const Infomation: React.FC<InfomationProps> = ({
       setInitialValues(data);
     }, [data])
   );
+  const [loading, setLoading] = useState<boolean>(false);
   const element: RenderInputProps[] = [
     {
+      name: "Tên",
       label: "name",
       type: "text",
       onChange: (value) => {
@@ -58,6 +62,7 @@ const Infomation: React.FC<InfomationProps> = ({
       value: data.name,
     },
     {
+      name: "Loại",
       label: "type",
       type: "select",
       onChange: (value) => {
@@ -69,6 +74,7 @@ const Infomation: React.FC<InfomationProps> = ({
       value: data.type,
     },
     {
+      name: "Số phòng tắm",
       label: "num_bath_room",
       type: "number",
       onChange: (value) => {
@@ -80,6 +86,7 @@ const Infomation: React.FC<InfomationProps> = ({
       value: data.num_bath_room,
     },
     {
+      name: "Số phòng ngủ",
       label: "num_bed_room",
       type: "number",
       onChange: (value) => {
@@ -91,6 +98,7 @@ const Infomation: React.FC<InfomationProps> = ({
       value: data.num_bed_room,
     },
     {
+      name: "Số giường",
       label: "num_of_beds",
       type: "number",
       onChange: (value) => {
@@ -102,6 +110,7 @@ const Infomation: React.FC<InfomationProps> = ({
       value: data.num_of_beds,
     },
     {
+      name: "Số khách tối đa",
       label: "max_guests",
       type: "number",
       onChange: (value) => {
@@ -130,6 +139,7 @@ const Infomation: React.FC<InfomationProps> = ({
     onChange,
     error,
     type,
+    name,
     setFieldValue,
   }: RenderInputProps & {
     setFieldValue: (field: string, value: any) => void;
@@ -141,19 +151,14 @@ const Infomation: React.FC<InfomationProps> = ({
       case "text":
         return (
           <View className="mx-5">
-            <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+            <Text className="text-lg font-bold">{name}</Text>
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
               onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
-              style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 5,
-                padding: 10,
-                marginBottom: 10,
-              }}
+              className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+              style={{ borderColor: Colors.primary }}
             />
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
@@ -161,7 +166,7 @@ const Infomation: React.FC<InfomationProps> = ({
       case "area":
         return (
           <View className="mx-5">
-            <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+            <Text className="text-lg font-bold">{name}</Text>
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
               onChangeText={onChange}
@@ -169,13 +174,8 @@ const Infomation: React.FC<InfomationProps> = ({
               autoCapitalize="none"
               multiline
               numberOfLines={4}
-              style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 5,
-                padding: 10,
-                marginBottom: 10,
-              }}
+              className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+              style={{ borderColor: Colors.primary }}
             />
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
@@ -183,20 +183,15 @@ const Infomation: React.FC<InfomationProps> = ({
       case "number":
         return (
           <View className="mx-5">
-            <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+            <Text className="text-lg font-bold">{name}</Text>
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
               onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
               keyboardType="numeric"
-              style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 5,
-                padding: 10,
-                marginBottom: 10,
-              }}
+              className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+              style={{ borderColor: Colors.primary }}
             />
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
@@ -205,18 +200,13 @@ const Infomation: React.FC<InfomationProps> = ({
         return (
           <>
             <View className="mx-5">
-              <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+              <Text className="text-lg font-bold">{name}</Text>
               <TouchableOpacity
                 onPress={() => {
                   setModalVisible(true);
                 }}
-                style={{
-                  borderWidth: 1,
-                  borderColor: "gray",
-                  borderRadius: 5,
-                  padding: 10,
-                  marginBottom: 10,
-                }}
+                className="bg-white p-2 rounded-lg border-2 py-2 my-2 "
+                style={{ borderColor: Colors.primary }}
               >
                 <Text>{value.description}</Text>
               </TouchableOpacity>
@@ -226,27 +216,39 @@ const Infomation: React.FC<InfomationProps> = ({
               animationType="slide"
               transparent={true}
               visible={modalVisible}
-              onRequestClose={() => {
-                setModalVisible(!modalVisible);
-              }}
+              onRequestClose={() => setModalVisible(!modalVisible)}
             >
               <View
                 style={{
                   flex: 1,
                   justifyContent: "center",
                   alignItems: "center",
-                  backgroundColor: "rgba(0,0,0,0.5)",
+                  backgroundColor: "rgba(0,0,0,0.6)",
                 }}
               >
                 <View
                   style={{
                     backgroundColor: "white",
                     padding: 20,
-                    borderRadius: 10,
-                    width: 300,
+                    borderRadius: 15,
+                    width: 320,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 5,
+                    elevation: 5,
                   }}
                 >
-                  <Text>Select</Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      marginBottom: 15,
+                    }}
+                  >
+                    Select
+                  </Text>
+
                   {optionSelect.map((item, index) => (
                     <TouchableOpacity
                       key={index}
@@ -259,8 +261,14 @@ const Infomation: React.FC<InfomationProps> = ({
                         onChange(value);
                         setModalVisible(false);
                       }}
+                      style={{
+                        padding: 10,
+                        backgroundColor: "#f0f0f0",
+                        borderRadius: 5,
+                        marginBottom: 10,
+                      }}
                     >
-                      <Text>{item.name}</Text>
+                      <Text style={{ fontSize: 16 }}>{item.name}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -294,9 +302,11 @@ const Infomation: React.FC<InfomationProps> = ({
 
   return (
     <View>
+      <Loading loading={loading} />
       <Formik
         initialValues={initialValues}
         onSubmit={(values) => {
+          setLoading(true);
           setData((prevData) => ({
             ...prevData,
             information: values,
@@ -313,6 +323,7 @@ const Infomation: React.FC<InfomationProps> = ({
           };
 
           solveApi(dataPost);
+          setLoading(false);
         }}
         validate={(values) => {
           const errors: any = {};
@@ -349,6 +360,7 @@ const Infomation: React.FC<InfomationProps> = ({
           <View>
             {element.map((item, index) => (
               <RenderInput
+                name={item.name}
                 key={index}
                 label={item.label}
                 value={values[item.label as keyof typeof values]}

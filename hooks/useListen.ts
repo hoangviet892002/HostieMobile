@@ -1,17 +1,26 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useSocket } from "@/context/SocketProvider";
 
-const useListen = (action: any, callback: any) => {
-  const dispatch = useDispatch();
-  const state = useSelector((state) => state);
-
-  useEffect(() => {
-    dispatch(action());
-  }, [state]);
+const useSocketListener = (eventName: string) => {
+  const socket = useSocket();
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    callback();
-  }, [state]);
+    if (!socket) return;
+
+    const handleEvent = (eventData: any) => {
+      setData(eventData);
+      console.log(`Event ${eventName} received:`, eventData);
+    };
+
+    socket.on(eventName, handleEvent);
+
+    return () => {
+      socket.off(eventName, handleEvent);
+    };
+  }, [socket, eventName]);
+
+  return data;
 };
 
-export default useListen;
+export default useSocketListener;
