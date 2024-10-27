@@ -16,6 +16,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DayInfo from "./DayInfo";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/stores";
 type RouteParams = {
   params: {
     ids: string;
@@ -24,6 +26,7 @@ type RouteParams = {
 const CalendarsBooking = () => {
   const [element, setElement] = useState<Calendar[]>([]);
   const [isLoad, setIsLoad] = useState<boolean>(false);
+  const id = useSelector((state: RootState) => state.auth.userId);
 
   const route = useRoute<RouteProp<RouteParams, "params">>();
   const { ids } = route.params;
@@ -43,6 +46,8 @@ const CalendarsBooking = () => {
 
   const [name, setName] = useState<string>("");
 
+  const [isHost, setIsHost] = useState<boolean>(false);
+
   const getCalendar = async () => {
     setIsLoad(true);
     // for mat month MM
@@ -54,6 +59,9 @@ const CalendarsBooking = () => {
       setElement(response.data.calendars[0].calendar);
       setName(response.data.calendars[0].name);
 
+      if (response.data.calendars[0].host_id === id) {
+        setIsHost(true);
+      }
       setIsEmty(false);
     } else {
       setIsEmty(true);
@@ -418,6 +426,7 @@ const CalendarsBooking = () => {
             selectedDayForm={selectedDayForm}
             name={name}
             setSelectedDayForm={setSelectedDayForm}
+            isHost={isHost}
           />
         </ScrollView>
       </SafeAreaView>

@@ -6,6 +6,7 @@ import { use } from "i18next";
 const initialState = {
   isAuthenticated: false,
   userId: null,
+  role: null,
 };
 
 const authSlice = createSlice({
@@ -13,7 +14,8 @@ const authSlice = createSlice({
   initialState: initialState,
   reducers: {
     login: (state, payload) => {
-      state.userId = payload.payload;
+      state.userId = payload.payload.user_id;
+      state.role = payload.payload.scope;
       state.isAuthenticated = true;
     },
     logout: (state) => {
@@ -28,6 +30,8 @@ export const selectIsAuthenticated = (state: RootState) =>
   state.auth.isAuthenticated;
 
 export const selectUserId = (state: RootState) => state.auth.userId;
+
+export const selectRole = (state: RootState) => state.auth.role;
 
 // actions
 export const authActions = authSlice.actions;

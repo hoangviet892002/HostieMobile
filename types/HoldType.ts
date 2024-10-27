@@ -11,4 +11,6 @@ export interface HoldType {
   status: number;
   created_at: string;
   updated_at: string;
+  residence_name: string;
+  host_id: number;
 }

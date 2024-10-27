@@ -1,48 +1,75 @@
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  View,
+  TextInput,
+  Pressable,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { useFocusEffect } from "expo-router";
+import Icon, { Icons } from "@/components/Icons";
 import { Loading, VillaCard } from "@/components";
 import { Colors } from "@/constants/Colors";
-import { VillaType } from "@/types";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
-import { ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import Icon, { Icons } from "@/components/Icons";
 import { Residence } from "@/types/response/Residences";
-import { getResidences } from "@/apis/residences";
-/**
- * Home Screen
- *  */
+import { getResidencesBySellerApi } from "@/apis/residences";
+
 const Home = () => {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [serach, setSearch] = useState<string>("");
-  const [Residences, setResidences] = useState<Residence[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [search, setSearch] = useState<string>("");
+  const [residences, setResidences] = useState<Residence[]>([]);
+
+  const fetchResidences = async (pageToFetch = 1) => {
+    if (pageToFetch === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    const res = await getResidencesBySellerApi(pageToFetch);
+    if (res.success) {
+      if (pageToFetch === 1) {
+        setResidences(res.data.residences);
+      } else {
+        setResidences((prevResidences) => [
+          ...prevResidences,
+          ...res.data.residences,
+        ]);
+      }
+      setTotalPage(res.data.total_pages);
+    }
+    if (pageToFetch === 1) {
+      setLoading(false);
+    } else {
+      setLoadingMore(false);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      setPage(0);
-      setResidences([]);
-      fetchResidences(0);
+      setPage(1);
+      fetchResidences(1);
     }, [])
   );
-  useEffect(() => {
-    fetchResidences(page);
-  }, [page]);
-  const fetchResidences = async (pageToFetch = page) => {
-    setLoading(true);
-    const res = await getResidences(10, pageToFetch, serach);
-    if (res.success) {
-      setTotalPage(res.data.total_pages);
-      setResidences((prevResidences) => [
-        ...prevResidences,
-        ...res.data.residences,
-      ]);
+
+  const handleLoadMore = () => {
+    if (!loadingMore && page < totalPage) {
+      setPage((prevPage) => prevPage + 1);
+      fetchResidences(page + 1);
     }
-    setLoading(false);
+  };
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return (
+      <View className="py-4">
+        <ActivityIndicator size="small" color={Colors.primary} />
+      </View>
+    );
   };
 
   return (
@@ -52,7 +79,7 @@ const Home = () => {
         <TextInput
           className="bg-white p-2 rounded-lg border-2 py-2 my-2"
           style={{ width: wp(80), borderColor: Colors.primary }}
-          value={serach}
+          value={search}
           placeholder="Search"
           onChangeText={(text) => {
             setSearch(text);
@@ -67,30 +94,20 @@ const Home = () => {
           />
         </Pressable>
       </View>
-      <ScrollView>
-        <View className="flex justify-center items-center">
-          {Residences.map((villa, index) => (
-            <VillaCard key={index} villa={villa} />
-          ))}
-          {/* load more button */}
-          <Pressable
-            className="p-2 rounded-lg h-[50px] w-[100px] items-center justify-center m-2"
-            style={{ backgroundColor: Colors.primary }}
-            onPress={() => {
-              if (page < totalPage) {
-                setPage(page + 1);
-              }
-            }}
-          >
-            <Icon
-              type={Icons.Feather}
-              name="arrow-down"
-              size={24}
-              color="white"
-            />
-          </Pressable>
-        </View>
-      </ScrollView>
+
+      <FlatList
+        className="flex"
+        data={residences}
+        renderItem={({ item }) => (
+          <View className="flex items-center justify-center">
+            <VillaCard villa={item} />
+          </View>
+        )}
+        keyExtractor={(item) => item.residence_id.toString()}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+      />
     </SafeAreaView>
   );
 };

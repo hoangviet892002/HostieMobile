@@ -29,9 +29,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         newSocket.emit("subscribe", data);
         console.log(`Connected with room_id: ${id}`);
       });
-      newSocket.on("host.receive_hold_request", (data) => {
-        console.log(data);
-      });
+      // newSocket.on("host.receive_hold_request", (data) => {
+      //   console.log(data);
+      // });
       newSocket.on("disconnect", () => {
         console.log("Disconnected");
       });

@@ -7,6 +7,7 @@ import DateTimePicker from "./DateTimePicker/DateTimePicker";
 import Bookings from "./Bookings";
 import MonthNavigator from "./MonthNavigator";
 import Loading from "./Loading";
+import EmptyData from "./EmptyData";
 export {
   DateRangePicker,
   VillaCard,
@@ -17,4 +18,5 @@ export {
   Bookings,
   MonthNavigator,
   Loading,
+  EmptyData,
 };

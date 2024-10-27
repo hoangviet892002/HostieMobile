@@ -2,7 +2,8 @@ import { bookingApi, getPrice, holdBookingApi } from "@/apis/booking";
 import { Loading } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
+import { Formik } from "formik";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -23,10 +24,12 @@ const DayInfo = ({
   selectedDayForm,
   name,
   setSelectedDayForm,
+  isHost,
 }: {
   selectedDayForm: DayFormProps;
   name: string;
   setSelectedDayForm: (value: React.SetStateAction<DayFormProps>) => void;
+  isHost: boolean;
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -95,7 +98,7 @@ const DayInfo = ({
               year: "numeric",
             })
             .split("/")
-            .join("-") // to convert the default slashes to dashes
+            .join("-")
         : undefined,
       checkout: selectedDayForm.checkout
         ? new Date(selectedDayForm.checkout)
@@ -105,11 +108,13 @@ const DayInfo = ({
               year: "numeric",
             })
             .split("/")
-            .join("-") // to convert the slashes to dashes
+            .join("-")
         : undefined,
       residence_ids: [selectedDayForm.residence_id],
     };
+
     const response = await getPrice(data);
+    console.log(response);
     if (response.success) {
       setPrice(response.data[0].total_price);
     } else {
@@ -122,8 +127,11 @@ const DayInfo = ({
     setLoading(false);
   };
   const RenderBookingForm = () => {
-    const [phone, setPhone] = useState("");
-    const [name, setName] = useState("");
+    const [guest_phone, setPhone] = useState("");
+    const [guest_name, setName] = useState("");
+    const [guest_count, setCount] = useState(1);
+    const [note, setNote] = useState("");
+
     return (
       <Modal
         animationType="fade"
@@ -231,81 +239,152 @@ const DayInfo = ({
                 <Text style={{ fontSize: 16, color: "#6c757d" }}>{price}</Text>
               </View>
 
-              <Text className="text-lg font-bold"> Customer Name </Text>
-              <TextInput
-                className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-                style={{ borderColor: Colors.primary }}
-                placeholder="Name"
-                onChangeText={setName}
-              />
-              <Text className="text-lg font-bold"> Customer Phone </Text>
-              <TextInput
-                className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-                style={{ borderColor: Colors.primary }}
-                placeholder="Phone"
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-              />
-
-              {/* Buttons */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginTop: 20,
+              <Formik
+                initialValues={{ guest_phone, guest_name, guest_count, note }}
+                onSubmit={() => {
+                  const data = {
+                    guest_phone: guest_phone,
+                    guest_name: guest_name,
+                    guest_count: guest_count,
+                    note: note,
+                  };
+                  handleBooking(data);
+                  setModalVisibleBooking(!modalVisibleBooking);
+                }}
+                validate={() => {
+                  const errors: any = {};
+                  if (!guest_phone) {
+                    errors.guest_phone = "Required";
+                  }
+                  // check format phone
+                  if (!/^\d{10}$/.test(guest_phone)) {
+                    errors.guest_phone = "Invalid phone number";
+                  }
+                  if (!guest_name) {
+                    errors.guest_name = "Required";
+                  }
+                  if (!guest_count) {
+                    errors.guest_count = "Required";
+                  }
+                  return errors;
                 }}
               >
-                <Pressable
-                  onPress={() => setModalVisibleBooking(!modalVisibleBooking)}
-                  style={{
-                    backgroundColor: "#dc3545", // Red background for Close
-                    paddingVertical: 10,
-                    paddingHorizontal: 20,
-                    borderRadius: 10,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 5,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontSize: 16,
-                      fontWeight: "600",
-                    }}
-                  >
-                    Close
-                  </Text>
-                </Pressable>
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                }) => (
+                  <>
+                    <View>
+                      <Text className="text-lg font-bold"> Phone </Text>
+                      <TextInput
+                        className="bg-white p-2 rounded-lg border-2 py-2"
+                        style={{ borderColor: Colors.primary }}
+                        value={guest_phone}
+                        placeholder="Phone"
+                        onChangeText={(text) => setPhone(text)}
+                      />
 
-                <Pressable
-                  onPress={() => {
-                    handleBooking();
-                  }}
-                  style={{
-                    backgroundColor: "#007bff",
-                    paddingVertical: 10,
-                    paddingHorizontal: 20,
-                    borderRadius: 10,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 5,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontSize: 16,
-                      fontWeight: "600",
-                    }}
-                  >
-                    Book
-                  </Text>
-                </Pressable>
-              </View>
+                      {/* error */}
+                      <Text style={{ color: "red" }}>{errors.guest_phone}</Text>
+
+                      <Text className="text-lg font-bold"> Name </Text>
+                      <TextInput
+                        className="bg-white p-2 rounded-lg border-2 py-2"
+                        style={{ borderColor: Colors.primary }}
+                        value={guest_name}
+                        placeholder="Name"
+                        onChangeText={(text) => setName(text)}
+                      />
+
+                      {/* error */}
+                      <Text style={{ color: "red" }}>{errors.guest_name}</Text>
+
+                      <Text className="text-lg font-bold"> Count </Text>
+                      <TextInput
+                        className="bg-white p-2 rounded-lg border-2 py-2"
+                        style={{ borderColor: Colors.primary }}
+                        value={guest_count.toString()}
+                        placeholder="Count"
+                        onChangeText={(text) => setCount(parseInt(text))}
+                      />
+                      {/* error */}
+                      <Text style={{ color: "red" }}>{errors.guest_count}</Text>
+
+                      <Text className="text-lg font-bold"> Note </Text>
+
+                      <TextInput
+                        className="bg-white p-2 rounded-lg border-2 py-2"
+                        style={{ borderColor: Colors.primary }}
+                        value={note}
+                        placeholder="Note"
+                        onChangeText={(text) => setNote(text)}
+                      />
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <Pressable
+                        onPress={() =>
+                          setModalVisibleBooking(!modalVisibleBooking)
+                        }
+                        style={{
+                          backgroundColor: "#dc3545",
+                          paddingVertical: 10,
+                          paddingHorizontal: 20,
+                          borderRadius: 10,
+                          shadowColor: "#000",
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.2,
+                          shadowRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 16,
+                            fontWeight: "600",
+                          }}
+                        >
+                          Close
+                        </Text>
+                      </Pressable>
+
+                      <Pressable
+                        onPress={() => handleSubmit()}
+                        style={{
+                          backgroundColor: "#007bff",
+                          paddingVertical: 10,
+                          paddingHorizontal: 20,
+                          borderRadius: 10,
+                          shadowColor: "#000",
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.2,
+                          shadowRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 16,
+                            fontWeight: "600",
+                          }}
+                        >
+                          Book
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </>
+                )}
+              </Formik>
             </Pressable>
           </View>
         </View>
@@ -313,8 +392,10 @@ const DayInfo = ({
     );
   };
 
-  const handleBooking = async () => {
+  const handleBooking = async (dataSolve: any) => {
     setLoading(true);
+
+    console.log(dataSolve);
     const data = {
       paid_amount: price,
       residence_id: selectedDayForm.residence_id,
@@ -338,6 +419,11 @@ const DayInfo = ({
             .split("/")
             .join("-")
         : undefined,
+
+      guest_phone: dataSolve.guest_phone,
+      guest_name: dataSolve.guest_name,
+      guest_count: dataSolve.guest_count,
+      note: dataSolve.note,
     };
     console.log(data);
     const response = await bookingApi(data);

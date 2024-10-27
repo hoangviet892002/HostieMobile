@@ -12,6 +12,7 @@ import {
   useNotification,
 } from "@/context/NotificationContext";
 import useSocketListener from "@/hooks/useListen";
+import { eventConfig } from "@/configs/eventConfig";
 
 LogBox.ignoreAllLogs(true);
 
@@ -62,19 +63,50 @@ const AppWrapper = () => {
     {
       name: "BookingForHost",
     },
+    {
+      name: "Hold",
+    },
+    {
+      name: "Booking",
+    },
   ];
+
   const { scheduleNotification } = useNotification();
-  const eventData = useSocketListener("host.receive_hold_request");
+
+  const socketEvents = {
+    holdRequest: useSocketListener("host.receive_hold_request"),
+    bookingRequest: useSocketListener("host.receive_booking_request"),
+    sellerTransfer: useSocketListener("host.receive_seller_transfer"),
+    holdAcceptReject: useSocketListener("seller.receive_hold_accepted_reject"),
+    bookingAcceptReject: useSocketListener(
+      "seller.receive_booking_accepted_reject"
+    ),
+    hostReceiveTransfer: useSocketListener("seller.host_receive_transfer"),
+    hostNotReceiveTransfer: useSocketListener(
+      "seller.host_not_receive_transfer"
+    ),
+  };
+
   useEffect(() => {
-    if (eventData) {
-      console.log("eventData", eventData);
-      scheduleNotification(
-        "Hold request",
-        "You have a hold request from residence: " + eventData.residence_id
-      );
-      // Handle the event data here
-    }
-  }, [eventData]);
+    eventConfig.forEach(({ key, log, notification }) => {
+      const eventData = socketEvents[key as keyof typeof socketEvents];
+      if (eventData) {
+        scheduleNotification(
+          notification.title,
+          notification.message(eventData)
+        );
+      }
+    });
+  }, [
+    socketEvents.holdRequest,
+    socketEvents.bookingRequest,
+    socketEvents.sellerTransfer,
+    socketEvents.holdAcceptReject,
+    socketEvents.bookingAcceptReject,
+    socketEvents.hostReceiveTransfer,
+    socketEvents.hostNotReceiveTransfer,
+  ]);
+
   return (
     <Stack>
       {element.map((item, index) => (

@@ -86,6 +86,14 @@ const postBlockApi = async (data: any): Promise<InfoResponse<any>> => {
 const deleteBlockApi = async (id: string): Promise<InfoResponse<any>> => {
   return await axiosCore.delete(`${endPoint.residences.deleteBlock(id)}`);
 };
+
+const getResidencesBySellerApi = async (
+  page: number
+): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(
+    `${endPoint.residences.getResidencesBySeller(page)}`
+  );
+};
 export {
   postResidence,
   getResidences,
@@ -97,4 +105,5 @@ export {
   getBlocksApi,
   postBlockApi,
   deleteBlockApi,
+  getResidencesBySellerApi,
 };

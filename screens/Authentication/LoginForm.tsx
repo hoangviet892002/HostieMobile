@@ -22,10 +22,9 @@ const LoginForm = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const [loginForm, setLoginForm] = useState<SignInRequest>({
-    username: "host",
-    password: "host",
+    username: "seller",
+    password: "seller",
   });
-  // set userEffect  redux state
 
   const handleChange = (key: string, value: string) => {
     setLoginForm({ ...loginForm, [key]: value });
@@ -33,14 +32,15 @@ const LoginForm = () => {
   const onSubmit = async () => {
     const response = await signInApi(loginForm);
     if (response.result) {
-      // set async storage
-
       await AsyncStorage.setItem("session", JSON.stringify(response.result));
-      // decode token
 
       const decodedToken = decodeJWT(response.result.token);
 
-      dispatch(authActions.login(decodedToken.user_id));
+      // ROLE_SELLER
+      // ROLE_HOST
+      console.log(decodedToken);
+
+      dispatch(authActions.login(decodedToken));
     } else {
       Toast.show({
         type: "error",

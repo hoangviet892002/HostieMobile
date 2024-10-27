@@ -1,33 +1,59 @@
 import { acceptHoldApi, getHoldsForHostApi } from "@/apis/booking";
-import { BackButton, Loading } from "@/components";
+import { BackButton, EmptyData, Loading } from "@/components";
 import { Colors } from "@/constants/Colors";
 import { HoldType } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View, Modal } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  Modal,
+  FlatList,
+  ActivityIndicator,
+  Image,
+} from "react-native";
 import * as Animatable from "react-native-animatable";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 const HoldForHost = () => {
   const [loading, setLoading] = useState(false);
+  const [holds, setHolds] = useState<HoldType[]>([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [holds, setHolds] = useState<HoldType[]>([]);
+
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [holdDetail, setHoldDetail] = useState<HoldType | null>(null);
-  const fetchHold = async () => {
-    setLoading(true);
-    const response = await getHoldsForHostApi(page);
-    if (response.success) {
-      setHolds((prevHolds) => [...prevHolds, ...response.data.result]);
 
+  const fetchHold = async (pageNumber = 1) => {
+    if (pageNumber === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    const response = await getHoldsForHostApi(pageNumber);
+    if (response.success && response.data.result) {
+      if (pageNumber === 1) {
+        setHolds(response.data.result);
+      } else {
+        setHolds((prevHolds) => [...prevHolds, ...response.data.result]);
+      }
       setTotalPage(response.data.pagination.total_pages);
     }
-    setLoading(false);
+
+    if (pageNumber === 1) {
+      setLoading(false);
+    } else {
+      setLoadingMore(false);
+    }
   };
 
   useEffect(() => {
-    fetchHold();
+    fetchHold(page);
   }, [page]);
 
   const acceptBooking = async () => {
@@ -44,7 +70,7 @@ const HoldForHost = () => {
       setHolds((prevHolds) =>
         prevHolds.map((hold) => {
           if (hold.id === holdDetail?.id) {
-            hold.is_host_accept = true;
+            return { ...hold, is_host_accept: true };
           }
           return hold;
         })
@@ -52,9 +78,8 @@ const HoldForHost = () => {
     }
     setLoading(false);
     setModalVisible(false);
-
-    // Accept booking
   };
+
   const RenderModal = () => {
     return (
       <Modal
@@ -65,195 +90,178 @@ const HoldForHost = () => {
           setModalVisible(!modalVisible);
         }}
       >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 20,
-              borderRadius: 15,
-              width: "85%",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 4,
-              elevation: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                marginBottom: 15,
-                textAlign: "center",
-              }}
-            >
-              Booking Details
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="bg-white p-5 rounded-xl w-11/12 shadow-lg">
+            <Text className="text-2xl font-bold mb-4 text-center">
+              Chi tiết Booking
             </Text>
 
-            <View style={{ marginBottom: 10 }}>
-              <Text style={{ fontWeight: "bold" }}>Check-in:</Text>
+            <View className="mb-3">
+              <Text className="font-bold">Check-in:</Text>
               <Text>{moment(holdDetail?.checkin).format("DD-MM-YYYY")}</Text>
             </View>
 
-            <View style={{ marginBottom: 10 }}>
-              <Text style={{ fontWeight: "bold" }}>Check-out:</Text>
+            <View className="mb-3">
+              <Text className="font-bold">Check-out:</Text>
               <Text>{moment(holdDetail?.checkout).format("DD-MM-YYYY")}</Text>
             </View>
 
-            <View style={{ marginBottom: 10 }}>
-              <Text style={{ fontWeight: "bold" }}>Total Days:</Text>
+            <View className="mb-3">
+              <Text className="font-bold">Tổng số ngày:</Text>
               <Text>{holdDetail?.total_days}</Text>
             </View>
 
-            <View style={{ marginBottom: 10 }}>
-              <Text style={{ fontWeight: "bold" }}>Total Nights:</Text>
+            <View className="mb-3">
+              <Text className="font-bold">Tổng số đêm:</Text>
               <Text>{holdDetail?.total_nights}</Text>
             </View>
 
             {!holdDetail?.is_host_accept ? (
-              <View style={{ marginBottom: 10 }}>
+              <View className="mb-3">
                 <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.primary,
-                    padding: 12,
-                    borderRadius: 8,
-                  }}
-                  onPress={() => {
-                    acceptBooking();
-                  }}
+                  className="bg-green-500 p-3 rounded-lg"
+                  onPress={acceptBooking}
                 >
-                  <Text
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontSize: 16,
-                    }}
-                  >
-                    Accept
+                  <Text className="text-white text-center text-lg">
+                    Chấp nhận
                   </Text>
                 </TouchableOpacity>
               </View>
             ) : (
-              <View style={{ marginBottom: 10 }}>
+              <View className="mb-3">
                 <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.primary,
-                    padding: 12,
-                    borderRadius: 8,
-                  }}
+                  className="bg-red-500 p-3 rounded-lg"
+                  onPress={() => {}}
                 >
-                  <Text
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontSize: 16,
-                    }}
-                  >
-                    Cancel
-                  </Text>
+                  <Text className="text-white text-center text-lg">Hủy</Text>
                 </TouchableOpacity>
               </View>
             )}
 
             <TouchableOpacity
-              style={{
-                backgroundColor: Colors.primary,
-                padding: 12,
-                borderRadius: 8,
-              }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
+              className="bg-gray-500 p-3 rounded-lg"
+              onPress={() => setModalVisible(false)}
             >
-              <Text
-                style={{ color: "white", textAlign: "center", fontSize: 16 }}
-              >
-                Close
-              </Text>
+              <Text className="text-white text-center text-lg">Đóng</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
     );
   };
+
+  const renderHoldItem = ({ item }: { item: HoldType }) => (
+    <TouchableOpacity
+      className="bg-white shadow-md rounded-xl p-4 mb-4"
+      onPress={() => {
+        setHoldDetail(item);
+        setModalVisible(true);
+      }}
+    >
+      <Image
+        source={{ uri: "https://via.placeholder.com/150" }}
+        className="w-full h-40 rounded-lg mb-4"
+      />
+
+      {/* Tiêu đề và trạng thái */}
+      <View className="flex flex-row justify-between items-center mb-2">
+        <Text className="text-xl font-bold text-gray-800">
+          {item.residence_name}
+        </Text>
+        <View className="flex flex-row items-center">
+          <Ionicons
+            name={item.is_host_accept ? "checkmark-circle" : "time-outline"}
+            size={20}
+            color={item.is_host_accept ? "#38A169" : "#ECC94B"}
+          />
+          <Text
+            className={`ml-1 font-medium ${
+              item.is_host_accept ? "text-green-600" : "text-yellow-600"
+            }`}
+          >
+            {item.is_host_accept ? "Đã chấp nhận" : "Chờ duyệt"}
+          </Text>
+        </View>
+      </View>
+
+      {/* Thông tin ngày tháng */}
+      <View className="flex flex-row justify-between items-center mb-2">
+        <View className="flex flex-row items-center">
+          <Ionicons name="calendar-outline" size={18} color="#4A5568" />
+          <Text className="ml-1 text-gray-700">
+            {moment(item.checkin).format("DD-MM-YYYY")}
+          </Text>
+        </View>
+        <Text className="text-gray-500">đến</Text>
+        <View className="flex flex-row items-center">
+          <Ionicons name="calendar-outline" size={18} color="#4A5568" />
+          <Text className="ml-1 text-gray-700">
+            {moment(item.checkout).format("DD-MM-YYYY")}
+          </Text>
+        </View>
+      </View>
+
+      {/* Số đêm và số ngày */}
+      <View className="flex flex-row justify-between items-center mb-2">
+        <View className="flex flex-row items-center">
+          <Ionicons name="moon-outline" size={18} color="#4A5568" />
+          <Text className="ml-1 text-gray-700">{item.total_nights} đêm</Text>
+        </View>
+        <View className="flex flex-row items-center">
+          <Ionicons name="sunny-outline" size={18} color="#4A5568" />
+          <Text className="ml-1 text-gray-700">{item.total_days} ngày</Text>
+        </View>
+      </View>
+
+      {/* Mô tả */}
+      {item.description ? (
+        <View className="mt-2">
+          <Text className="text-gray-600">{item.description}</Text>
+        </View>
+      ) : null}
+    </TouchableOpacity>
+  );
+
+  const handleLoadMore = () => {
+    if (page < totalPage) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return (
+      <View className="py-4">
+        <ActivityIndicator size="small" />
+      </View>
+    );
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1">
       <Loading loading={loading} />
       <Animatable.View
-        className="flex flex-row items-center"
+        className="flex flex-row items-center px-4"
         delay={120}
         animation="slideInDown"
       >
         <BackButton />
-        <View className="flex flex-row items-center ">
-          <View className="flex ">
-            <Text className="text-3xl font-bold ">Hold</Text>
-          </View>
+        <View className="flex flex-row items-center">
+          <Text className="text-3xl font-bold">Danh sách Hold</Text>
         </View>
       </Animatable.View>
 
-      <ScrollView className="p-4 mb-4">
-        {holds.map((hold, index) => (
-          <TouchableOpacity
-            key={index}
-            className="bg-white shadow-md rounded-lg p-4 mb-4"
-            onPress={() => {
-              setHoldDetail(hold);
-              setModalVisible(true);
-            }}
-          >
-            <View className="flex flex-row justify-between">
-              <View>
-                <Text className="text-lg font-bold">
-                  {moment(hold.checkin).format("DD-MM-YYYY")}
-                </Text>
-                <Text className="text-gray-600">
-                  {moment(hold.checkout).format("DD-MM-YYYY")}
-                </Text>
-              </View>
-              <View>
-                <Text className="text-lg font-semibold">
-                  {hold.total_days} days
-                </Text>
-                <Text className="text-gray-600">
-                  {hold.total_nights} nights
-                </Text>
-              </View>
-              <View>
-                <Text
-                  className={`font-semibold ${
-                    hold.is_host_accept ? "text-green-500" : "text-yellow-500"
-                  }`}
-                >
-                  {hold.is_host_accept ? "Accepted" : "Pending"}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+      <FlatList
+        data={holds}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderHoldItem}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={() => <EmptyData />}
+      />
 
-        {/* Load more button */}
-        <View className="flex justify-center items-center mb-5">
-          <TouchableOpacity
-            className="bg-primary p-2 rounded-lg"
-            style={{ backgroundColor: Colors.primary }}
-            onPress={() => {
-              if (page < totalPage) {
-                setPage((prevPage) => prevPage + 1);
-              }
-            }}
-          >
-            <Text className="text-white">Load more</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
       <RenderModal />
     </SafeAreaView>
   );

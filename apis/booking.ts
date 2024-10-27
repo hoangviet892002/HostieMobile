@@ -45,6 +45,13 @@ const getBooksForHostApi = async (page: number): Promise<InfoResponse<any>> => {
 const acceptHoldApi = async (data: any): Promise<InfoResponse<any>> => {
   return await axiosCore.post(`${endPoint.booking.acceptHold}`, data);
 };
+
+const getHoldApi = async (page: number): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(`${endPoint.booking.getHold(page)}`);
+};
+const getBookingApi = async (page: number): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(`${endPoint.booking.getBooking(page)}`);
+};
 export {
   holdBookingApi,
   getPrice,
@@ -52,4 +59,6 @@ export {
   getHoldsForHostApi,
   getBooksForHostApi,
   acceptHoldApi,
+  getHoldApi,
+  getBookingApi,
 };

@@ -11,13 +11,18 @@ import {
   languageActions,
   selectCurrentLanguage,
 } from "@/redux/slices/languageSlice";
-import { authActions, selectIsAuthenticated } from "@/redux/slices/authSlice";
+import {
+  authActions,
+  selectIsAuthenticated,
+  selectRole,
+} from "@/redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useNavigation } from "expo-router";
 import { useNotification } from "@/context/NotificationContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useSocket } from "@/context/SocketProvider";
+import { Roles } from "@/constants/enums/roles";
 interface menu {
   title: string;
   icon: string;
@@ -28,6 +33,7 @@ const Setting = () => {
   const dispatch = useDispatch();
   const currentLanguage = useSelector(selectCurrentLanguage);
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const role = useSelector(selectRole);
   const navigation = useNavigation();
 
   useFocusEffect(
@@ -54,6 +60,20 @@ const Setting = () => {
   };
 
   const optionMenu: menu[] = [
+    {
+      title: t("Booking"),
+      icon: "calendar",
+      handle: () => {
+        navigation.navigate("Booking");
+      },
+    },
+    {
+      title: t("Hold"),
+      icon: "bookmark",
+      handle: () => {
+        navigation.navigate("Hold");
+      },
+    },
     {
       title: t("Change Password"),
       icon: "lock",
@@ -126,24 +146,27 @@ const Setting = () => {
             </Text>
           </View>
         </View>
-        <View className="flex flex-row">
-          <TouchableOpacity
-            className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-l-xl"
-            onPress={() => {
-              navigation.navigate("BookingForHost");
-            }}
-          >
-            <Text className="text-lg font-semibold">Booking</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-r-xl"
-            onPress={() => {
-              navigation.navigate("HoldForHost");
-            }}
-          >
-            <Text className="text-lg font-semibold">Hold</Text>
-          </TouchableOpacity>
-        </View>
+        {role === Roles.ROLE_HOST && (
+          <View className="flex flex-row">
+            <TouchableOpacity
+              className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-l-xl"
+              onPress={() => {
+                navigation.navigate("BookingForHost");
+              }}
+            >
+              <Text className="text-lg font-semibold">Booking</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-r-xl"
+              onPress={() => {
+                navigation.navigate("HoldForHost");
+              }}
+            >
+              <Text className="text-lg font-semibold">Hold</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <View className="flex flex-col mt-8">
           {optionMenu.map((item, index) => (
             <TouchableOpacity

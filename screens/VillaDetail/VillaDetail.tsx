@@ -77,11 +77,11 @@ const VillaDetail = () => {
     ward: "",
   });
   const fetchVillaDetail = async (id: string) => {
-    getResidence(id).then((res) => {
-      if (res.success) {
-        setVilla(res.data);
-      }
-    });
+    const res = await getResidence(id);
+    console.log(res);
+    if (res.success) {
+      setVilla(res.data);
+    }
   };
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<{ id: string; image: string }[]>([]);
