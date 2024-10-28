@@ -1,4 +1,5 @@
 export const eventConfig = [
+  // host
   {
     key: "holdRequest",
     log: "host.receive_hold_request",
@@ -26,6 +27,7 @@ export const eventConfig = [
         `You have a seller transfer from seller ID: ${data.seller_id}`,
     },
   },
+  //   seller
   {
     key: "holdAcceptReject",
     log: "seller.receive_hold_accepted_reject",
@@ -62,6 +64,17 @@ export const eventConfig = [
       title: "Transfer Not Received",
       message: (data: any) =>
         `You have not received the transfer from seller: ${data.seller_id}`,
+    },
+  },
+
+  //   common
+  {
+    key: "RecieveChangeCalendar",
+    log: "common.receive_change_calendar",
+    notification: {
+      title: "Calendar Update",
+      message: (data: any) =>
+        `The calendar of residence: ${data.residence_id} has been updated`,
     },
   },
 ];

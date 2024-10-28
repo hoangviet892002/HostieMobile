@@ -86,11 +86,10 @@ const VillaDetail = () => {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<{ id: string; image: string }[]>([]);
   const fetchImages = async (id: string) => {
-    getImages(id).then((res) => {
-      if (res.success) {
-        setImages(res.data.images);
-      }
-    });
+    const res = await getImages(id);
+    if (res.success) {
+      setImages(res.data);
+    }
   };
   useEffect(() => {
     setLoading(true);

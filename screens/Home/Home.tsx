@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { useFocusEffect } from "expo-router";
 import Icon, { Icons } from "@/components/Icons";
-import { Loading, VillaCard } from "@/components";
+import { EmptyData, Loading, VillaCard } from "@/components";
 import { Colors } from "@/constants/Colors";
 import { Residence } from "@/types/response/Residences";
 import { getResidencesBySellerApi } from "@/apis/residences";
@@ -107,6 +107,7 @@ const Home = () => {
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
+        ListEmptyComponent={() => <EmptyData />}
       />
     </SafeAreaView>
   );

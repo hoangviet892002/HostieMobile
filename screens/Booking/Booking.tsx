@@ -7,6 +7,8 @@ import { BookingType } from "@/types";
 import { getBookingApi } from "@/apis/booking";
 import { Ionicons } from "@expo/vector-icons";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import { parseStatusBooking } from "@/utils/parseStatusBooking";
+import { getStatusStyle } from "@/constants/getStatusStyle";
 
 const Booking = () => {
   const [loading, setLoading] = useState(false);
@@ -54,6 +56,7 @@ const Booking = () => {
   };
 
   const renderItem = ({ item }: { item: BookingType }) => {
+    const { icon, color, textColor } = getStatusStyle(parseStatusBooking(item));
     return (
       <View className="bg-white p-5 mb-5 mx-4 rounded-2xl shadow-lg">
         {/* Hình ảnh đại diện */}
@@ -68,17 +71,9 @@ const Booking = () => {
             {item.residence_name}
           </Text>
           <View className="flex flex-row items-center">
-            <Ionicons
-              name={item.is_host_accept ? "checkmark-circle" : "time-outline"}
-              size={24}
-              color={item.is_host_accept ? "#38A169" : "#ECC94B"}
-            />
-            <Text
-              className={`ml-2 font-medium ${
-                item.is_host_accept ? "text-green-600" : "text-yellow-600"
-              }`}
-            >
-              {item.is_host_accept ? "Đã chấp nhận" : "Đang chờ"}
+            <Ionicons name={icon} size={24} color={color} />
+            <Text className={`ml-2 font-medium ${textColor}`}>
+              {parseStatusBooking(item)}
             </Text>
           </View>
         </View>

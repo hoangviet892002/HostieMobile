@@ -85,6 +85,7 @@ const AppWrapper = () => {
     hostNotReceiveTransfer: useSocketListener(
       "seller.host_not_receive_transfer"
     ),
+    RecieveChangeCalendar: useSocketListener("common.receive_change_calendar"),
   };
 
   useEffect(() => {
