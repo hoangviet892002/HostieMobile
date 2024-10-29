@@ -88,7 +88,7 @@ const VillaDetail = () => {
   const fetchImages = async (id: string) => {
     const res = await getImages(id);
     if (res.success) {
-      setImages(res.data);
+      setImages(res.data.images);
     }
   };
   useEffect(() => {

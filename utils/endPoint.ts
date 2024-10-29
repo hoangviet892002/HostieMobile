@@ -1,4 +1,5 @@
 import { getPrice, getResidence } from "@/apis/residences";
+import { transform } from "@babel/core";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const baseURL = "http://34.81.244.146:8080";
@@ -56,6 +57,17 @@ const endPoint = {
     acceptHold: `/booking/hold/accept`,
     getHold: (page: number) => `/booking/hold?page=${page}`,
     getBooking: (page: number) => `/booking?page=${page}`,
+    getDetailBooking: (id: string) => `/booking/${id}`,
+    acceptBooking: `/booking/accept`,
+    sellerTransfer: `/booking/transfer`,
+    hostReceive: `/booking/receive`,
+    sellerCancel: `/booking/cancel`,
+  },
+  customer: {
+    create: `/customers`,
+    getAll: `/customers`,
+    update: (id: string) => `/customers/${id}`,
+    delete: (id: string) => `/customers/${id}`,
   },
 };
 

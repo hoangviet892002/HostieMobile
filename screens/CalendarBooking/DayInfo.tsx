@@ -1,15 +1,20 @@
 import { bookingApi, getPrice, holdBookingApi } from "@/apis/booking";
+import { getCusomtersApi, postCustomer } from "@/apis/customer";
 import { Loading } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
+import { Customer } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import {
+  FlatList,
   Modal,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
@@ -114,7 +119,7 @@ const DayInfo = ({
     };
 
     const response = await getPrice(data);
-    console.log(response);
+
     if (response.success) {
       setPrice(response.data[0].total_price);
     } else {
@@ -129,8 +134,95 @@ const DayInfo = ({
   const RenderBookingForm = () => {
     const [guest_phone, setPhone] = useState("");
     const [guest_name, setName] = useState("");
+    const [guest_id, setId] = useState("");
     const [guest_count, setCount] = useState(1);
     const [note, setNote] = useState("");
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+
+    const [customers, setCustomers] = useState<any[]>([]);
+    useEffect(() => {
+      setLoading(true);
+      const fetchCustomers = async () => {
+        const response = await getCusomtersApi();
+
+        if (response.success) {
+          setCustomers(response.data.data);
+        }
+      };
+      fetchCustomers();
+      setLoading(false);
+    }, []);
+    useEffect(() => {
+      const selectedCustomer = customers.find(
+        (c) => c.id === selectedCustomerId
+      );
+      if (selectedCustomer) {
+        setName(selectedCustomer.name);
+        setPhone(selectedCustomer.phone);
+        setId(selectedCustomer.id);
+      } else {
+        setName("");
+        setPhone("");
+        setId("");
+      }
+    }, [selectedCustomerId]);
+    const renderCustomerItem = ({
+      item,
+      setSelectedCustomerId,
+      setDropdownVisible,
+    }) => (
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedCustomerId(item.id);
+          setDropdownVisible(false);
+        }}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          padding: 15,
+          backgroundColor: "#fff",
+          borderBottomWidth: 1,
+          borderBottomColor: "#eee",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 2,
+          elevation: 2, // For Android shadow
+          borderRadius: 8,
+          marginHorizontal: 10,
+          marginVertical: 5,
+        }}
+        activeOpacity={0.7}
+        accessibilityLabel={`Select customer ${item.name}`}
+      >
+        {/* Customer Icon */}
+        <Ionicons
+          name="person-circle-outline"
+          size={40}
+          color="#4F8EF7"
+          style={{ marginRight: 15 }}
+        />
+
+        {/* Customer Details */}
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 18, fontWeight: "600", color: "#333" }}>
+            {item.name}
+          </Text>
+          <Text style={{ fontSize: 14, color: "#666", marginTop: 4 }}>
+            {item.phone}
+          </Text>
+        </View>
+
+        {/* Chevron Icon */}
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color="#ccc"
+          style={{ marginLeft: 10 }}
+        />
+      </TouchableOpacity>
+    );
 
     return (
       <Modal
@@ -243,8 +335,7 @@ const DayInfo = ({
                 initialValues={{ guest_phone, guest_name, guest_count, note }}
                 onSubmit={() => {
                   const data = {
-                    guest_phone: guest_phone,
-                    guest_name: guest_name,
+                    guest_id: guest_id,
                     guest_count: guest_count,
                     note: note,
                   };
@@ -278,40 +369,200 @@ const DayInfo = ({
                 }) => (
                   <>
                     <View>
-                      <Text className="text-lg font-bold"> Phone </Text>
-                      <TextInput
-                        className="bg-white p-2 rounded-lg border-2 py-2"
-                        style={{ borderColor: Colors.primary }}
-                        value={guest_phone}
-                        placeholder="Phone"
-                        onChangeText={(text) => setPhone(text)}
-                      />
+                      <View style={{ marginBottom: 15 }}>
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontWeight: "600",
+                            color: "#4a4a4a",
+                            marginBottom: 5,
+                          }}
+                        >
+                          Select Customer
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => setDropdownVisible(!dropdownVisible)}
+                          style={{
+                            backgroundColor: "#fff",
+                            padding: 10,
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor: Colors.primary,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              color: guest_name ? "#000" : "#6c757d",
+                            }}
+                          >
+                            {guest_name
+                              ? `${guest_name} (${guest_phone})`
+                              : "Select a customer"}
+                          </Text>
+                        </TouchableOpacity>
 
+                        {/* Dropdown Modal */}
+                        <Modal
+                          animationType="fade"
+                          transparent={true}
+                          visible={dropdownVisible}
+                          onRequestClose={() => {
+                            setDropdownVisible(!dropdownVisible);
+                          }}
+                        >
+                          <View
+                            style={{
+                              flex: 1,
+                              justifyContent: "center",
+                              alignItems: "center",
+                              backgroundColor: "rgba(0,0,0,0.5)",
+                            }}
+                          >
+                            <View
+                              style={{
+                                width: "90%",
+                                backgroundColor: "#f8f9fa",
+                                padding: 25,
+                                borderRadius: 15,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.3,
+                                shadowRadius: 8,
+                                elevation: 5,
+                              }}
+                            >
+                              {/* Add new customer */}
+
+                              <Formik
+                                initialValues={{ phone: "", name: "" }}
+                                onSubmit={(values) => {
+                                  const newCustomer: Customer = {
+                                    phone: values.phone,
+                                    name: values.name,
+                                  };
+                                  const addCustomer = async () => {
+                                    const response = await postCustomer(
+                                      newCustomer
+                                    );
+                                    if (response.success) {
+                                      setCustomers([
+                                        ...customers,
+                                        response.data,
+                                      ]);
+                                    } else {
+                                      Toast.show({
+                                        type: "error",
+                                        text1: "Add Customer Failed",
+                                        text2: response.msg,
+                                      });
+                                    }
+                                  };
+                                  addCustomer();
+                                  setDropdownVisible(false);
+                                }}
+                                validate={(values) => {
+                                  const errors: any = {};
+                                  if (!values.phone) {
+                                    errors.phone = "Required";
+                                  }
+                                  // check format phone
+                                  if (!/^\d{10}$/.test(values.phone)) {
+                                    errors.phone = "Invalid phone number";
+                                  }
+                                  if (!values.name) {
+                                    errors.name = "Required";
+                                  }
+                                  return errors;
+                                }}
+                              >
+                                {({
+                                  handleChange,
+                                  handleBlur,
+                                  handleSubmit,
+                                  values,
+                                  errors,
+                                }) => (
+                                  <>
+                                    <Text className="text-lg font-bold">
+                                      {" "}
+                                      Phone{" "}
+                                    </Text>
+                                    <TextInput
+                                      className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+                                      style={{ borderColor: Colors.primary }}
+                                      value={values.phone}
+                                      placeholder="Phone"
+                                      onChangeText={handleChange("phone")}
+                                    />
+                                    {errors.phone && (
+                                      <Text style={{ color: "red" }}>
+                                        {errors.phone}
+                                      </Text>
+                                    )}
+                                    <Text className="text-lg font-bold">
+                                      {" "}
+                                      Name{" "}
+                                    </Text>
+                                    <TextInput
+                                      className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+                                      style={{ borderColor: Colors.primary }}
+                                      value={values.name}
+                                      placeholder="Name"
+                                      onChangeText={handleChange("name")}
+                                    />
+                                    {errors.name && (
+                                      <Text style={{ color: "red" }}>
+                                        {errors.name}
+                                      </Text>
+                                    )}
+                                    <Pressable
+                                      onPress={() => handleSubmit()}
+                                      style={{
+                                        backgroundColor: "#007bff",
+                                        paddingVertical: 10,
+                                        paddingHorizontal: 20,
+                                        borderRadius: 10,
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 2 },
+                                        shadowOpacity: 0.2,
+                                        shadowRadius: 5,
+                                      }}
+                                    >
+                                      <Text
+                                        style={{
+                                          color: "white",
+                                          fontSize: 16,
+                                          fontWeight: "600",
+                                        }}
+                                      >
+                                        Add
+                                      </Text>
+                                    </Pressable>
+                                  </>
+                                )}
+                              </Formik>
+                              <FlatList
+                                data={customers}
+                                renderItem={(item) =>
+                                  renderCustomerItem({
+                                    item: item.item,
+                                    setSelectedCustomerId,
+                                    setDropdownVisible,
+                                  })
+                                }
+                                keyExtractor={(item) => item.id}
+                              />
+                            </View>
+                          </View>
+                        </Modal>
+                      </View>
                       {/* error */}
-                      <Text style={{ color: "red" }}>{errors.guest_phone}</Text>
-
-                      <Text className="text-lg font-bold"> Name </Text>
-                      <TextInput
-                        className="bg-white p-2 rounded-lg border-2 py-2"
-                        style={{ borderColor: Colors.primary }}
-                        value={guest_name}
-                        placeholder="Name"
-                        onChangeText={(text) => setName(text)}
-                      />
-
-                      {/* error */}
-                      <Text style={{ color: "red" }}>{errors.guest_name}</Text>
-
-                      <Text className="text-lg font-bold"> Count </Text>
-                      <TextInput
-                        className="bg-white p-2 rounded-lg border-2 py-2"
-                        style={{ borderColor: Colors.primary }}
-                        value={guest_count.toString()}
-                        placeholder="Count"
-                        onChangeText={(text) => setCount(parseInt(text))}
-                      />
-                      {/* error */}
-                      <Text style={{ color: "red" }}>{errors.guest_count}</Text>
+                      {errors.guest_name && (
+                        <Text style={{ color: "red" }}>
+                          {errors.guest_name}
+                        </Text>
+                      )}
 
                       <Text className="text-lg font-bold"> Note </Text>
 
@@ -323,6 +574,8 @@ const DayInfo = ({
                         onChangeText={(text) => setNote(text)}
                       />
                     </View>
+
+                    {/* Buttons */}
 
                     <View
                       style={{
@@ -395,7 +648,6 @@ const DayInfo = ({
   const handleBooking = async (dataSolve: any) => {
     setLoading(true);
 
-    console.log(dataSolve);
     const data = {
       paid_amount: price,
       residence_id: selectedDayForm.residence_id,
@@ -420,14 +672,13 @@ const DayInfo = ({
             .join("-")
         : undefined,
 
-      guest_phone: dataSolve.guest_phone,
-      guest_name: dataSolve.guest_name,
+      guest_id: dataSolve.guest_id,
       guest_count: dataSolve.guest_count,
       note: dataSolve.note,
     };
-    console.log(data);
+
     const response = await bookingApi(data);
-    console.log(response);
+
     if (response.success) {
       Toast.show({
         type: "success",

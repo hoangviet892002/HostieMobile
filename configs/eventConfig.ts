@@ -7,6 +7,13 @@ export const eventConfig = [
       title: "Hold Request",
       message: (data: any) =>
         `You have a hold request from residence: ${data.residence_id}`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: data,
+        };
+      },
     },
   },
   {
@@ -16,6 +23,13 @@ export const eventConfig = [
       title: "Booking Request",
       message: (data: any) =>
         `You have a booking request from residence: ${data.residence_id}`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: { data },
+        };
+      },
     },
   },
   {
@@ -25,6 +39,13 @@ export const eventConfig = [
       title: "Seller Transfer",
       message: (data: any) =>
         `You have a seller transfer from seller ID: ${data.seller_id}`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: { data },
+        };
+      },
     },
   },
   //   seller
@@ -35,6 +56,13 @@ export const eventConfig = [
       title: "Hold Request Update",
       message: (data: any) =>
         `Your hold request has been ${data.accepted ? "accepted" : "rejected"}`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: { data },
+        };
+      },
     },
   },
   {
@@ -46,6 +74,13 @@ export const eventConfig = [
         `Your booking request has been ${
           data.accepted ? "accepted" : "rejected"
         }`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: { data },
+        };
+      },
     },
   },
   {
@@ -55,6 +90,13 @@ export const eventConfig = [
       title: "Transfer Received",
       message: (data: any) =>
         `You have received a transfer from seller: ${data.seller_id}`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: { data },
+        };
+      },
     },
   },
   {
@@ -64,6 +106,13 @@ export const eventConfig = [
       title: "Transfer Not Received",
       message: (data: any) =>
         `You have not received the transfer from seller: ${data.seller_id}`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: { data },
+        };
+      },
     },
   },
 
@@ -75,6 +124,13 @@ export const eventConfig = [
       title: "Calendar Update",
       message: (data: any) =>
         `The calendar of residence: ${data.residence_id} has been updated`,
+      navigateTo: (data: any) => {
+        const href = "HoldForHost";
+        return {
+          href,
+          params: { data },
+        };
+      },
     },
   },
 ];

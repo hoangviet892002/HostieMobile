@@ -3,7 +3,7 @@ import { Provider, useDispatch } from "react-redux";
 import store from "@/redux/stores";
 import "@/resources/translate";
 import { useEffect, useState } from "react";
-
+import { NavigationContainer } from "@react-navigation/native";
 import { LogBox } from "react-native";
 import Toast from "react-native-toast-message";
 import { SocketProvider } from "@/context/SocketProvider";
@@ -13,6 +13,7 @@ import {
 } from "@/context/NotificationContext";
 import useSocketListener from "@/hooks/useListen";
 import { eventConfig } from "@/configs/eventConfig";
+import { navigationRef } from "@/utils/navigationRef";
 
 LogBox.ignoreAllLogs(true);
 
@@ -69,6 +70,9 @@ const AppWrapper = () => {
     {
       name: "Booking",
     },
+    {
+      name: "BookingDetail",
+    },
   ];
 
   const { scheduleNotification } = useNotification();
@@ -94,7 +98,8 @@ const AppWrapper = () => {
       if (eventData) {
         scheduleNotification(
           notification.title,
-          notification.message(eventData)
+          notification.message(eventData),
+          notification.navigateTo(eventData)
         );
       }
     });
@@ -106,6 +111,7 @@ const AppWrapper = () => {
     socketEvents.bookingAcceptReject,
     socketEvents.hostReceiveTransfer,
     socketEvents.hostNotReceiveTransfer,
+    socketEvents.RecieveChangeCalendar,
   ]);
 
   return (

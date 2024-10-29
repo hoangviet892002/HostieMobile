@@ -1,5 +1,12 @@
-import { View, Text, ActivityIndicator, FlatList, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackButton, EmptyData, Loading } from "@/components";
 import * as Animatable from "react-native-animatable";
@@ -9,6 +16,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
 import { parseStatusBooking } from "@/utils/parseStatusBooking";
 import { getStatusStyle } from "@/constants/getStatusStyle";
+import { useFocusEffect, useNavigation } from "expo-router";
+import Toast from "react-native-toast-message";
 
 const Booking = () => {
   const [loading, setLoading] = useState(false);
@@ -16,29 +25,48 @@ const Booking = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [totalPage, setTotalPage] = useState(1);
   const [books, setBooks] = useState<BookingType[]>([]);
+  const navigation = useNavigation();
   const fetchBook = async (pageNumber = 1) => {
-    setLoading(true);
     if (pageNumber === 1) {
       setLoading(true);
     } else {
       setLoadingMore(true);
     }
 
-    const response = await getBookingApi(page);
-    if (response.success && response.data.result) {
-      setBooks((prevBooks) => [...prevBooks, ...response.data.result]);
-
-      setTotalPage(response.data.pagination.total_pages);
-    }
-    setLoading(false);
-    if (pageNumber === 1) {
-      setLoading(false);
-    } else {
-      setLoadingMore(false);
+    try {
+      const response = await getBookingApi(pageNumber);
+      if (response.success && response.data.result) {
+        if (pageNumber === 1) {
+          setBooks(response.data.result);
+        } else {
+          setBooks((prevBooks) => [...prevBooks, ...response.data.result]);
+        }
+        setTotalPage(response.data.pagination.total_pages);
+      }
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      console.error("Failed to fetch bookings:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to fetch bookings.",
+      });
+    } finally {
+      if (pageNumber === 1) {
+        setLoading(false);
+      } else {
+        setLoadingMore(false);
+      }
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchBook();
+    }, [])
+  );
   useEffect(() => {
-    fetchBook();
+    fetchBook(page);
   }, [page]);
   const handleLoadMore = () => {
     if (!loadingMore && page < totalPage) {
@@ -58,7 +86,12 @@ const Booking = () => {
   const renderItem = ({ item }: { item: BookingType }) => {
     const { icon, color, textColor } = getStatusStyle(parseStatusBooking(item));
     return (
-      <View className="bg-white p-5 mb-5 mx-4 rounded-2xl shadow-lg">
+      <TouchableOpacity
+        className="bg-white p-5 mb-5 mx-4 rounded-2xl shadow-lg"
+        onPress={() => {
+          navigation.navigate("BookingDetail", { id: item.id });
+        }}
+      >
         {/* Hình ảnh đại diện */}
         <Image
           source={{ uri: "https://picsum.photos/200/300" }}
@@ -136,14 +169,7 @@ const Booking = () => {
             })}
           </Text>
         </View>
-
-        {/* Nút hành động */}
-        <View className="flex flex-row justify-end">
-          <View className="bg-blue-500 px-4 py-2 rounded-full">
-            <Text className="text-white font-medium">Xem chi tiết</Text>
-          </View>
-        </View>
-      </View>
+      </TouchableOpacity>
     );
   };
   return (

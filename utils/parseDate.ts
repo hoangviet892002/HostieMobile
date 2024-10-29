@@ -12,8 +12,8 @@ export const parseDate = (date: string) => {
 //  parse format date DD-MM-YYYY
 export const parseDateDDMMYYYY = (date: string) => {
   const dateObj = new Date(date);
-  const day = dateObj.getDate();
+  const day = String(dateObj.getDate()).padStart(2, "0");
+  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
   const year = dateObj.getFullYear();
-  const month = dateObj.getMonth() + 1;
   return `${day}-${month}-${year}`;
 };

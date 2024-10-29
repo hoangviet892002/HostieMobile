@@ -1,3 +1,5 @@
+import { StatusBooking } from "@/constants/enums/statusBookingEnums";
+
 interface data {
   is_host_accept: boolean;
   is_seller_transfer: boolean;
@@ -6,17 +8,21 @@ interface data {
 }
 
 export const parseStatusBooking = (data: data) => {
+  if (data.status === 0) {
+    return StatusBooking.CANCEL;
+  }
+  if (data.status === 3) {
+    return StatusBooking.REJECT;
+  }
   if (!data.is_host_accept) {
-    return "Wait Accept";
+    return StatusBooking.WAIT_ACCEPT;
   }
   if (!data.is_seller_transfer) {
-    return "Wait Transfer";
+    return StatusBooking.WAIT_TRANSFER;
   }
   if (!data.is_host_receive) {
-    return "Wait Receive";
+    return StatusBooking.WAIT_RECEIVE;
   }
-  if (data.status === 0) {
-    return "Cancel";
-  }
-  return "Success";
+
+  return StatusBooking.SUCCESS;
 };

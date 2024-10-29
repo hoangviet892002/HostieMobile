@@ -12,6 +12,8 @@ import { CalendarResponse } from "./response/CalendarReponse";
 import { ResidenceBlock } from "./ResidenceBlock";
 import { HoldType } from "./HoldType";
 import { BookingType } from "./BookingType";
+import { Customer } from "./Customer";
+import { DetailBookingType } from "./DetailBookingType";
 export type {
   Calendar,
   AmenityType,
@@ -27,4 +29,6 @@ export type {
   ResidenceBlock,
   HoldType,
   BookingType,
+  Customer,
+  DetailBookingType,
 };

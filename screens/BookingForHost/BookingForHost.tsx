@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -18,8 +18,10 @@ import { Colors } from "@/constants/Colors";
 import EmptyData from "@/components/EmptyData";
 import { parseStatusBooking } from "@/utils/parseStatusBooking";
 import { getStatusStyle } from "@/constants/getStatusStyle";
+import { useFocusEffect, useNavigation } from "expo-router";
 
 const BookingForHost = () => {
+  const navigation = useNavigation();
   const [books, setBooks] = useState<BookingType[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -27,6 +29,11 @@ const BookingForHost = () => {
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchBooks(1);
+    }, [])
+  );
   const fetchBooks = async (pageNumber = 1) => {
     if (pageNumber === 1 && !refreshing) {
       setLoading(true);
@@ -92,11 +99,13 @@ const BookingForHost = () => {
     return (
       <TouchableOpacity
         className="bg-white p-5 mb-5 mx-4 rounded-2xl shadow-lg"
-        onPress={() => {}}
+        onPress={() => {
+          navigation.navigate("BookingDetail", { id: item.id });
+        }}
       >
         {/* Hình ảnh đại diện */}
         <Image
-          source={{ uri: "https://picsum.photos/200/300" }} // Thay
+          source={{ uri: "https://picsum.photos/200/300" }}
           className="w-full h-40 rounded-xl mb-4"
         />
 

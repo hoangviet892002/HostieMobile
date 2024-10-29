@@ -16,6 +16,7 @@ import HoldForHost from "./HoldForHost";
 import BookingForHost from "./BookingForHost";
 import Hold from "./Hold";
 import Booking from "./Booking";
+import BookingDetail from "./BookingDetail";
 export {
   VillaDetail,
   CalendarDetail,
@@ -35,4 +36,5 @@ export {
   BookingForHost,
   Hold,
   Booking,
+  BookingDetail,
 };

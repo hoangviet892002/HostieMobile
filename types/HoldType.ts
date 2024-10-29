@@ -13,4 +13,6 @@ export interface HoldType {
   updated_at: string;
   residence_name: string;
   host_id: number;
+  seller_name: string;
+  seller_avatar: string;
 }

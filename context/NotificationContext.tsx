@@ -1,13 +1,14 @@
+import { useNavigation } from "@react-navigation/native";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 import React, {
   createContext,
+  ReactNode,
   useContext,
   useEffect,
   useState,
-  ReactNode,
 } from "react";
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
-
+import { useRouter } from "expo-router";
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -46,9 +47,11 @@ interface NotificationProviderProps {
 export const NotificationProvider = ({
   children,
 }: NotificationProviderProps) => {
+  const router = useRouter();
   const [notification, setNotification] =
     useState<Notifications.Notification | null>(null);
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -71,17 +74,31 @@ export const NotificationProvider = ({
     const subscription =
       Notifications.addNotificationReceivedListener(setNotification);
 
+    const responseListener =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        const data = response.notification.request.content.data;
+
+        setTimeout(() => {
+          router.replace(data.href);
+        }, 500);
+      });
+
     return () => {
       subscription.remove();
+      responseListener.remove();
     };
   }, []);
 
-  const scheduleNotification = async (title: string, body: string) => {
+  const scheduleNotification = async (
+    title: string,
+    body: string,
+    data: any
+  ) => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: title,
         body: body,
-        data: { someData: "goes here" },
+        data: data,
       },
       trigger: null,
     });

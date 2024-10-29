@@ -6,8 +6,10 @@ export interface BookingType {
   paid_amount: number;
   checkin: string;
   checkout: string;
-  total_night: number;
-  total_day: number;
+  total_night?: number;
+  total_nights?: number;
+  total_day?: number;
+  total_days?: number;
   guest_name: null | string;
   guest_phone: null | string;
   host_phone: null | string;
@@ -21,4 +23,6 @@ export interface BookingType {
   residence_name: string;
   host_id: number;
   description: null | string;
+  hold_residence_id?: number;
+  expire: null | string;
 }
