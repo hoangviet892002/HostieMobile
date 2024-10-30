@@ -79,7 +79,7 @@ export const NotificationProvider = ({
         const data = response.notification.request.content.data;
 
         setTimeout(() => {
-          router.replace(data.href);
+          router.replace(data.href, data.params);
         }, 500);
       });
 

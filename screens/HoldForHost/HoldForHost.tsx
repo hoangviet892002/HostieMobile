@@ -67,6 +67,7 @@ const HoldForHost = () => {
     };
 
     const res = await acceptHoldApi(data);
+    console.log(res);
     if (res.success) {
       setHolds((prevHolds) =>
         prevHolds.map((hold) => {
@@ -131,6 +132,7 @@ const HoldForHost = () => {
                   }`}
                 >
                   {holdDetail?.is_host_accept ? "Đã chấp nhận" : "Chờ duyệt"}
+                  {holdDetail?.status === 0 && "Đã hủy"}
                 </Text>
               </View>
             </View>
@@ -352,7 +354,7 @@ const HoldForHost = () => {
         delay={120}
         animation="slideInDown"
       >
-        <BackButton />
+        <BackButton navigateTo="(tabs)" />
         <View className="flex flex-row items-center">
           <Text className="text-3xl font-bold">Danh sách Hold</Text>
         </View>

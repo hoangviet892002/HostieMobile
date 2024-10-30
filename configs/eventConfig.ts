@@ -22,27 +22,29 @@ export const eventConfig = [
     notification: {
       title: "Booking Request",
       message: (data: any) =>
-        `You have a booking request from residence: ${data.residence_id}`,
+        `Mr/Mrs ${data.seller_id} has requested to book residence: ${data.residence_id}`,
       navigateTo: (data: any) => {
-        const href = "HoldForHost";
+        const href = "BookingDetail";
+        const params = `?id=${data.id}`;
         return {
-          href,
-          params: { data },
+          href: href + params,
+          params: { id: data.id },
         };
       },
     },
   },
   {
     key: "sellerTransfer",
-    log: "host.receive_seller_transfer",
+    log: "host.receive_seller_transfered",
     notification: {
       title: "Seller Transfer",
       message: (data: any) =>
         `You have a seller transfer from seller ID: ${data.seller_id}`,
       navigateTo: (data: any) => {
-        const href = "HoldForHost";
+        const href = "BookingDetail";
+        const params = `?id=${data.id}`;
         return {
-          href,
+          href: href + params,
           params: { data },
         };
       },
@@ -55,11 +57,14 @@ export const eventConfig = [
     notification: {
       title: "Hold Request Update",
       message: (data: any) =>
-        `Your hold request has been ${data.accepted ? "accepted" : "rejected"}`,
+        `Your hold request has been ${
+          data.is_host_accept ? "accepted" : "rejected"
+        }`,
       navigateTo: (data: any) => {
-        const href = "HoldForHost";
+        const href = "BookingDetail";
+        const params = `?id=${data.id}`;
         return {
-          href,
+          href: href + params,
           params: { data },
         };
       },
@@ -75,9 +80,10 @@ export const eventConfig = [
           data.accepted ? "accepted" : "rejected"
         }`,
       navigateTo: (data: any) => {
-        const href = "HoldForHost";
+        const href = "BookingDetail";
+        const params = `?id=${data.id}`;
         return {
-          href,
+          href: href + params,
           params: { data },
         };
       },
@@ -91,9 +97,10 @@ export const eventConfig = [
       message: (data: any) =>
         `You have received a transfer from seller: ${data.seller_id}`,
       navigateTo: (data: any) => {
-        const href = "HoldForHost";
+        const href = "BookingDetail";
+        const params = `?id=${data.id}`;
         return {
-          href,
+          href: href + params,
           params: { data },
         };
       },
@@ -107,9 +114,10 @@ export const eventConfig = [
       message: (data: any) =>
         `You have not received the transfer from seller: ${data.seller_id}`,
       navigateTo: (data: any) => {
-        const href = "HoldForHost";
+        const href = "BookingDetail";
+        const params = `?id=${data.id}`;
         return {
-          href,
+          href: href + params,
           params: { data },
         };
       },

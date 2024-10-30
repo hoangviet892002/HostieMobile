@@ -4,7 +4,11 @@ import { Colors } from "@/constants/Colors";
 import Icon, { Icons } from "../Icons";
 import { router } from "expo-router";
 
-const BackButton = () => {
+interface BackButtonProps {
+  navigateTo?: string;
+}
+
+const BackButton: React.FC<BackButtonProps> = ({ navigateTo }) => {
   return (
     <TouchableOpacity
       className="bg-white h-[60px] w-[60px] m-5 flex justify-center items-center"
@@ -14,7 +18,11 @@ const BackButton = () => {
         borderWidth: 1,
       }}
       onPress={() => {
-        router.back();
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace(navigateTo);
+        }
       }}
     >
       <Icon

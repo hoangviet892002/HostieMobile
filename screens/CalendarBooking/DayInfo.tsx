@@ -564,6 +564,21 @@ const DayInfo = ({
                         </Text>
                       )}
 
+                      <Text className="text-lg font-bold"> Guest Count </Text>
+                      <TextInput
+                        className="bg-white p-2 rounded-lg border-2 py-2"
+                        style={{ borderColor: Colors.primary }}
+                        value={guest_count.toString()}
+                        placeholder="Guest Count"
+                        keyboardType="numeric"
+                        onChangeText={(text) => setCount(parseInt(text))}
+                      />
+                      {errors.guest_count && (
+                        <Text style={{ color: "red" }}>
+                          {errors.guest_count}
+                        </Text>
+                      )}
+
                       <Text className="text-lg font-bold"> Note </Text>
 
                       <TextInput

@@ -16,6 +16,7 @@ import { selectRole } from "@/redux/slices/authSlice";
 import { BookingType, DetailBookingType } from "@/types";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
 import { parseStatusBooking } from "@/utils/parseStatusBooking";
+import { parse } from "@babel/core";
 import { Ionicons } from "@expo/vector-icons";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import moment from "moment";
@@ -39,10 +40,12 @@ const BookingDetail = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<Data>({} as Data);
   const route = useRoute<RouteProp<RouteParams, "params">>();
+  console.log(route.params);
   const { id } = route.params;
   const [icon, setIcon] = useState("");
   const [color, setColor] = useState("");
   const [textColor, setTextColor] = useState("");
+
   const role = useSelector(selectRole);
   const [permission, setPermission] = useState<string[]>([]);
   const updatePermission = () => {
@@ -99,7 +102,7 @@ const BookingDetail = () => {
       title: ActionStatusBooking.ACCEPT,
       onPress: () => {
         const dataSolve = {
-          id: id,
+          id: parseInt(id),
           accept: true,
           checkin: parseDateDDMMYYYY(data.booking.checkin),
           checkout: parseDateDDMMYYYY(data.booking.checkout),
@@ -126,7 +129,7 @@ const BookingDetail = () => {
       title: ActionStatusBooking.REJECT,
       onPress: () => {
         const dataSolve = {
-          id: id,
+          id: parseInt(id),
           accept: false,
           checkin: parseDateDDMMYYYY(data.booking.checkin),
           checkout: parseDateDDMMYYYY(data.booking.checkout),
@@ -151,7 +154,7 @@ const BookingDetail = () => {
       title: ActionStatusBooking.TRANSFER,
       onPress: () => {
         const dataSolve = {
-          id: id,
+          id: parseInt(id),
           checkin: parseDateDDMMYYYY(data.booking.checkin),
           checkout: parseDateDDMMYYYY(data.booking.checkout),
         };
@@ -176,7 +179,7 @@ const BookingDetail = () => {
       title: ActionStatusBooking.RECEIVE,
       onPress: () => {
         const dataSolve = {
-          id: id,
+          id: parseInt(id),
           checkin: parseDateDDMMYYYY(data.booking.checkin),
           checkout: parseDateDDMMYYYY(data.booking.checkout),
           is_received: true,
@@ -202,7 +205,7 @@ const BookingDetail = () => {
       title: ActionStatusBooking.NOT_RECEIVE,
       onPress: () => {
         const dataSolve = {
-          id: id,
+          id: parseInt(id),
           checkin: parseDateDDMMYYYY(data.booking.checkin),
           checkout: parseDateDDMMYYYY(data.booking.checkout),
           is_received: false,
@@ -228,7 +231,7 @@ const BookingDetail = () => {
       title: ActionStatusBooking.CANCEL,
       onPress: () => {
         const dataSolve = {
-          id: id,
+          id: parseInt(id),
           checkin: parseDateDDMMYYYY(data.booking.checkin),
           checkout: parseDateDDMMYYYY(data.booking.checkout),
         };
@@ -257,6 +260,7 @@ const BookingDetail = () => {
     fetchData();
     setLoading(false);
   }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loading loading={loading} />
@@ -265,7 +269,7 @@ const BookingDetail = () => {
         delay={120}
         animation="slideInDown"
       >
-        <BackButton />
+        <BackButton navigateTo="(tabs)" />
         <View className="flex flex-row items-center ">
           <View className="flex ">
             <Text className="text-3xl font-bold ">Booking Detail</Text>

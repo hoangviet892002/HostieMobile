@@ -80,7 +80,7 @@ const AppWrapper = () => {
   const socketEvents = {
     holdRequest: useSocketListener("host.receive_hold_request"),
     bookingRequest: useSocketListener("host.receive_booking_request"),
-    sellerTransfer: useSocketListener("host.receive_seller_transfer"),
+    sellerTransfer: useSocketListener("host.receive_seller_transfered"),
     holdAcceptReject: useSocketListener("seller.receive_hold_accepted_reject"),
     bookingAcceptReject: useSocketListener(
       "seller.receive_booking_accepted_reject"
