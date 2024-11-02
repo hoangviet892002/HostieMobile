@@ -9,6 +9,7 @@ import { postResidence } from "@/apis/residences";
 import Toast from "react-native-toast-message";
 import { useFocusEffect } from "expo-router";
 import { Loading } from "@/components";
+import useToast from "@/hooks/useToast";
 
 interface InterfaceType {
   name: string;
@@ -41,6 +42,7 @@ const Infomation: React.FC<InfomationProps> = ({
   setId,
   id,
 }) => {
+  const { showToast } = useToast();
   const [initialValues, setInitialValues] = useState<InterfaceType>(data);
   useFocusEffect(
     useCallback(() => {
@@ -292,11 +294,7 @@ const Infomation: React.FC<InfomationProps> = ({
       setId(res.data.id);
       setStep(2);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: res.msg,
-      });
+      showToast(res);
     }
   };
 

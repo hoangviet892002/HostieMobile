@@ -17,6 +17,7 @@ import { ResidencesStep4 } from "@/types/request/ResidencesRequest";
 import { parseDate } from "@/utils/parseDate";
 import { Formik } from "formik";
 import Toast from "react-native-toast-message";
+import useToast from "@/hooks/useToast";
 
 interface PriceType {
   price_default: number;
@@ -49,6 +50,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
   id,
   setId,
 }) => {
+  const { showToast } = useToast();
   const solveApi = async (dataPost: ResidencesStep4) => {
     if (id !== "") {
       dataPost.id = id;
@@ -60,11 +62,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
       setId(res.data.id);
       setStep(5);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: res.msg,
-      });
+      showToast(res);
     }
   };
   const data: PriceType = price;

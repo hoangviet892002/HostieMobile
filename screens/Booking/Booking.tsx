@@ -1,22 +1,23 @@
+import { getBookingApi } from "@/apis/booking";
+import { BackButton, EmptyData, Loading } from "@/components";
+import { getStatusStyle } from "@/constants/getStatusStyle";
+import useToast from "@/hooks/useToast";
+import { BookingType } from "@/types";
+import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import { parseStatusBooking } from "@/utils/parseStatusBooking";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useNavigation } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  View,
-  Text,
   ActivityIndicator,
   FlatList,
   Image,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { BackButton, EmptyData, Loading } from "@/components";
 import * as Animatable from "react-native-animatable";
-import { BookingType } from "@/types";
-import { getBookingApi } from "@/apis/booking";
-import { Ionicons } from "@expo/vector-icons";
-import { parseDateDDMMYYYY } from "@/utils/parseDate";
-import { parseStatusBooking } from "@/utils/parseStatusBooking";
-import { getStatusStyle } from "@/constants/getStatusStyle";
-import { useFocusEffect, useNavigation } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 const Booking = () => {
@@ -26,6 +27,7 @@ const Booking = () => {
   const [totalPage, setTotalPage] = useState(1);
   const [books, setBooks] = useState<BookingType[]>([]);
   const navigation = useNavigation();
+  const { showToast } = useToast();
   const fetchBook = async (pageNumber = 1) => {
     if (pageNumber === 1) {
       setLoading(true);

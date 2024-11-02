@@ -1,8 +1,13 @@
 import { acceptHoldApi, getHoldsForHostApi } from "@/apis/booking";
 import { BackButton, EmptyData, Loading } from "@/components";
 import { Colors } from "@/constants/Colors";
+import { StatusHold } from "@/constants/enums/statusHoldEnums";
+import { getStatusHoldStyle } from "@/constants/getStatusHoldStyle";
+import useToast from "@/hooks/useToast";
 import { HoldType } from "@/types";
+import { parseStatusHold } from "@/utils/parseStatusHold";
 import { Ionicons } from "@expo/vector-icons";
+import { t } from "i18next";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
@@ -28,6 +33,7 @@ const HoldForHost = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [holdDetail, setHoldDetail] = useState<HoldType | null>(null);
+  const { showToast } = useToast();
 
   const fetchHold = async (pageNumber = 1) => {
     if (pageNumber === 1) {
@@ -57,17 +63,17 @@ const HoldForHost = () => {
     fetchHold(page);
   }, [page]);
 
-  const acceptBooking = async () => {
+  const acceptBooking = async (accept: boolean) => {
     setLoading(true);
     const data = {
       hold_id: holdDetail?.id,
       checkin: moment(holdDetail?.checkin).format("DD-MM-YYYY"),
       checkout: moment(holdDetail?.checkout).format("DD-MM-YYYY"),
-      accept: true,
+      accept: accept,
     };
 
     const res = await acceptHoldApi(data);
-    console.log(res);
+    showToast(res);
     if (res.success) {
       setHolds((prevHolds) =>
         prevHolds.map((hold) => {
@@ -83,6 +89,9 @@ const HoldForHost = () => {
   };
 
   const RenderModal = () => {
+    const { color, icon, textColor } = holdDetail
+      ? getStatusHoldStyle(parseStatusHold(holdDetail))
+      : { color: "", icon: "", textColor: "" };
     return (
       <Modal
         animationType="fade"
@@ -115,24 +124,9 @@ const HoldForHost = () => {
                 {holdDetail?.residence_name}
               </Text>
               <View className="flex flex-row items-center">
-                <Ionicons
-                  name={
-                    holdDetail?.is_host_accept
-                      ? "checkmark-circle"
-                      : "time-outline"
-                  }
-                  size={20}
-                  color={holdDetail?.is_host_accept ? "#38A169" : "#ECC94B"}
-                />
-                <Text
-                  className={`ml-1 font-medium ${
-                    holdDetail?.is_host_accept
-                      ? "text-green-600"
-                      : "text-yellow-600"
-                  }`}
-                >
-                  {holdDetail?.is_host_accept ? "Đã chấp nhận" : "Chờ duyệt"}
-                  {holdDetail?.status === 0 && "Đã hủy"}
+                <Ionicons name={icon} size={20} color={color} />
+                <Text className={`ml-1 font-medium ${textColor}`}>
+                  {holdDetail ? parseStatusHold(holdDetail) : ""}
                 </Text>
               </View>
             </View>
@@ -204,30 +198,34 @@ const HoldForHost = () => {
 
             {/* Action Buttons */}
             <View className="mb-4">
-              {!holdDetail?.is_host_accept ? (
-                <TouchableOpacity
-                  className="bg-green-600 p-3 rounded-lg mb-3"
-                  onPress={acceptBooking}
-                  activeOpacity={0.8}
-                  accessibilityLabel="Chấp nhận Booking"
-                >
-                  <Text className="text-white text-center text-lg font-semibold">
-                    Chấp nhận
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                // <TouchableOpacity
-                //   className="bg-red-600 p-3 rounded-lg mb-3"
-                //   onPress={() => {}}
-                //   activeOpacity={0.8}
-                //   accessibilityLabel="Hủy Booking"
-                // >
-                //   <Text className="text-white text-center text-lg font-semibold">
-                //     Hủy
-                //   </Text>
-                // </TouchableOpacity>
-                <></>
-              )}
+              {holdDetail &&
+              parseStatusHold(holdDetail) === StatusHold.WAIT_ACCEPT ? (
+                <View className="flex-row justify-between mb-3">
+                  <TouchableOpacity
+                    className="flex-1 bg-green-500 p-3 rounded-lg flex-row justify-center items-center mr-2"
+                    onPress={() => acceptBooking(true)}
+                    activeOpacity={0.8}
+                    accessibilityLabel="Chấp nhận Booking"
+                  >
+                    <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                    <Text className="text-white text-center text-lg font-semibold ml-2">
+                      Accept
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    className="flex-1 bg-red-500 p-3 rounded-lg flex-row justify-center items-center ml-2"
+                    onPress={() => acceptBooking(false)}
+                    activeOpacity={0.8}
+                    accessibilityLabel="Từ chối Booking"
+                  >
+                    <Ionicons name="close-circle" size={20} color="#fff" />
+                    <Text className="text-white text-center text-lg font-semibold ml-2">
+                      Reject
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
 
               <TouchableOpacity
                 className="bg-gray-600 p-3 rounded-lg"
@@ -236,7 +234,7 @@ const HoldForHost = () => {
                 accessibilityLabel="Đóng Modal"
               >
                 <Text className="text-white text-center text-lg font-semibold">
-                  Đóng
+                  Close
                 </Text>
               </TouchableOpacity>
             </View>
@@ -246,90 +244,87 @@ const HoldForHost = () => {
     );
   };
 
-  const renderHoldItem = ({ item }: { item: HoldType }) => (
-    <TouchableOpacity
-      className="bg-white shadow-md rounded-xl p-4 mb-4"
-      onPress={() => {
-        setHoldDetail(item);
-        setModalVisible(true);
-      }}
-    >
-      <Image
-        source={{ uri: "https://via.placeholder.com/150" }}
-        className="w-full h-40 rounded-lg mb-4"
-      />
-
-      {/* Tiêu đề và trạng thái */}
-      <View className="flex flex-row justify-between items-center mb-2">
-        <Text className="text-xl font-bold text-gray-800">
-          {item.residence_name}
-        </Text>
-        <View className="flex flex-row items-center">
-          <Ionicons
-            name={item.is_host_accept ? "checkmark-circle" : "time-outline"}
-            size={20}
-            color={item.is_host_accept ? "#38A169" : "#ECC94B"}
-          />
-          <Text
-            className={`ml-1 font-medium ${
-              item.is_host_accept ? "text-green-600" : "text-yellow-600"
-            }`}
-          >
-            {item.is_host_accept ? "Đã chấp nhận" : "Chờ duyệt"}
-          </Text>
-        </View>
-      </View>
-
-      {/* Thông tin ngày tháng */}
-      <View className="flex flex-row justify-between items-center mb-2">
-        <View className="flex flex-row items-center">
-          <Ionicons name="calendar-outline" size={18} color="#4A5568" />
-          <Text className="ml-1 text-gray-700">
-            {moment(item.checkin).format("DD-MM-YYYY")} -{" "}
-            {moment(item.checkout).format("DD-MM-YYYY")}
-          </Text>
-        </View>
-        <View className="flex flex-row items-center">
-          <Ionicons name="time-outline" size={18} color="#4A5568" />
-          <Text className="ml-1 text-gray-700">
-            {moment(item.created_at).fromNow()}
-          </Text>
-        </View>
-      </View>
-
-      {/* Số đêm và số ngày */}
-      <View className="flex flex-row justify-between items-center mb-2">
-        <View className="flex flex-row items-center">
-          <Ionicons name="moon-outline" size={18} color="#4A5568" />
-          <Text className="ml-1 text-gray-700">{item.total_nights} đêm</Text>
-        </View>
-        <View className="flex flex-row items-center">
-          <Ionicons name="sunny-outline" size={18} color="#4A5568" />
-          <Text className="ml-1 text-gray-700">{item.total_days} ngày</Text>
-        </View>
-      </View>
-
-      {/* name and image person seller */}
-      <View className="flex flex-row items-center mb-2">
+  const renderHoldItem = ({ item }: { item: HoldType }) => {
+    const { color, icon, textColor } = getStatusHoldStyle(
+      parseStatusHold(item)
+    );
+    return (
+      <TouchableOpacity
+        className="bg-white shadow-md rounded-xl p-4 mb-4"
+        onPress={() => {
+          setHoldDetail(item);
+          setModalVisible(true);
+        }}
+      >
         <Image
-          source={{
-            uri: item.seller_avatar || "https://via.placeholder.com/150",
-          }}
-          className="w-10 h-10 rounded-full"
+          source={{ uri: "https://via.placeholder.com/150" }}
+          className="w-full h-40 rounded-lg mb-4"
         />
-        <Text className="ml-2 font-medium text-gray-700">
-          {item.seller_name}
-        </Text>
-      </View>
 
-      {/* Mô tả */}
-      {item.description ? (
-        <View className="mt-2">
-          <Text className="text-gray-600">{item.description}</Text>
+        {/* Tiêu đề và trạng thái */}
+        <View className="flex flex-row justify-between items-center mb-2">
+          <Text className="text-xl font-bold text-gray-800">
+            {item.residence_name}
+          </Text>
+          <View className="flex flex-row items-center">
+            <Ionicons name={icon} size={20} color={color} />
+            <Text className={`ml-1 font-medium ${textColor}`}>
+              {parseStatusHold(item)}
+            </Text>
+          </View>
         </View>
-      ) : null}
-    </TouchableOpacity>
-  );
+
+        {/* Thông tin ngày tháng */}
+        <View className="flex flex-row justify-between items-center mb-2">
+          <View className="flex flex-row items-center">
+            <Ionicons name="calendar-outline" size={18} color="#4A5568" />
+            <Text className="ml-1 text-gray-700">
+              {moment(item.checkin).format("DD-MM-YYYY")} -{" "}
+              {moment(item.checkout).format("DD-MM-YYYY")}
+            </Text>
+          </View>
+          <View className="flex flex-row items-center">
+            <Ionicons name="time-outline" size={18} color="#4A5568" />
+            <Text className="ml-1 text-gray-700">
+              {moment(item.created_at).fromNow()}
+            </Text>
+          </View>
+        </View>
+
+        {/* Số đêm và số ngày */}
+        <View className="flex flex-row justify-between items-center mb-2">
+          <View className="flex flex-row items-center">
+            <Ionicons name="moon-outline" size={18} color="#4A5568" />
+            <Text className="ml-1 text-gray-700">{item.total_nights} đêm</Text>
+          </View>
+          <View className="flex flex-row items-center">
+            <Ionicons name="sunny-outline" size={18} color="#4A5568" />
+            <Text className="ml-1 text-gray-700">{item.total_days} ngày</Text>
+          </View>
+        </View>
+
+        {/* name and image person seller */}
+        <View className="flex flex-row items-center mb-2">
+          <Image
+            source={{
+              uri: item.seller_avatar || "https://via.placeholder.com/150",
+            }}
+            className="w-10 h-10 rounded-full"
+          />
+          <Text className="ml-2 font-medium text-gray-700">
+            {item.seller_name}
+          </Text>
+        </View>
+
+        {/* Mô tả */}
+        {item.description ? (
+          <View className="mt-2">
+            <Text className="text-gray-600">{item.description}</Text>
+          </View>
+        ) : null}
+      </TouchableOpacity>
+    );
+  };
 
   const handleLoadMore = () => {
     if (page < totalPage) {

@@ -88,10 +88,12 @@ const deleteBlockApi = async (id: string): Promise<InfoResponse<any>> => {
 };
 
 const getResidencesBySellerApi = async (
-  page: number
+  page: number,
+  checkin: string,
+  checkout: string
 ): Promise<InfoResponse<any>> => {
   return await axiosCore.get(
-    `${endPoint.residences.getResidencesBySeller(page)}`
+    `${endPoint.residences.getResidencesBySeller(page, checkin, checkout)}`
   );
 };
 export {

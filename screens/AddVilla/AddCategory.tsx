@@ -1,6 +1,7 @@
 import { getIcons } from "@/apis/icon";
 import { postResidence } from "@/apis/residences";
 import { Colors } from "@/constants/Colors";
+import useToast from "@/hooks/useToast";
 import { AmenityType } from "@/types";
 import { CategoryType } from "@/types/CategoryType";
 import { ResidencesStep3 } from "@/types/request/ResidencesRequest";
@@ -38,6 +39,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
   setId,
 }) => {
   const [options, setOptions] = useState<CategoryType[]>([]);
+  const { showToast } = useToast();
 
   const fetchIcon = async () => {
     const response = await getIcons();
@@ -71,11 +73,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
       setId(res.data.id);
       setStep(4);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: res.msg,
-      });
+      showToast(res);
     }
   };
   const handleSubmit = () => {

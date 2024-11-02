@@ -3,6 +3,7 @@ import { getCusomtersApi, postCustomer } from "@/apis/customer";
 import { Loading } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
+import useToast from "@/hooks/useToast";
 import { Customer } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
@@ -17,7 +18,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Toast from "react-native-toast-message";
 
 interface DayFormProps {
   checkin?: string;
@@ -36,6 +36,7 @@ const DayInfo = ({
   setSelectedDayForm: (value: React.SetStateAction<DayFormProps>) => void;
   isHost: boolean;
 }) => {
+  const { showToast } = useToast();
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -69,23 +70,13 @@ const DayInfo = ({
     };
 
     const response = await holdBookingApi(data);
+    showToast(response);
 
     if (response.success) {
-      Toast.show({
-        type: "success",
-        text1: "Booking Success",
-        text2: "Your booking is successful",
-      });
       setSelectedDayForm({
         ...selectedDayForm,
         checkin: null,
         checkout: null,
-      });
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Booking Failed",
-        text2: response.msg,
       });
     }
     setLoading(false);
@@ -123,11 +114,7 @@ const DayInfo = ({
     if (response.success) {
       setPrice(response.data[0].total_price);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Get Price Failed",
-        text2: response.msg,
-      });
+      showToast(response);
     }
     setLoading(false);
   };
@@ -451,11 +438,7 @@ const DayInfo = ({
                                         response.data,
                                       ]);
                                     } else {
-                                      Toast.show({
-                                        type: "error",
-                                        text1: "Add Customer Failed",
-                                        text2: response.msg,
-                                      });
+                                      showToast(response);
                                     }
                                   };
                                   addCustomer();
@@ -694,22 +677,12 @@ const DayInfo = ({
 
     const response = await bookingApi(data);
 
+    showToast(response);
     if (response.success) {
-      Toast.show({
-        type: "success",
-        text1: "Booking Success",
-        text2: "Your booking is successful",
-      });
       setSelectedDayForm({
         ...selectedDayForm,
         checkin: null,
         checkout: null,
-      });
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Booking Failed",
-        text2: response.msg,
       });
     }
     setLoading(false);

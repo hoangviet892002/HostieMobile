@@ -1,16 +1,12 @@
 import { getDistricts, getProvinces, getWards } from "@/apis/region";
 import { postResidence } from "@/apis/residences";
 import { Colors } from "@/constants/Colors";
+import useToast from "@/hooks/useToast";
 import { RegionType } from "@/types";
-import {
-  ResidencesStep1,
-  ResidencesStep2,
-} from "@/types/request/ResidencesRequest";
+import { ResidencesStep2 } from "@/types/request/ResidencesRequest";
 
-import { useFocusEffect } from "expo-router";
 import { Formik } from "formik";
-import { use } from "i18next";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   ScrollView,
@@ -19,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Toast from "react-native-toast-message";
 interface AddressType {
   provide: {
     label: string;
@@ -57,6 +52,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
   id,
   setId,
 }) => {
+  const { showToast } = useToast();
   const [data] = useState<AddressType>(formData);
 
   const [optionProvide, setOptionProvide] = useState<RegionType[]>([]);
@@ -386,11 +382,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
       setId(res.data.id);
       setStep(3);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: res.msg,
-      });
+      showToast(res);
     }
   };
   return (

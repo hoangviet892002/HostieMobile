@@ -46,7 +46,8 @@ const endPoint = {
     getBlocks: (id: string) => `/residences/block/${id}`,
     postBlock: `/residences/block`,
     deleteBlock: (id: string) => `/residences/block?ids=${id}`,
-    getResidencesBySeller: (page: number) => `/residences/seller?page=${page}`,
+    getResidencesBySeller: (page: number, checkin: string, checkout: string) =>
+      `/residences/seller?page=${page}&checkin=${checkin}&checkout=${checkout}`,
   },
   booking: {
     book: "/booking",

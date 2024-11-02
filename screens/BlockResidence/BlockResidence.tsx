@@ -2,6 +2,7 @@ import { deleteBlockApi, getBlocksApi, postBlockApi } from "@/apis/residences";
 import { BackButton, DateRangePicker, Loading } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
+import useToast from "@/hooks/useToast";
 import { ResidenceBlock } from "@/types";
 import { Feather } from "@expo/vector-icons";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -19,6 +20,7 @@ type RouteParams = {
   };
 };
 const BlockResidence = () => {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [blocks, setBlocks] = useState<ResidenceBlock[]>([]);
 
@@ -46,11 +48,7 @@ const BlockResidence = () => {
         setBlocks(res.data.residence_block);
       }
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Cannot get blocks",
-      });
+      showToast(res);
     }
     setLoading(false);
   };
@@ -112,21 +110,11 @@ const BlockResidence = () => {
                   end_date: formatDate(values.end_date),
                 };
                 const res = await postBlockApi(data);
-                console.log(res);
+
+                showToast(res);
 
                 if (res.success) {
-                  Toast.show({
-                    type: "success",
-                    text1: "Success",
-                    text2: "Add block successfully",
-                  });
                   getBlocks();
-                } else {
-                  Toast.show({
-                    type: "error",
-                    text1: "Error",
-                    text2: "Cannot add block",
-                  });
                 }
                 setModalVisible(false);
                 setLoadingAtModal(false);
@@ -248,19 +236,9 @@ const BlockResidence = () => {
   };
   const onDelete = async (id: string) => {
     const res = await deleteBlockApi(id);
+    showToast(res);
     if (res.success) {
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Delete block successfully",
-      });
       getBlocks();
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Cannot delete block",
-      });
     }
   };
 

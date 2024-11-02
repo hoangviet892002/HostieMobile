@@ -1,19 +1,22 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  View,
-  TextInput,
-  Pressable,
-  FlatList,
-  ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { useFocusEffect } from "expo-router";
+import { getResidencesBySellerApi } from "@/apis/residences";
+import { DateRangePicker, EmptyData, Loading, VillaCard } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
-import { EmptyData, Loading, VillaCard } from "@/components";
 import { Colors } from "@/constants/Colors";
 import { Residence } from "@/types/response/Residences";
-import { getResidencesBySellerApi } from "@/apis/residences";
+import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
+import { Text, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  Pressable,
+  TextInput,
+  View,
+} from "react-native";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const [page, setPage] = useState(1);
@@ -22,6 +25,12 @@ const Home = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [search, setSearch] = useState<string>("");
   const [residences, setResidences] = useState<Residence[]>([]);
+  const [pickedDate, setPickedDate] = useState({
+    start_date: new Date(),
+    //  tomorrow
+    end_date: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+  });
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const fetchResidences = async (pageToFetch = 1) => {
     if (pageToFetch === 1) {
@@ -30,7 +39,11 @@ const Home = () => {
       setLoadingMore(true);
     }
 
-    const res = await getResidencesBySellerApi(pageToFetch);
+    const res = await getResidencesBySellerApi(
+      pageToFetch,
+      parseDateDDMMYYYY(pickedDate.start_date.toISOString()),
+      parseDateDDMMYYYY(pickedDate.end_date.toISOString())
+    );
     if (res.success) {
       if (pageToFetch === 1) {
         setResidences(res.data.residences);
@@ -53,7 +66,7 @@ const Home = () => {
     useCallback(() => {
       setPage(1);
       fetchResidences(1);
-    }, [])
+    }, [showCalendar])
   );
 
   const handleLoadMore = () => {
@@ -75,7 +88,7 @@ const Home = () => {
   return (
     <SafeAreaView className="h-full p-5 pb-24 w-[450px]">
       <Loading loading={loading} />
-      <View className="flex flex-row items-center justify-center">
+      {/* <View className="flex flex-row items-center justify-center">
         <TextInput
           className="bg-white p-2 rounded-lg border-2 py-2 my-2"
           style={{ width: wp(80), borderColor: Colors.primary }}
@@ -93,7 +106,49 @@ const Home = () => {
             color={Colors.primary}
           />
         </Pressable>
-      </View>
+      </View> */}
+      <TouchableOpacity
+        className="flex flex-row items-center justify-center mx-2"
+        onPress={() => setShowCalendar(!showCalendar)}
+        style={{
+          borderColor: Colors.primary,
+          borderWidth: 1,
+          borderRadius: 10,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: "bold",
+            color: Colors.primary,
+            padding: 10,
+          }}
+        >
+          {parseDateDDMMYYYY(pickedDate.start_date.toISOString())} -{" "}
+          {parseDateDDMMYYYY(pickedDate.end_date.toISOString())}
+        </Text>
+
+        <Pressable style={{ padding: 10 }}>
+          <Icon
+            type={Icons.FontAwesome}
+            name="calendar"
+            size={24}
+            color={Colors.primary}
+          />
+        </Pressable>
+      </TouchableOpacity>
+      <Modal visible={showCalendar} animationType="slide">
+        <View className="flex flex-row items-center justify-center">
+          <DateRangePicker
+            initialRange={[pickedDate.start_date, pickedDate.end_date]}
+            onSuccess={(start, end) => {
+              setPickedDate({ start_date: start, end_date: end });
+              setShowCalendar(false);
+              fetchResidences(1);
+            }}
+          />
+        </View>
+      </Modal>
 
       <FlatList
         className="flex"

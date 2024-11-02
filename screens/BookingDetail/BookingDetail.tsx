@@ -12,11 +12,11 @@ import {
   StatusBooking,
 } from "@/constants/enums/statusBookingEnums";
 import { getStatusStyle } from "@/constants/getStatusStyle";
+import useToast from "@/hooks/useToast";
 import { selectRole } from "@/redux/slices/authSlice";
 import { BookingType, DetailBookingType } from "@/types";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
 import { parseStatusBooking } from "@/utils/parseStatusBooking";
-import { parse } from "@babel/core";
 import { Ionicons } from "@expo/vector-icons";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import moment from "moment";
@@ -24,7 +24,6 @@ import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
 
 interface Data {
@@ -38,6 +37,7 @@ type RouteParams = {
 };
 const BookingDetail = () => {
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const [data, setData] = useState<Data>({} as Data);
   const route = useRoute<RouteProp<RouteParams, "params">>();
   console.log(route.params);
@@ -114,11 +114,7 @@ const BookingDetail = () => {
           if (response.success) {
             fetchData();
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Error",
-              text2: response.msg,
-            });
+            showToast(response);
           }
         };
         callApi();
@@ -139,11 +135,7 @@ const BookingDetail = () => {
           if (response.success) {
             fetchData();
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Error",
-              text2: response.msg,
-            });
+            showToast(response);
           }
         };
         callApi();
@@ -164,11 +156,7 @@ const BookingDetail = () => {
           if (response.success) {
             fetchData();
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Error",
-              text2: response.msg,
-            });
+            showToast(response);
           }
         };
         callApi();
@@ -190,11 +178,7 @@ const BookingDetail = () => {
           if (response.success) {
             fetchData();
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Error",
-              text2: response.msg,
-            });
+            showToast(response);
           }
         };
         callApi();
@@ -216,11 +200,7 @@ const BookingDetail = () => {
           if (response.success) {
             fetchData();
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Error",
-              text2: response.msg,
-            });
+            showToast(response);
           }
         };
         callApi();
@@ -242,11 +222,7 @@ const BookingDetail = () => {
             console.log(response);
             fetchData();
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Error",
-              text2: response.msg,
-            });
+            showToast(response);
           }
         };
         callApi();

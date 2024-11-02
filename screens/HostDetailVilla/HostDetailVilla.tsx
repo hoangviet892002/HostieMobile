@@ -1,35 +1,25 @@
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
-  FlatList,
   Image,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  Modal,
 } from "react-native";
 
-import {
-  BackButton,
-  DateRangePicker,
-  ImageCustom,
-  Loading,
-} from "@/components";
-import { VillaType } from "@/types";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { BackButton, ImageCustom, Loading } from "@/components";
 import { Colors } from "@/constants/Colors";
-import * as Animatable from "react-native-animatable";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
+import * as Animatable from "react-native-animatable";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import Icon, { Icons } from "@/components/Icons";
-import { router } from "expo-router";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { deleteResidenc, getImages, getResidence } from "@/apis/residences";
-import { parseDate } from "@/utils/parseDate";
-import { holdBookingApi } from "@/apis/booking";
-import Toast from "react-native-toast-message";
+import Icon, { Icons } from "@/components/Icons";
+import useToast from "@/hooks/useToast";
+import { router } from "expo-router";
+import { useSelector } from "react-redux";
 
 type RouteParams = {
   params: {
@@ -65,6 +55,7 @@ interface Residence {
 }
 const { height, width } = Dimensions.get("window");
 const HostDetailVilla = () => {
+  const { showToast } = useToast();
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RouteParams, "params">>();
   const { itemId } = route.params;
@@ -85,6 +76,7 @@ const HostDetailVilla = () => {
     step: 0,
     ward: "",
   });
+
   const fetchVillaDetail = async (id: string) => {
     getResidence(id).then((res) => {
       if (res.success) {
@@ -132,19 +124,9 @@ const HostDetailVilla = () => {
       id: itemId,
     };
     const res = await deleteResidenc(data);
+    showToast(res);
     if (res.success) {
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: res.msg,
-      });
       router.back();
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: res.msg,
-      });
     }
   };
   const RenderPhoneContact = () => {
