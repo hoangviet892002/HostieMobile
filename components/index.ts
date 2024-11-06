@@ -8,6 +8,7 @@ import Bookings from "./Bookings";
 import MonthNavigator from "./MonthNavigator";
 import Loading from "./Loading";
 import EmptyData from "./EmptyData";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 export {
   DateRangePicker,
   VillaCard,
@@ -19,4 +20,5 @@ export {
   MonthNavigator,
   Loading,
   EmptyData,
+  DeleteConfirmationModal,
 };

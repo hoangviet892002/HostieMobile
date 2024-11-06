@@ -14,9 +14,14 @@ import {
 import useSocketListener from "@/hooks/useListen";
 import { eventConfig } from "@/configs/eventConfig";
 import { navigationRef } from "@/utils/navigationRef";
+import { refreshTokenApi } from "@/apis/users";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { decodeJWT } from "@/utils/decodeJWT";
+import { authActions } from "@/redux/slices/authSlice";
 
 LogBox.ignoreAllLogs(true);
-
+// 10 seconds
+const TOKEN_REFRESH_INTERVAL = 10 * 1000;
 const AppWrapper = () => {
   const element = [
     {
@@ -113,6 +118,58 @@ const AppWrapper = () => {
     socketEvents.hostNotReceiveTransfer,
     socketEvents.RecieveChangeCalendar,
   ]);
+
+  // refresh token with api refresh token
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let isMounted = true; // Flag to track if the component is still mounted
+    let timeoutId;
+
+    const refreshToken = async () => {
+      if (!isMounted) return;
+
+      const session = await AsyncStorage.getItem("session");
+      if (session) {
+        const sessionData = JSON.parse(session);
+        const response = await refreshTokenApi(sessionData.token);
+
+        if (response.result) {
+          await AsyncStorage.setItem(
+            "session",
+            JSON.stringify(response.result)
+          );
+
+          const decodedToken = decodeJWT(response.result.token);
+          console.log(response.result.token);
+          console.log(decodedToken);
+
+          dispatch(authActions.login(decodedToken));
+        } else {
+          await AsyncStorage.removeItem("session");
+          dispatch(authActions.logout());
+          navigationRef.current?.navigate("Authentication");
+        }
+      }
+      setLoading(false);
+
+      // Schedule the next token refresh
+      if (isMounted) {
+        timeoutId = setTimeout(refreshToken, TOKEN_REFRESH_INTERVAL);
+      }
+    };
+
+    // Start the token refresh cycle immediately
+    refreshToken();
+
+    return () => {
+      // Cleanup function to clear the timeout and prevent memory leaks
+      isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, []);
 
   return (
     <Stack>

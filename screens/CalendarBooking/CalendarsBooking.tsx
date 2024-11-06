@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DayInfo from "./DayInfo";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/stores";
+import { Colors } from "@/constants/Colors";
 type RouteParams = {
   params: {
     ids: string;
@@ -238,6 +239,29 @@ const CalendarsBooking = () => {
                       >
                         {item?.price ? `${parsePrice(item?.price)} VND` : ""}
                       </Text>
+                      <View
+                        style={{
+                          width:
+                            item?.middle_point ||
+                            item?.start_point ||
+                            item?.end_point
+                              ? "100%"
+                              : 0,
+                          height: 5,
+                          position: "relative",
+                        }}
+                      >
+                        {/* Colored bar depending on start, middle, or end point */}
+                        <View
+                          style={{
+                            width: item?.middle_point ? "100%" : "50%",
+                            height: "100%",
+                            backgroundColor: Colors.primary,
+                            position: "absolute",
+                            left: item?.start_point ? "50%" : 0,
+                          }}
+                        />
+                      </View>
                     </TouchableOpacity>
                   </>
                 );
@@ -423,6 +447,7 @@ const CalendarsBooking = () => {
           </Modal>
           {/* select Day */}
           <DayInfo
+            RefreshCalendar={getCalendar}
             selectedDayForm={selectedDayForm}
             name={name}
             setSelectedDayForm={setSelectedDayForm}

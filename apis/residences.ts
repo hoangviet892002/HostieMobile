@@ -23,21 +23,8 @@ interface deleteResidence {
 const postResidence = async (
   data: ResidencesRequest
 ): Promise<InfoResponse<any>> => {
-  if (data.step === 5) {
-    //multipart/form-data
-    const formData = new FormData();
-    //  interface ResidencesStep5 {
-    //   step: number;
-    //   id: string;
-    //   files: File[];
-    // }
-
-    formData.append("id", data.id);
-    data.files.forEach((file) => {
-      formData.append("files", file);
-    });
-    formData.append("step", "5");
-    return await axiosCore.post(endPoint.residences.post, formData, {
+  if (data._parts) {
+    return await axiosCore.post(endPoint.residences.post, data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -96,6 +83,14 @@ const getResidencesBySellerApi = async (
     `${endPoint.residences.getResidencesBySeller(page, checkin, checkout)}`
   );
 };
+
+const getResidencesByHouseKeeperApi = async (
+  page: number
+): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(
+    `${endPoint.residences.getResidencesByHouseKeeper(page)}`
+  );
+};
 export {
   postResidence,
   getResidences,
@@ -108,4 +103,5 @@ export {
   postBlockApi,
   deleteBlockApi,
   getResidencesBySellerApi,
+  getResidencesByHouseKeeperApi,
 };

@@ -14,6 +14,8 @@ import { HoldType } from "./HoldType";
 import { BookingType } from "./BookingType";
 import { Customer } from "./Customer";
 import { DetailBookingType } from "./DetailBookingType";
+import { BankAccountsType } from "./bank-accounts";
+import { QRType } from "./QRType";
 export type {
   Calendar,
   AmenityType,
@@ -31,4 +33,6 @@ export type {
   BookingType,
   Customer,
   DetailBookingType,
+  BankAccountsType,
+  QRType,
 };

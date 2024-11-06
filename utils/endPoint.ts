@@ -13,6 +13,8 @@ const endPoint = {
     signIn: `/v1/api/auth/sign-in`,
     info: `/v1/api/users/my-info`,
     update: `/v1/api/users/update`,
+    getBanks: `/v1/api/users/bank-accounts`,
+    refreshToken: `/v1/api/auth/refresh-token`,
   },
   admin: {
     ///user mangament
@@ -48,6 +50,8 @@ const endPoint = {
     deleteBlock: (id: string) => `/residences/block?ids=${id}`,
     getResidencesBySeller: (page: number, checkin: string, checkout: string) =>
       `/residences/seller?page=${page}&checkin=${checkin}&checkout=${checkout}`,
+    getResidencesByHouseKeeper: (page: number) =>
+      `/residences/housekeeper?page=${page}`,
   },
   booking: {
     book: "/booking",
@@ -57,12 +61,19 @@ const endPoint = {
     getBooksForHost: (page: number) => `/booking/host?page=${page}`,
     acceptHold: `/booking/hold/accept`,
     getHold: (page: number) => `/booking/hold?page=${page}`,
-    getBooking: (page: number) => `/booking?page=${page}`,
+    getBooking: (page: number) =>
+      `/booking?page=${page}&sort=id:desc,created_at:desc`,
     getDetailBooking: (id: string) => `/booking/${id}`,
     acceptBooking: `/booking/accept`,
     sellerTransfer: `/booking/transfer`,
     hostReceive: `/booking/receive`,
     sellerCancel: `/booking/cancel`,
+    getLog: (id: string) => `/booking/${id}/logs`,
+    getQR: (id: string) => `/booking/${id}/qr`,
+    getBookForHouseKeeper: (page: number) =>
+      `/booking/housekeeper?page=${page}`,
+    checkin: `/booking/checkin`,
+    checkout: `/booking/checkout`,
   },
   customer: {
     create: `/customers`,

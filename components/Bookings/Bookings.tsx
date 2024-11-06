@@ -1,77 +1,70 @@
-import { View, Text, TouchableOpacity, Modal, ScrollView } from "react-native";
-import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  FlatList,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import DateTimePicker from "../DateTimePicker";
 import { parseDate } from "@/utils/parseDate";
 import * as Animatable from "react-native-animatable";
 import Booking from "./Booking";
-
-type status = "pending" | "completed" | "canceled";
-interface Todo {
-  id: number;
-  villaName: string;
-  status: status;
-  date: string;
-  thumbnail: string;
-  address: string;
-  price: number;
-}
+import { BookingType } from "@/types";
+import useToast from "@/hooks/useToast";
+import { getBookForHouseKeeperApi } from "@/apis/booking";
 
 const Bookings = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    {
-      id: 1,
-      villaName: "Villa 1",
-      status: "pending",
-      date: "2022-09-10",
-      thumbnail: "https://picsum.photos/200/300",
-      address: "Jl. Raya Kuta",
-      price: 100,
-    },
-    {
-      id: 2,
-      villaName: "Villa 2",
-      status: "completed",
-      date: "2022-09-10",
-      thumbnail: "https://picsum.photos/200/300",
-      address: "Jl. Raya Kuta",
-      price: 100,
-    },
-    {
-      id: 3,
-      villaName: "Villa 3",
-      status: "canceled",
-      date: "2022-09-10",
-      thumbnail: "https://picsum.photos/200/300",
-      address: "Jl. Raya Kuta",
-      price: 100,
-    },
-    {
-      id: 4,
-      villaName: "Villa 4",
-      status: "pending",
-      date: "2022-09-10",
-      thumbnail: "https://picsum.photos/200/300",
-      address: "Jl. Raya Kuta",
-      price: 100,
-    },
-    {
-      id: 5,
-      villaName: "Villa 5",
-      status: "pending",
-      date: "2022-09-10",
-      thumbnail: "https://picsum.photos/200/300",
-      address: "Jl. Raya Kuta",
-      price: 100,
-    },
-  ]);
+  const [bookings, setBookings] = useState<BookingType[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totalPage, setTotalPage] = useState(1);
+  const { showToast } = useToast();
+
+  const fetchBookings = async () => {
+    if (page === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    try {
+      const response = await getBookForHouseKeeperApi(page);
+      if (response.success && response.data.result) {
+        if (page === 1) {
+          setBookings(response.data.result);
+        } else {
+          setBookings((prevBookings) => [
+            ...prevBookings,
+            ...response.data.result,
+          ]);
+        }
+        setTotalPage(response.data.pagination.total_pages);
+      }
+    } catch (error) {
+      console.error("Failed to fetch bookings:", error);
+    } finally {
+      if (page === 1) {
+        setLoading(false);
+      } else {
+        setLoadingMore(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   return (
     <Animatable.View delay={120} animation={"fadeInDown"}>
-      <ScrollView>
-        {todos.map((todo) => (
-          <Booking todo={todo} key={todo.id} />
-        ))}
-      </ScrollView>
+      <FlatList
+        data={bookings}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <Booking {...item} />}
+      />
     </Animatable.View>
   );
 };

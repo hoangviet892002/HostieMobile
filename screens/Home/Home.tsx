@@ -137,16 +137,25 @@ const Home = () => {
           />
         </Pressable>
       </TouchableOpacity>
-      <Modal visible={showCalendar} animationType="slide">
-        <View className="flex flex-row items-center justify-center">
-          <DateRangePicker
-            initialRange={[pickedDate.start_date, pickedDate.end_date]}
-            onSuccess={(start, end) => {
-              setPickedDate({ start_date: start, end_date: end });
-              setShowCalendar(false);
-              fetchResidences(1);
-            }}
-          />
+      <Modal visible={showCalendar} transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View>
+            <DateRangePicker
+              initialRange={[pickedDate.start_date, pickedDate.end_date]}
+              onSuccess={(start, end) => {
+                setPickedDate({ start_date: start, end_date: end });
+                setShowCalendar(false);
+                fetchResidences(1);
+              }}
+            />
+          </View>
         </View>
       </Modal>
 

@@ -46,11 +46,10 @@ interface informationType {
 interface PriceType {
   price_default: number;
   price_weekend: { day: string; price: string }[];
-  price_weeknd_delete: number[];
+
   price_special: { day: string; price: string }[];
-  price_special_delete: number[];
+
   price_season: { start_date: string; end_date: string; price: string }[];
-  price_season_delete: number[];
 }
 const AddVilla = () => {
   const [step, setStep] = useState(1);
@@ -77,14 +76,14 @@ const AddVilla = () => {
               })
             )
           : [],
-        price_weeknd_delete: [],
+
         price_special: special_day_price
           ? special_day_price.map((item: { date: string; price: string }) => ({
               day: item.date,
               price: item.price,
             }))
           : [],
-        price_special_delete: [],
+
         price_season: season_price
           ? season_price.map(
               (item: {
@@ -98,7 +97,6 @@ const AddVilla = () => {
               })
             )
           : [],
-        price_season_delete: [],
       };
 
       setData((prevData) => ({
@@ -138,28 +136,37 @@ const AddVilla = () => {
         ...prevData,
         address: {
           provide: {
-            label: province,
-            value: province_code,
+            label: province || "",
+            value: province_code || "",
           },
           district: {
-            label: district,
-            value: district_code,
+            label: district || "",
+            value: district_code || "",
           },
           ward: {
-            label: ward,
-            value: ward_code,
+            label: ward || "",
+            value: ward_code || "",
           },
-          address: residence_address,
-          phones: phones.map((phone: { phone: string }) => phone.phone),
+          address: residence_address || "",
+          phones: phones.map((phone: { phone: string }) => phone.phone) || [],
         },
         // parse amenities to utilities
-        // utilities: amenities.map((amenity: { id: number; name: string }) => {
-        //   console.log("amenity :", amenity);
-        //   return {
-        //     id: amenity.id.toString(),
-        //     name: amenity.icon,
-        //   };
-        // }),
+        utilities: amenities.map(
+          (amenity: {
+            id: number;
+            name: string;
+            description: string;
+            icon_id: number;
+            icon: string;
+          }) => {
+            return {
+              name: amenity.name,
+              description: amenity.description,
+              amenity_id: amenity.icon_id,
+              icon: amenity.icon,
+            };
+          }
+        ),
         information: {
           max_guests,
           name: residence_name,
@@ -196,22 +203,21 @@ const AddVilla = () => {
         value: "",
       },
       address: "",
-      phones: ["sdadsa"],
+      phones: ["0987654321"],
     },
     utilities: [],
     price: {
       price_default: 0,
       price_season: [],
-      price_season_delete: [],
+
       price_special: [],
-      price_special_delete: [],
+
       price_weekend: [],
-      price_weeknd_delete: [],
     },
     images: [],
     information: {
       max_guests: 2,
-      name: "x",
+      name: "Villa Pay Lak",
       num_bath_room: 2,
       num_bed_room: 2,
       num_of_beds: 2,
@@ -259,6 +265,7 @@ const AddVilla = () => {
       />
     );
   };
+
   // Render Step 4
   const RenderStep4 = () => {
     return (

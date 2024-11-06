@@ -78,7 +78,6 @@ const VillaDetail = () => {
   });
   const fetchVillaDetail = async (id: string) => {
     const res = await getResidence(id);
-    console.log(res);
     if (res.success) {
       setVilla(res.data);
     }

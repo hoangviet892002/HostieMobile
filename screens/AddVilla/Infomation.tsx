@@ -10,6 +10,11 @@ import Toast from "react-native-toast-message";
 import { useFocusEffect } from "expo-router";
 import { Loading } from "@/components";
 import useToast from "@/hooks/useToast";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import Icon, { Icons } from "@/components/Icons";
 
 interface InterfaceType {
   name: string;
@@ -33,6 +38,7 @@ interface RenderInputProps {
   onChange: (value: any) => void;
   error?: string;
   type: "text" | "select" | "number" | "area";
+  icon: string;
 }
 
 const Infomation: React.FC<InfomationProps> = ({
@@ -62,6 +68,7 @@ const Infomation: React.FC<InfomationProps> = ({
         }));
       },
       value: data.name,
+      icon: "home",
     },
     {
       name: "Loại",
@@ -74,6 +81,7 @@ const Infomation: React.FC<InfomationProps> = ({
         }));
       },
       value: data.type,
+      icon: "home",
     },
     {
       name: "Số phòng tắm",
@@ -86,6 +94,7 @@ const Infomation: React.FC<InfomationProps> = ({
         }));
       },
       value: data.num_bath_room,
+      icon: "droplet",
     },
     {
       name: "Số phòng ngủ",
@@ -98,6 +107,7 @@ const Infomation: React.FC<InfomationProps> = ({
         }));
       },
       value: data.num_bed_room,
+      icon: "moon",
     },
     {
       name: "Số giường",
@@ -110,6 +120,7 @@ const Infomation: React.FC<InfomationProps> = ({
         }));
       },
       value: data.num_of_beds,
+      icon: "layers",
     },
     {
       name: "Số khách tối đa",
@@ -122,6 +133,7 @@ const Infomation: React.FC<InfomationProps> = ({
         }));
       },
       value: data.max_guests,
+      icon: "users",
     },
   ];
   const [optionSelect, setOptionSelect] = useState<Type[]>([]);
@@ -143,6 +155,7 @@ const Infomation: React.FC<InfomationProps> = ({
     type,
     name,
     setFieldValue,
+    icon,
   }: RenderInputProps & {
     setFieldValue: (field: string, value: any) => void;
   }) => {
@@ -152,15 +165,37 @@ const Infomation: React.FC<InfomationProps> = ({
     switch (type) {
       case "text":
         return (
-          <View className="mx-5">
-            <Text className="text-lg font-bold">{name}</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderColor: Colors.primary,
+              borderWidth: 2,
+              borderRadius: 25,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              marginVertical: 5,
+              width: wp(80),
+            }}
+          >
+            <Icon
+              type={Icons.AntDesign}
+              name={icon}
+              size={20}
+              color={Colors.primary}
+            />
+
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
               onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
-              className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-              style={{ borderColor: Colors.primary }}
+              style={{
+                flex: 1,
+                marginLeft: 10,
+                color: Colors.black,
+                paddingVertical: 8,
+              }}
             />
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
@@ -184,16 +219,37 @@ const Infomation: React.FC<InfomationProps> = ({
         );
       case "number":
         return (
-          <View className="mx-5">
-            <Text className="text-lg font-bold">{name}</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderColor: Colors.primary,
+              borderWidth: 2,
+              borderRadius: 25,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              marginVertical: 5,
+              width: wp(80),
+            }}
+          >
+            <Icon
+              type={Icons.Feather}
+              name={icon}
+              size={20}
+              color={Colors.primary}
+            />
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
               onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
               keyboardType="numeric"
-              className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-              style={{ borderColor: Colors.primary }}
+              style={{
+                flex: 1,
+                marginLeft: 10,
+                color: Colors.black,
+                paddingVertical: 8,
+              }}
             />
             {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
@@ -201,17 +257,37 @@ const Infomation: React.FC<InfomationProps> = ({
       case "select":
         return (
           <>
-            <View className="mx-5">
-              <Text className="text-lg font-bold">{name}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderColor: Colors.primary,
+                borderWidth: 2,
+                borderRadius: 25,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginVertical: 5,
+                width: wp(80),
+              }}
+            >
+              <Icon
+                type={Icons.Feather}
+                name={icon}
+                size={20}
+                color={Colors.primary}
+              />
               <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(true);
+                onPress={() => setModalVisible(true)}
+                style={{
+                  flex: 1,
+                  marginLeft: 10,
+
+                  paddingVertical: 8,
                 }}
-                className="bg-white p-2 rounded-lg border-2 py-2 my-2 "
-                style={{ borderColor: Colors.primary }}
               >
-                <Text>{value.description}</Text>
+                <Text>{value.name}</Text>
               </TouchableOpacity>
+
               {error && <Text style={{ color: "red" }}>{error}</Text>}
             </View>
             <Modal
@@ -288,6 +364,7 @@ const Infomation: React.FC<InfomationProps> = ({
       dataPost.id = id;
       setId(id);
     }
+
     const res = await postResidence(dataPost);
 
     if (res.success) {
@@ -355,7 +432,7 @@ const Infomation: React.FC<InfomationProps> = ({
           values,
           setFieldValue,
         }) => (
-          <View>
+          <View className="flex items-center justify-center ">
             {element.map((item, index) => (
               <RenderInput
                 name={item.name}
@@ -365,6 +442,7 @@ const Infomation: React.FC<InfomationProps> = ({
                 onChange={(value) => {
                   setFieldValue(item.label, value);
                 }}
+                icon={item.icon}
                 setFieldValue={setFieldValue}
                 error={
                   typeof errors[item.label as keyof typeof errors] === "string"
@@ -374,18 +452,46 @@ const Infomation: React.FC<InfomationProps> = ({
                 type={item.type}
               />
             ))}
-            <View className="flex flex-row justify-end m-4">
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                margin: 16,
+              }}
+            >
               <TouchableOpacity
-                className="flex items-center justify-center"
                 onPress={() => handleSubmit()}
                 style={{
+                  flexDirection: "row",
+                  alignItems: "center",
                   backgroundColor: Colors.primary,
-                  padding: 10,
-                  borderRadius: 5,
-                  width: 100,
+                  paddingVertical: 12,
+                  paddingHorizontal: 20,
+                  borderRadius: 25,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  elevation: 5,
                 }}
               >
-                <Text>Next</Text>
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 16,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Next
+                </Text>
+                <Icon
+                  type={Icons.Feather}
+                  name="arrow-right"
+                  size={20}
+                  color="#fff"
+                  style={{ marginLeft: 8 }}
+                />
               </TouchableOpacity>
             </View>
           </View>

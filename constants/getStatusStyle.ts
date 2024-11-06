@@ -38,6 +38,19 @@ export const getStatusStyle = (status: string) => {
         color: "#E53E3E",
         textColor: "text-red-600",
       };
+
+    case StatusBooking.CHECKOUT:
+      return {
+        icon: "checkmark-circle",
+        color: "#38A169",
+        textColor: "text-green-600",
+      };
+    case StatusBooking.CHECKIN:
+      return {
+        icon: "checkmark-circle",
+        color: "#38A169",
+        textColor: "text-green-600",
+      };
     default:
       return {
         icon: "help-circle",

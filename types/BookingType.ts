@@ -25,4 +25,7 @@ export interface BookingType {
   description: null | string;
   hold_residence_id?: number;
   expire: null | string;
+  is_customer_checkin: boolean;
+  is_customer_checkout: boolean;
+  commission_rate: number | null;
 }

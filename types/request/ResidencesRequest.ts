@@ -33,11 +33,8 @@ export interface ResidencesStep4 {
   id: string;
   price_default: number;
   price_weekend: { day: number; price: number }[];
-  price_weeknd_delete: number[];
   price_special: { day: string; price: number }[];
-  price_special_delete: number[];
   price_season: { start_date: string; end_date: string; price: number }[];
-  price_season_delete: number[];
 }
 export interface ResidencesStep5 {
   step: number;
@@ -49,4 +46,4 @@ export type ResidencesRequest =
   | ResidencesStep2
   | ResidencesStep3
   | ResidencesStep4
-  | ResidencesStep5;
+  | FormData;

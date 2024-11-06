@@ -15,15 +15,15 @@ const postCustomer = async (data: Customer): Promise<InfoResponse<any>> => {
   return await axiosCore.post(endPoint.customer.create, data);
 };
 
-const updateCustomer = async (
+const updateCustomerApi = async (
   id: string,
   data: Customer
 ): Promise<InfoResponse<any>> => {
   return await axiosCore.put(endPoint.customer.update(id), data);
 };
 
-const deleteCustomer = async (id: string): Promise<InfoResponse<any>> => {
+const deleteCustomerApi = async (id: string): Promise<InfoResponse<any>> => {
   return await axiosCore.delete(endPoint.customer.delete(id));
 };
 
-export { getCusomtersApi, postCustomer, updateCustomer, deleteCustomer };
+export { getCusomtersApi, postCustomer, updateCustomerApi, deleteCustomerApi };

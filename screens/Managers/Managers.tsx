@@ -10,11 +10,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { VillaType } from "@/types";
 import { EmptyData, VillaManageCard } from "@/components";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Residence } from "@/types/response/Residences";
 import { getResidences } from "@/apis/residences";
 import { Loading } from "@/components";
+import { Colors } from "@/constants/Colors";
 
 const Managers = () => {
   const [loading, setLoading] = useState(false);

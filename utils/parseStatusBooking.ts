@@ -5,6 +5,8 @@ interface data {
   is_seller_transfer: boolean;
   is_host_receive: boolean;
   status: number;
+  is_customer_checkin: boolean;
+  is_customer_checkout: boolean;
 }
 
 export const parseStatusBooking = (data: data) => {
@@ -22,6 +24,12 @@ export const parseStatusBooking = (data: data) => {
   }
   if (!data.is_host_receive) {
     return StatusBooking.WAIT_RECEIVE;
+  }
+  if (data.is_customer_checkin) {
+    return StatusBooking.CHECKIN;
+  }
+  if (data.is_customer_checkout) {
+    return StatusBooking.CHECKOUT;
   }
 
   return StatusBooking.SUCCESS;

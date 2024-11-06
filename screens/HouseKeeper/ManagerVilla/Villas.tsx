@@ -1,144 +1,72 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View, FlatList, ActivityIndicator } from "react-native";
+import React, { useCallback, useState } from "react";
 import { VillaType } from "@/types";
 import VillaCard from "./VillaCard";
+import { Residence } from "@/types/response/Residences";
+import { useFocusEffect } from "expo-router";
+import { getResidencesByHouseKeeperApi } from "@/apis/residences";
+import { Colors } from "@/constants/Colors";
+import { EmptyData } from "@/components";
 
 const Villas = () => {
-  const villas: VillaType[] = [
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-    {
-      name: "Villa 1",
-      thumbnail: "https://picsum.photos/200/300",
-      location: "123 Street, City",
-      category: [],
-      id: "1",
-      maximumGuests: 10,
-      standardGuests: 5,
-      type: "Villa",
-      description: "This is a description",
-      images: [
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-        "https://picsum.photos/200/300",
-      ],
-    },
-  ];
+  const [villas, setVillas] = useState<Residence[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
+  useFocusEffect(
+    useCallback(() => {
+      fetchVillas();
+    }, [])
+  );
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const fetchVillas = async (pageNumber = 1) => {
+    if (pageNumber === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+    const res = await getResidencesByHouseKeeperApi(pageNumber);
+    if (res.success) {
+      if (pageNumber === 1) {
+        setVillas(res.data.residences);
+      } else {
+        setVillas((prevVillas) => [...prevVillas, ...res.data.residences]);
+      }
+      setTotalPage(res.data.total_pages);
+    }
+    if (pageNumber === 1) {
+      setLoading(false);
+    } else {
+      setLoadingMore(false);
+    }
+  };
+  const handleLoadMore = () => {
+    if (!loadingMore && page < totalPage) {
+      setPage((prevPage) => prevPage + 1);
+      fetchVillas(page + 1);
+    }
+  };
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return (
+      <View className="py-4">
+        <ActivityIndicator size="small" color={Colors.primary} />
+      </View>
+    );
+  };
+
   return (
     <View>
-      {villas.map((villa, index) => (
-        <VillaCard villa={villa} key={index} />
-      ))}
+      <FlatList
+        data={villas}
+        renderItem={({ item }) => <VillaCard villa={item} />}
+        keyExtractor={(item) => item.residence_id}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={<EmptyData />}
+      />
     </View>
   );
 };

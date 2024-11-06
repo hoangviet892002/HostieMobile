@@ -19,6 +19,7 @@ import EmptyData from "@/components/EmptyData";
 import { parseStatusBooking } from "@/utils/parseStatusBooking";
 import { getStatusStyle } from "@/constants/getStatusStyle";
 import { useFocusEffect, useNavigation } from "expo-router";
+import { parseDateDDMMYYYY } from "@/utils/parseDate";
 
 const BookingForHost = () => {
   const navigation = useNavigation();
@@ -127,14 +128,14 @@ const BookingForHost = () => {
             <Ionicons name="calendar-outline" size={20} color="#4A5568" />
             <Text className="ml-2 text-gray-700">
               <Text className="font-medium">Check-in:</Text>{" "}
-              {moment(item.checkin).format("DD-MM-YYYY")}
+              {parseDateDDMMYYYY(item.checkin)}
             </Text>
           </View>
           <View className="flex-row items-center mb-2">
             <Ionicons name="calendar-outline" size={20} color="#4A5568" />
             <Text className="ml-2 text-gray-700">
               <Text className="font-medium">Check-out:</Text>{" "}
-              {moment(item.checkout).format("DD-MM-YYYY")}
+              {parseDateDDMMYYYY(item.checkout)}
             </Text>
           </View>
 

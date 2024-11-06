@@ -11,6 +11,11 @@ export const parseDate = (date: string) => {
 
 //  parse format date DD-MM-YYYY
 export const parseDateDDMMYYYY = (date: string) => {
+  const ddmmyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
+  if (ddmmyyyyRegex.test(date)) {
+    return date;
+  }
+
   const dateObj = new Date(date);
   const day = String(dateObj.getDate()).padStart(2, "0");
   const month = String(dateObj.getMonth() + 1).padStart(2, "0");

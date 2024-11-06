@@ -5,6 +5,8 @@ export enum StatusBooking {
   CANCEL = "Cancel",
   SUCCESS = "Success",
   REJECT = "Reject",
+  CHECKOUT = "Checkout",
+  CHECKIN = "Checkin",
 }
 export enum ActionStatusBooking {
   REJECT = "Reject",
@@ -13,4 +15,7 @@ export enum ActionStatusBooking {
   RECEIVE = "Receive",
   NOT_RECEIVE = "Not Receive",
   CANCEL = "Cancel",
+  CHECKOUT = "Checkout",
+  CHECKIN = "Checkin",
+  OPENQR = "OpenQR",
 }

@@ -1,5 +1,6 @@
 import { getIcons } from "@/apis/icon";
 import { postResidence } from "@/apis/residences";
+import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
 import useToast from "@/hooks/useToast";
 import { AmenityType } from "@/types";
@@ -14,7 +15,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import Toast from "react-native-toast-message";
 
 interface AddCategoryProps {
@@ -119,35 +123,81 @@ const AddCategory: React.FC<AddCategoryProps> = ({
           </TouchableOpacity>
         ))}
       </View>
+      <View className="flex items-center justify-center">
+        {/* Input name and verify */}
 
-      {/* Input name and verify */}
-      <View className="m-4">
-        <Text>Name</Text>
-        <TextInput
-          className="border border-gray-400 p-2 w-full"
-          placeholder="Name"
-          value={form.name}
-          onChangeText={(text) => {
-            setForm({ ...form, name: text });
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            borderColor: Colors.primary,
+            borderWidth: 2,
+            borderRadius: 25,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            marginVertical: 5,
+            width: wp(80),
           }}
-        />
-      </View>
+        >
+          <Icon
+            type={Icons.AntDesign}
+            name="user"
+            size={20}
+            color={Colors.primary}
+          />
+          <TextInput
+            style={{
+              flex: 1,
+              marginLeft: 10,
+              color: Colors.black,
+              paddingVertical: 8,
+            }}
+            placeholder="Name"
+            value={form.name}
+            onChangeText={(text) => {
+              setForm({ ...form, name: text });
+            }}
+          />
+        </View>
 
-      {/* Input description */}
-      <View className="m-4">
-        <Text>Description</Text>
-        <TextInput
-          className="border border-gray-400 p-2 w-full"
-          placeholder="Description"
-          value={form.description}
-          onChangeText={(text) => {
-            setForm({ ...form, description: text });
+        {/* Input description */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            borderColor: Colors.primary,
+            borderWidth: 2,
+            borderRadius: 25,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            marginVertical: 5,
+            width: wp(80),
           }}
-        />
+        >
+          <Icon
+            type={Icons.AntDesign}
+            name="user"
+            size={20}
+            color={Colors.primary}
+          />
+          <TextInput
+            style={{
+              flex: 1,
+              marginLeft: 10,
+              color: Colors.black,
+              paddingVertical: 8,
+            }}
+            placeholder="Description"
+            value={form.description}
+            onChangeText={(text) => {
+              setForm({ ...form, description: text });
+            }}
+          />
+        </View>
       </View>
 
       <TouchableOpacity
-        className="m-4"
+        className="m-4 flex flex-row items-center justify-center rounded-3xl"
         onPress={() => {
           if (selected && form.name && form.description) {
             const data: utilitie = {
@@ -173,6 +223,12 @@ const AddCategory: React.FC<AddCategoryProps> = ({
           alignSelf: "center",
         }}
       >
+        <Icon
+          type={Icons.AntDesign}
+          name="plus"
+          size={20}
+          color={Colors.white}
+        />
         <Text>Add</Text>
       </TouchableOpacity>
 
@@ -180,7 +236,8 @@ const AddCategory: React.FC<AddCategoryProps> = ({
         {utilitiesList.map((item, index) => (
           // Render list of utilities have delete button
           <View
-            className="flex flex-row justify-between m-4 border border-gray-400 p-2"
+            className="flex flex-row justify-between m-4 border border-gray-400 p-2 rounded-3xl"
+            style={{ borderRadius: 5 }}
             key={index}
           >
             <View className="flex flex-row">
@@ -199,7 +256,12 @@ const AddCategory: React.FC<AddCategoryProps> = ({
                 setUtilitiesList(utilitiesList.filter((_, i) => i !== index));
               }}
             >
-              <Text>Delete</Text>
+              <Icon
+                type={Icons.AntDesign}
+                name="delete"
+                size={20}
+                color={Colors.red}
+              />
             </TouchableOpacity>
           </View>
         ))}
@@ -210,13 +272,34 @@ const AddCategory: React.FC<AddCategoryProps> = ({
               setStep(2);
             }}
             style={{
-              backgroundColor: Colors.gray,
-              padding: 10,
-              borderRadius: 5,
-              width: 100,
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: Colors.primary,
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 25,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 3,
+              elevation: 5,
             }}
           >
-            <Text>Back</Text>
+            <Icon
+              name="arrow-left"
+              size={20}
+              color={Colors.white}
+              type={Icons.Feather}
+            />
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "bold",
+              }}
+            >
+              Back
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="flex items-center justify-center"
@@ -224,13 +307,34 @@ const AddCategory: React.FC<AddCategoryProps> = ({
               handleSubmit();
             }}
             style={{
+              flexDirection: "row",
+              alignItems: "center",
               backgroundColor: Colors.primary,
-              padding: 10,
-              borderRadius: 5,
-              width: 100,
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 25,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 3,
+              elevation: 5,
             }}
           >
-            <Text>Next</Text>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "bold",
+              }}
+            >
+              Next
+            </Text>
+            <Icon
+              name="arrow-right"
+              size={20}
+              color={Colors.white}
+              type={Icons.Feather}
+            />
           </TouchableOpacity>
         </View>
       </ScrollView>

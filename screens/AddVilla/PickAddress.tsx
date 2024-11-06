@@ -4,7 +4,10 @@ import { Colors } from "@/constants/Colors";
 import useToast from "@/hooks/useToast";
 import { RegionType } from "@/types";
 import { ResidencesStep2 } from "@/types/request/ResidencesRequest";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import {
@@ -15,6 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Icon, { Icons } from "@/components/Icons";
 interface AddressType {
   provide: {
     label: string;
@@ -44,6 +48,7 @@ interface RenderInputProps {
   onChange: (value: any) => void;
   error?: string;
   type: "text" | "select" | "number" | "area" | "multiInput";
+  icon: string;
 }
 const PickAddress: React.FC<PickAddressProps> = ({
   setStep,
@@ -100,6 +105,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
       value: formData.provide,
       type: "select",
       onChange: (value) => {},
+      icon: "map-pin",
     },
     {
       label: "district",
@@ -108,6 +114,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
       onChange: (value) => {
         fetchDistricts(value.value);
       },
+      icon: "map-pin",
     },
     {
       label: "ward",
@@ -115,12 +122,14 @@ const PickAddress: React.FC<PickAddressProps> = ({
       type: "select",
 
       onChange: (value) => {},
+      icon: "map-pin",
     },
     {
       label: "address",
       value: formData.address,
       type: "text",
       onChange: (value) => {},
+      icon: "map-pin",
     },
 
     {
@@ -128,6 +137,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
       value: formData.phones,
       type: "multiInput",
       onChange: (value) => {},
+      icon: "phone",
     },
   ];
 
@@ -138,25 +148,42 @@ const PickAddress: React.FC<PickAddressProps> = ({
     error,
     type,
     setFieldValue,
+    icon,
   }: RenderInputProps & {
     setFieldValue: (field: string, value: any) => void;
   }) => {
     switch (type) {
       case "text":
         return (
-          <View className="mx-5">
-            <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderColor: Colors.primary,
+              borderWidth: 2,
+              borderRadius: 25,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              marginVertical: 5,
+              width: wp(80),
+            }}
+          >
+            <Icon
+              type={Icons.Feather}
+              name={icon}
+              size={20}
+              color={Colors.primary}
+            />
             <TextInput
               placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
               onChangeText={onChange}
               value={value}
               autoCapitalize="none"
               style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 5,
-                padding: 10,
-                marginBottom: 10,
+                flex: 1,
+                marginLeft: 10,
+                color: Colors.black,
+                paddingVertical: 8,
               }}
             />
             {error && <Text style={{ color: "red" }}>{error}</Text>}
@@ -169,21 +196,40 @@ const PickAddress: React.FC<PickAddressProps> = ({
           // will open a modal to select
 
           <>
-            <View className="mx-5">
-              <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderColor: Colors.primary,
+                borderWidth: 2,
+                borderRadius: 25,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginVertical: 5,
+                width: wp(80),
+              }}
+            >
+              <Icon
+                type={Icons.Feather}
+                name={icon}
+                size={20}
+                color={Colors.primary}
+              />
               <TouchableOpacity
                 onPress={() => {
                   setModalVisible(true);
                 }}
                 style={{
-                  borderWidth: 1,
-                  borderColor: "gray",
-                  borderRadius: 5,
-                  padding: 10,
-                  marginBottom: 10,
+                  flex: 1,
+                  marginLeft: 10,
+
+                  paddingVertical: 8,
                 }}
               >
-                <Text>{value.label}</Text>
+                <Text>
+                  {value.label ||
+                    label.charAt(0).toUpperCase() + label.slice(1)}
+                </Text>
               </TouchableOpacity>
 
               {error && <Text style={{ color: "red" }}>{error}</Text>}
@@ -308,63 +354,80 @@ const PickAddress: React.FC<PickAddressProps> = ({
         );
       case "multiInput":
         return (
-          <View className="mx-5">
+          <>
             <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
-            {value.map((item: string, index: number) => (
-              <View key={index} className="flex flex-row">
-                <TextInput
-                  className="w-4/5"
-                  placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
-                  onChangeText={(text) => {
-                    const newPhones = [...value];
-                    newPhones[index] = text;
-                    onChange(newPhones);
-                  }}
-                  value={item}
-                  autoCapitalize="none"
-                  style={{
-                    borderWidth: 1,
-                    borderColor: "gray",
-                    borderRadius: 5,
-                    padding: 10,
-                    marginBottom: 10,
-                  }}
-                />
-                <TouchableOpacity
-                  className="w-1/5 flex items-center"
-                  onPress={() => {
-                    const newPhones = [...value];
-                    newPhones.splice(index, 1);
-                    onChange(newPhones);
-                  }}
-                  style={{
-                    borderWidth: 1,
-                    borderColor: "gray",
-                    borderRadius: 5,
-                    padding: 10,
-                    marginBottom: 10,
-                  }}
-                >
-                  <Text>-</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-            <TouchableOpacity
-              onPress={() => {
-                onChange([...value, ""]);
-              }}
+            <View
               style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 5,
+                borderColor: Colors.primary,
+                borderWidth: 2,
+                borderRadius: 25,
                 padding: 10,
-                marginBottom: 10,
+                marginVertical: 5,
+                width: wp(80),
               }}
             >
-              <Text>+</Text>
-            </TouchableOpacity>
-            {error && <Text style={{ color: "red" }}>{error}</Text>}
-          </View>
+              {value.map((item: string, index: number) => (
+                <View
+                  key={index}
+                  style={{
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    padding: 10,
+                    marginVertical: 5,
+                    flexDirection: "row",
+                  }}
+                >
+                  <TextInput
+                    className="w-4/5"
+                    placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+                    onChangeText={(text) => {
+                      const newPhones = [...value];
+                      newPhones[index] = text;
+                      onChange(newPhones);
+                    }}
+                    value={item}
+                    autoCapitalize="none"
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                    }}
+                  />
+                  <TouchableOpacity
+                    className="flex items-center justify-center"
+                    onPress={() => {
+                      const newPhones = [...value];
+                      newPhones.splice(index, 1);
+                      onChange(newPhones);
+                    }}
+                  >
+                    <Icon
+                      name="minus-square"
+                      type={Icons.Feather}
+                      color={Colors.primary}
+                      size={27}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <TouchableOpacity
+                className="flex items-center justify-center rounded-3xl "
+                style={{
+                  backgroundColor: Colors.primary,
+                  padding: 10,
+                  borderRadius: 5,
+                }}
+                onPress={() => {
+                  onChange([...value, ""]);
+                }}
+              >
+                <Text className="text-white"> Add Phone</Text>
+              </TouchableOpacity>
+
+              {error && <Text style={{ color: "red" }}>{error}</Text>}
+            </View>
+          </>
         );
 
       default:
@@ -448,7 +511,6 @@ const PickAddress: React.FC<PickAddressProps> = ({
               errors.phones = "Phone is invalid";
             }
           });
-
           return errors;
         }}
       >
@@ -460,7 +522,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
           values,
           setFieldValue,
         }) => (
-          <View>
+          <View className="flex justify-center items-center">
             {element.map((item, index) => (
               <>
                 <RenderInput
@@ -482,36 +544,78 @@ const PickAddress: React.FC<PickAddressProps> = ({
                       : undefined
                   }
                   type={item.type}
+                  icon={item.icon}
                 />
               </>
             ))}
 
-            <View className="flex flex-row justify-between m-4">
+            <View className="flex flex-row justify-between m-4 w-full p-4">
               <TouchableOpacity
-                className="flex items-center justify-center"
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: Colors.primary,
+                  paddingVertical: 12,
+                  paddingHorizontal: 20,
+                  borderRadius: 25,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  elevation: 5,
+                }}
                 onPress={() => {
                   setStep(1);
                 }}
-                style={{
-                  backgroundColor: Colors.gray,
-                  padding: 10,
-                  borderRadius: 5,
-                  width: 100,
-                }}
               >
-                <Text>Back</Text>
+                <Icon
+                  name="arrow-left"
+                  size={20}
+                  color={Colors.white}
+                  type={Icons.Feather}
+                />
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 16,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Back
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex items-center justify-center"
                 onPress={() => handleSubmit()}
                 style={{
+                  flexDirection: "row",
+                  alignItems: "center",
                   backgroundColor: Colors.primary,
-                  padding: 10,
-                  borderRadius: 5,
-                  width: 100,
+                  paddingVertical: 12,
+                  paddingHorizontal: 20,
+                  borderRadius: 25,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  elevation: 5,
                 }}
               >
-                <Text>Next</Text>
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 16,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Next
+                </Text>
+                <Icon
+                  type={Icons.Feather}
+                  name="arrow-right"
+                  size={20}
+                  color="#fff"
+                  style={{ marginLeft: 8 }}
+                />
               </TouchableOpacity>
             </View>
           </View>

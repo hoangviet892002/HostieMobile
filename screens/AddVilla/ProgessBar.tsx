@@ -1,30 +1,48 @@
-import { View, Text } from "react-native";
 import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
 
-const ProgessBar = ({ step }: { step: number }) => {
+const ProgressBar = ({ step }: { step: number }) => {
   const stepBar = [1, 2, 3, 4, 5];
+
   return (
-    <View className="flex flex-row items-center justify-center">
+    <View style={styles.container}>
       {stepBar.map((item, index) => (
         <React.Fragment key={item}>
-          {/* Điểm */}
-          <View
-            style={{
-              width: 10,
-              height: 10,
-              backgroundColor: step >= item ? Colors.primary : "gray",
-              borderRadius: 10,
-            }}
-          />
-          {/* Đường nối giữa các điểm, không hiển thị ở điểm cuối cùng */}
+          {/* Step Indicator */}
+          <View style={styles.stepContainer}>
+            <View
+              style={[
+                styles.circle,
+                {
+                  backgroundColor: step >= item ? Colors.primary : "#fff",
+                  borderColor: step >= item ? Colors.primary : "gray",
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.stepLabel,
+                  {
+                    color: step >= item ? "#fff" : "gray",
+                  },
+                ]}
+              >
+                {item}
+              </Text>
+            </View>
+            <Text style={styles.stepText}>{`Bước ${item}`}</Text>
+          </View>
+
+          {/* Line Between Steps */}
           {index < stepBar.length - 1 && (
             <View
-              style={{
-                width: 40, // Chiều dài của đường nối
-                height: 2, // Độ dày của đường nối
-                backgroundColor: step > item ? Colors.primary : "gray",
-              }}
+              style={[
+                styles.line,
+                {
+                  backgroundColor: step > item ? Colors.primary : "gray",
+                },
+              ]}
             />
           )}
         </React.Fragment>
@@ -33,4 +51,38 @@ const ProgessBar = ({ step }: { step: number }) => {
   );
 };
 
-export default ProgessBar;
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepContainer: {
+    alignItems: "center",
+  },
+  circle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  stepText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: "gray",
+    textAlign: "center",
+  },
+  line: {
+    width: 40,
+    height: 2,
+    marginHorizontal: 4,
+  },
+});
+
+export default ProgressBar;

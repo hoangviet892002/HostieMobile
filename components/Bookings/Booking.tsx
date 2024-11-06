@@ -3,104 +3,100 @@ import React from "react";
 import { Button } from "@rneui/base";
 import { Colors } from "@/constants/Colors";
 import { useNavigation } from "expo-router";
+import { getStatusStyle } from "@/constants/getStatusStyle";
+import { parseStatusBooking } from "@/utils/parseStatusBooking";
+import { Ionicons } from "@expo/vector-icons";
+import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import { BookingType } from "@/types";
 
-interface TodoProps {
-  todo: Todo;
-}
-
-type status = "pending" | "completed" | "canceled";
-interface Todo {
-  id: number;
-  villaName: string;
-  status: status;
-  date: string;
-  thumbnail: string;
-  address: string;
-  price: number;
-}
-
-const Booking = (TodoProps: TodoProps) => {
+const Booking = (item: BookingType) => {
   const navigation = useNavigation();
-  const { todo } = TodoProps;
-  const RenderStatus = () => {
-    let backgroundColor;
-    switch (todo.status) {
-      case "pending":
-        backgroundColor = Colors.yellow;
-        break;
-      case "completed":
-        backgroundColor = Colors.green;
-        break;
-      case "canceled":
-        backgroundColor = Colors.red;
-        break;
-      default:
-        backgroundColor = Colors.yellow;
-    }
-
-    return (
-      <View
-        style={{
-          backgroundColor,
-          padding: 5,
-          borderRadius: 5,
-        }}
-        className="rounded-lg p-2"
-      >
-        <Text style={{ color: "#fff", fontWeight: "bold" }}>{todo.status}</Text>
-      </View>
-    );
-  };
+  const { icon, color, textColor } = getStatusStyle(parseStatusBooking(item));
   return (
-    <View
-      style={{
-        padding: 20,
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 10,
-        marginBottom: 10,
+    <TouchableOpacity
+      className="bg-white p-5 mb-5 mx-4 rounded-2xl shadow-lg"
+      onPress={() => {
+        navigation.navigate("BookingDetail", { id: item.id });
       }}
     >
+      {/* Hình ảnh đại diện */}
       <Image
-        style={{ width: "100%", height: 200, borderRadius: 10 }}
-        source={{ uri: todo.thumbnail }}
+        source={{ uri: "https://picsum.photos/200/300" }}
+        className="w-full h-40 rounded-xl mb-4"
       />
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 10 }}>
-        {todo.villaName}
-      </Text>
-      <Text style={{ fontSize: 16, color: "#666", marginTop: 5 }}>
-        {todo.address}
-      </Text>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 10,
-        }}
-      >
-        <View>
-          <Text style={{ fontSize: 16, color: "#666" }}>Date: {todo.date}</Text>
-          <Text style={{ fontSize: 16, color: "#666" }}>{todo.price} VND</Text>
+
+      {/* Tiêu đề và trạng thái */}
+      <View className="flex flex-row justify-between items-center mb-4">
+        <Text className="text-2xl font-semibold text-gray-800">
+          {item.residence_name}
+        </Text>
+        <View className="flex flex-row items-center">
+          <Ionicons name={icon} size={24} color={color} />
+          <Text className={`ml-2 font-medium ${textColor}`}>
+            {parseStatusBooking(item)}
+          </Text>
         </View>
-        <RenderStatus />
       </View>
 
-      <TouchableOpacity
-        className="bg-gray-200 p-4 rounded-md mt-4 border border-gray-400"
-        style={{
-          backgroundColor: Colors.primary,
-          padding: 10,
-          borderRadius: 5,
-          marginTop: 10,
-          borderBlockColor: "#ddd",
-        }}
-        onPress={() => {
-          navigation.navigate("ViewDetailBookingHouseKeepper", { id: todo.id });
-        }}
-      >
-        <Text style={{ textAlign: "center" }}>View Booking</Text>
-      </TouchableOpacity>
-    </View>
+      {/* Thông tin chi tiết */}
+      <View className="mb-4">
+        <View className="flex flex-row items-center mb-2">
+          <Ionicons name="calendar-outline" size={20} color="#4A5568" />
+          <Text className="ml-2 text-gray-700">
+            <Text className="font-medium">Check-in:</Text>{" "}
+            {parseDateDDMMYYYY(item.checkin)}
+          </Text>
+        </View>
+        <View className="flex flex-row items-center mb-2">
+          <Ionicons name="calendar-outline" size={20} color="#4A5568" />
+          <Text className="ml-2 text-gray-700">
+            <Text className="font-medium">Check-out:</Text>{" "}
+            {parseDateDDMMYYYY(item.checkout)}
+          </Text>
+        </View>
+        <View className="flex flex-row items-center mb-2">
+          <Ionicons name="moon-outline" size={20} color="#4A5568" />
+          <Text className="ml-2 text-gray-700">
+            <Text className="font-medium">Số đêm:</Text> {item.total_night}
+          </Text>
+        </View>
+        <View className="flex flex-row items-center mb-2">
+          <Ionicons name="person-outline" size={20} color="#4A5568" />
+          <Text className="ml-2 text-gray-700">
+            <Text className="font-medium">Tên khách hàng:</Text>{" "}
+            {item.guest_name || "N/A"}
+          </Text>
+        </View>
+        <View className="flex flex-row items-center mb-2">
+          <Ionicons name="call-outline" size={20} color="#4A5568" />
+          <Text className="ml-2 text-gray-700">
+            <Text className="font-medium">SĐT khách hàng:</Text>{" "}
+            {item.guest_phone || "N/A"}
+          </Text>
+        </View>
+      </View>
+
+      {/* Địa chỉ */}
+      {item.residence_address ? (
+        <View className="flex flex-row items-start mb-4">
+          <Ionicons name="location-outline" size={20} color="#4A5568" />
+          <Text className="ml-2 text-gray-700 flex-1">
+            {item.residence_address}
+          </Text>
+        </View>
+      ) : null}
+
+      {/* Tổng số tiền */}
+      <View className="flex flex-row justify-between items-center mb-4">
+        <Text className="text-lg font-bold text-gray-800">Tổng tiền:</Text>
+        <Text className="text-lg font-bold text-red-600">
+          {item.total_amount.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          })}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 

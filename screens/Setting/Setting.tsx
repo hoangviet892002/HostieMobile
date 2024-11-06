@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AccountInformation } from "@/types";
 import { Colors } from "@/constants/Colors";
@@ -23,6 +23,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useSocket } from "@/context/SocketProvider";
 import { Roles } from "@/constants/enums/roles";
+import { getMyInfoApi } from "@/apis/users";
 interface menu {
   title: string;
   icon: string;
@@ -35,6 +36,18 @@ const Setting = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const role = useSelector(selectRole);
   const navigation = useNavigation();
+  const [Account, SetAccount] = useState<AccountInformation>({
+    email: "",
+    username: "",
+    bankAccounts: [],
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    phones: [],
+    point: 0,
+    socials: [],
+    urlAvatar: "",
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -44,17 +57,18 @@ const Setting = () => {
     }, [isAuthenticated])
   );
 
-  const Account: AccountInformation = {
-    name: "John Doe",
-    email: "sdad",
-    phone: "123456789",
-    avatar: "https://picsum.photos/200/300",
-    type: "Admin",
+  const fetchMyInfo = async () => {
+    const response = await getMyInfoApi();
+    if (response) {
+      SetAccount(response.result);
+    }
   };
-  const moreInfo = {
-    wallet: 1000,
-    house: 5,
-  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchMyInfo();
+    }, [])
+  );
+
   const handleChangeLanguage = () => {
     dispatch(languageActions.changeLanguage());
   };
@@ -101,39 +115,39 @@ const Setting = () => {
 
   return (
     <SafeAreaView>
-      <ScrollView className=" m-[50px] ">
+      <ScrollView className=" m-[50px] my-6 ">
         <View className="flex flex-row">
           <Image
-            source={{ uri: Account.avatar }}
+            source={{
+              uri:
+                Account.urlAvatar ||
+                "https://www.w3schools.com/w3images/avatar6.png",
+            }}
             className="h-[100px] w-[100px] rounded-full"
           />
           <View className="flex justify-center ml-8  ">
-            <Text
-              className="font-semibold text-3xl"
-              style={{ color: Colors.primary }}
-            >
-              {Account.name}
+            <Text className="text-lg font-semibold text-gray-500">
+              {Account.firstName} {Account.middleName} {Account.lastName}
             </Text>
 
-            <Text className="text-lg font-semibold text-gray-500">
-              {Account.type}
-            </Text>
+            <Text className="text-lg font-semibold text-gray-500">{role}</Text>
           </View>
         </View>
 
         <View className="flex justify-center my-8">
-          <View className="flex flex-row">
-            <Icon
-              type={Icons.Feather}
-              name="phone"
-              size={24}
-              color={Colors.primary}
-            />
-
-            <Text className="text-lg font-semibold text-gray-500 mx-7">
-              {Account.phone}
-            </Text>
-          </View>
+          {Account.phones.map((phone, index) => (
+            <View key={index} className="flex flex-row my-4">
+              <Icon
+                type={Icons.Feather}
+                name="phone"
+                size={24}
+                color={Colors.primary}
+              />
+              <Text className="text-lg font-semibold text-gray-500 mx-7">
+                {phone.phone}
+              </Text>
+            </View>
+          ))}
           <View className="flex flex-row my-4">
             <Icon
               type={Icons.Feather}

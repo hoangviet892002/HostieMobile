@@ -67,6 +67,26 @@ const hostReceiveApi = async (data: any): Promise<InfoResponse<any>> => {
 const sellerCancelApi = async (data: any): Promise<InfoResponse<any>> => {
   return await axiosCore.post(`${endPoint.booking.sellerCancel}`, data);
 };
+const getLogApi = async (id: string): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(`${endPoint.booking.getLog(id)}`);
+};
+
+const getQRCodeApi = async (id: string): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(`${endPoint.booking.getQR(id)}`);
+};
+
+const getBookForHouseKeeperApi = async (
+  page: number
+): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(`${endPoint.booking.getBookForHouseKeeper(page)}`);
+};
+
+const checkinApi = async (data: any): Promise<InfoResponse<any>> => {
+  return await axiosCore.post(`${endPoint.booking.checkin}`, data);
+};
+const checkoutApi = async (data: any): Promise<InfoResponse<any>> => {
+  return await axiosCore.post(`${endPoint.booking.checkout}`, data);
+};
 export {
   holdBookingApi,
   getPrice,
@@ -81,4 +101,9 @@ export {
   sellerTransferApi,
   hostReceiveApi,
   sellerCancelApi,
+  getLogApi,
+  getQRCodeApi,
+  getBookForHouseKeeperApi,
+  checkinApi,
+  checkoutApi,
 };

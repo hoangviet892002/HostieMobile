@@ -20,19 +20,22 @@ import LoginWithGoogle from "./LoginWithGoogle";
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsAuthenticated } from "@/redux/slices/authSlice";
+import { selectIsAuthenticated, selectRole } from "@/redux/slices/authSlice";
 import { Colors } from "@/constants/Colors";
 import Logo from "@/assets/images/logo.png";
+import { Roles } from "@/constants/enums/roles";
 const Authentication = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const role = useSelector(selectRole);
 
   useFocusEffect(
     useCallback(() => {
-      if (isAuthenticated) {
-        router.replace("/(tabs)");
-      }
-    }, [isAuthenticated])
+      isAuthenticated &&
+        router.replace(
+          role === Roles.ROLE_HOUSEKEEPER ? "/housekeeper" : "/(tabs)"
+        );
+    }, [isAuthenticated, role])
   );
 
   const { t } = useTranslation();
@@ -54,11 +57,54 @@ const Authentication = () => {
   const [option, setOption] = useState(optionLogin[0]);
   const renderForm = () => {
     if (option.title === t("Sign in")) {
-      return <LoginForm />;
+      return (
+        <>
+          <Text
+            style={{ color: Colors.primary }}
+            className="font-semibold text-3xl"
+          >
+            {t("Sign in")}
+          </Text>
+          <LoginForm />
+
+          {/* register */}
+          <TouchableOpacity
+            onPress={() => setOption(optionLogin[1])}
+            className="flex justify-center items-center"
+          >
+            <Text
+              style={{ color: Colors.primary }}
+              className="font-semibold text-lg mt-5"
+            >
+              {t("Don't have an account? Sign up")}
+            </Text>
+          </TouchableOpacity>
+        </>
+      );
     } else {
       return (
         <ScrollView>
+          <Text
+            style={{ color: Colors.primary }}
+            className="font-semibold text-3xl"
+          >
+            {t("Sign up")}
+          </Text>
+
           <Register />
+
+          {/* login */}
+          <TouchableOpacity
+            onPress={() => setOption(optionLogin[0])}
+            className="flex justify-center items-center"
+          >
+            <Text
+              style={{ color: Colors.primary }}
+              className="font-semibold text-lg mt-5"
+            >
+              {t("Already have an account? Sign in")}
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       );
     }
@@ -73,38 +119,6 @@ const Authentication = () => {
         <Image source={Logo} style={{ width: wp(40), height: hp(20) }} />
       </Animatable.View>
 
-      <Animatable.View
-        className="flex flex-row p-2 my-2 rounded-lg justify-between"
-        style={{ width: wp(80), backgroundColor: Colors.primary }}
-        delay={120}
-        animation="slideInDown"
-      >
-        {optionLogin.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            className={` p-2 rounded-lg items-center justify-center`}
-            onPress={item.onPress}
-            style={{
-              width: wp(35),
-              backgroundColor:
-                option.title !== item.title ? Colors.primary : Colors.white,
-            }}
-          >
-            <Text
-              className={`${
-                option.title !== item.title ? "text-white" : "text-black"
-              }
-            text-2xl font-bold`}
-              style={{
-                color:
-                  option.title !== item.title ? Colors.white : Colors.black,
-              }}
-            >
-              {item.title}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </Animatable.View>
       {renderForm()}
     </View>
   );

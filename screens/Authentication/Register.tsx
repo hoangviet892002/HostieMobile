@@ -97,11 +97,32 @@ const Register = () => {
               className="w-full"
             >
               <View className="py-3">
-                <View>
-                  <Text className="text-lg font-bold"> {t("Email")} </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon
+                    type={Icons.Feather}
+                    name="mail"
+                    size={20}
+                    color={Colors.primary}
+                  />
                   <TextInput
-                    className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
                     value={values.email}
                     placeholder={t("Email")}
                     onChangeText={formikHandleChange("email")}
@@ -111,14 +132,34 @@ const Register = () => {
                     <Text className="text-red-500">{errors.email}</Text>
                   )}
                 </View>
-                <View>
-                  <Text className="text-lg font-bold">{t("User name")}</Text>
-
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon
+                    type={Icons.Feather}
+                    name="user"
+                    size={20}
+                    color={Colors.primary}
+                  />
                   <TextInput
-                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
-                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
                     value={values.username}
-                    placeholder={t("User name")}
+                    placeholder={t("Username")}
                     onChangeText={formikHandleChange("username")}
                     onBlur={handleBlur("username")}
                   />
@@ -126,12 +167,33 @@ const Register = () => {
                     <Text className="text-red-500">{errors.username}</Text>
                   )}
                 </View>
-                <View>
-                  <Text className="text-lg font-bold">{t("Password")}</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon
+                    type={Icons.Feather}
+                    name="lock"
+                    size={20}
+                    color={Colors.primary}
+                  />
                   <TextInput
                     secureTextEntry={true}
-                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
-                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
                     value={values.password}
                     placeholder={t("Password")}
                     onChangeText={formikHandleChange("password")}
@@ -141,16 +203,36 @@ const Register = () => {
                     <Text className="text-red-500">{errors.password}</Text>
                   )}
                 </View>
-                <View>
-                  <Text className="text-lg font-bold">
-                    {t("Retype Password")}
-                  </Text>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon
+                    type={Icons.Feather}
+                    name="lock"
+                    size={20}
+                    color={Colors.primary}
+                  />
                   <TextInput
                     secureTextEntry={true}
-                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
-                    style={{ width: wp(80), borderColor: Colors.primary }}
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
                     value={values.retype_password}
-                    placeholder={t("Confirm Password")}
+                    placeholder={t("Retype Password")}
                     onChangeText={formikHandleChange("retype_password")}
                     onBlur={handleBlur("retype_password")}
                   />
@@ -161,119 +243,213 @@ const Register = () => {
                   )}
                 </View>
 
-                <View>
-                  <Text className="text-lg font-bold">
-                    {t("Reference Code")}
-                  </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon
+                    type={Icons.Feather}
+                    name="hash"
+                    size={20}
+                    color={Colors.primary}
+                  />
                   <TextInput
-                    className="bg-white p-2 rounded-lg border-2 border-black py-2 my-2"
-                    style={{ width: wp(80), borderColor: Colors.primary }}
-                    value={values.reference_code || ""}
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
+                    value={values.reference_code}
                     placeholder={t("Reference Code")}
                     onChangeText={formikHandleChange("reference_code")}
                     onBlur={handleBlur("reference_code")}
                   />
                 </View>
+
                 <View>
-                  <Text className="text-lg font-bold">{t("Social")}</Text>
+                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                    {t("Social")}
+                  </Text>
                   {values.social_urls.map((item, index) => (
-                    <View key={index} className=" flex  justify-between">
-                      <View
-                        key={index}
-                        className="flex flex-row justify-between items-center my-2"
+                    <View
+                      key={index}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderColor: Colors.primary,
+                        borderWidth: 2,
+                        borderRadius: 25,
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        marginVertical: 5,
+                        width: wp(80),
+                      }}
+                    >
+                      <Icon
+                        type={Icons.Feather}
+                        name="hash"
+                        size={20}
+                        color={Colors.primary}
+                      />
+                      <TextInput
+                        style={{
+                          flex: 1,
+                          marginLeft: 10,
+                          color: Colors.black,
+                          paddingVertical: 8,
+                        }}
+                        value={item.social_name}
+                        placeholder={t("Social Name")}
+                        onChangeText={(text) => {
+                          const newSocialUrls = [...values.social_urls];
+                          newSocialUrls[index].social_name = text;
+                          setFieldValue("social_urls", newSocialUrls);
+                        }}
+                        onBlur={handleBlur("social_urls")}
+                      />
+                      <Icon
+                        type={Icons.Feather}
+                        name="link"
+                        size={20}
+                        color={Colors.primary}
+                        style={{ marginLeft: 10 }}
+                      />
+                      <TextInput
+                        style={{
+                          flex: 1,
+                          marginLeft: 10,
+                          color: Colors.black,
+                          paddingVertical: 8,
+                        }}
+                        value={item.url}
+                        placeholder={t("URL")}
+                        onChangeText={(text) => {
+                          const newSocialUrls = [...values.social_urls];
+                          newSocialUrls[index].url = text;
+                          setFieldValue("social_urls", newSocialUrls);
+                        }}
+                        onBlur={handleBlur("social_urls")}
+                      />
+                      <TouchableOpacity
+                        onPress={() => {
+                          const newSocialUrls = [...values.social_urls];
+                          newSocialUrls.splice(index, 1);
+                          setFieldValue("social_urls", newSocialUrls);
+                        }}
                       >
-                        <TextInput
-                          className="bg-white p-3 rounded-md border-2 border-black w-5/12"
-                          style={{
-                            borderColor: Colors.primary,
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.1,
-                            shadowRadius: 3,
-                          }}
-                          value={item.social_name}
-                          placeholder={t("Social Name")}
-                          onChangeText={(text) => {
-                            const newSocialUrls = [...values.social_urls];
-                            newSocialUrls[index].social_name = text;
-                            setFieldValue("social_urls", newSocialUrls);
-                          }}
-                          onBlur={handleBlur("social_urls")}
+                        <Icon
+                          type={Icons.Feather}
+                          name="minus"
+                          size={24}
+                          color={Colors.primary}
+                          style={{ marginLeft: 10 }}
                         />
-                        <TextInput
-                          className="bg-white p-3 rounded-md border-2 border-black w-5/12"
-                          style={{
-                            borderColor: Colors.primary,
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.1,
-                            shadowRadius: 3,
-                          }}
-                          value={item.url}
-                          placeholder={t("URL")}
-                          onChangeText={(text) => {
-                            const newSocialUrls = [...values.social_urls];
-                            newSocialUrls[index].url = text;
-                            setFieldValue("social_urls", newSocialUrls);
-                          }}
-                          onBlur={handleBlur("social_urls")}
-                        />
-                        <TouchableOpacity
-                          className="flex justify-center items-center w-1/12"
-                          onPress={() => {
-                            const newSocialUrls = [...values.social_urls];
-                            newSocialUrls.splice(index, 1);
-                            setFieldValue("social_urls", newSocialUrls);
-                          }}
-                        >
-                          <Icon
-                            type={Icons.Feather}
-                            name="minus"
-                            size={24}
-                            color={Colors.primary}
-                          />
-                        </TouchableOpacity>
-                      </View>
+                      </TouchableOpacity>
                     </View>
                   ))}
-                  {/* plus button social */}
-                  <TouchableOpacity
-                    className="bg-black p-2 rounded-lg items-center justify-center"
-                    style={{ width: wp(80), backgroundColor: Colors.primary }}
-                    onPress={() => {
-                      setFieldValue("social_urls", [
-                        ...values.social_urls,
-                        { social_name: "", url: "" },
-                      ]);
-                    }}
-                  >
-                    <Text>{t("Add more social")}</Text>
-                  </TouchableOpacity>
+
+                  {/* Plus button to add more social URLs */}
+                  <View className="flex items-center justify-center">
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: Colors.primary,
+                        padding: 10,
+                        borderRadius: 25,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: wp(80),
+                        marginVertical: 10,
+                      }}
+                      onPress={() => {
+                        setFieldValue("social_urls", [
+                          ...values.social_urls,
+                          { social_name: "", url: "" },
+                        ]);
+                      }}
+                    >
+                      <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                        {t("Add more social")}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-              <View className="py-4">
-                <CheckBox
-                  title={t("I agree to Terms and Privacy Policy")}
-                  checked={values.checked}
+              <View style={{ paddingVertical: 16 }}>
+                <TouchableOpacity
+                  style={{ flexDirection: "row", alignItems: "center" }}
                   onPress={() => {
                     setFieldValue("checked", !values.checked);
                   }}
-                />
+                >
+                  <View
+                    style={{
+                      height: 24,
+                      width: 24,
+                      borderWidth: 2,
+                      borderColor: Colors.primary,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 4,
+                    }}
+                  >
+                    {values.checked && (
+                      <Icon
+                        name="check"
+                        size={16}
+                        color={Colors.primary}
+                        type={Icons.Feather}
+                      />
+                    )}
+                  </View>
+                  <Text style={{ marginLeft: 8, flex: 1 }}>
+                    {t("I agree to the")}{" "}
+                    <Text
+                      style={{ color: Colors.primary }}
+                      onPress={() => {
+                        // Navigate to Terms and Conditions page
+                      }}
+                    >
+                      {t("Terms")}
+                    </Text>{" "}
+                    {t("and")}{" "}
+                    <Text
+                      style={{ color: Colors.primary }}
+                      onPress={() => {
+                        // Navigate to Privacy Policy page
+                      }}
+                    >
+                      {t("Privacy Policy")}
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
                 {errors.checked && (
-                  <Text className="text-red-500">{errors.checked}</Text>
+                  <Text style={{ color: "red", marginTop: 8 }}>
+                    {errors.checked}
+                  </Text>
                 )}
               </View>
             </Animatable.View>
             <Animatable.View delay={120} animation="slideInDown">
               <TouchableOpacity
-                className="bg-black p-2 rounded-lg items-center justify-center"
+                className="flex justify-center items-center py-3 rounded-3xl"
                 style={{ width: wp(80), backgroundColor: Colors.primary }}
                 onPress={() => {
                   handleSubmit();
                 }}
               >
                 <Text className="text-white text-2xl font-bold">
-                  {t("Register")}
+                  {" "}
+                  {t("Register")}{" "}
                 </Text>
               </TouchableOpacity>
             </Animatable.View>

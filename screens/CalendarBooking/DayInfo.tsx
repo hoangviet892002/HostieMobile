@@ -1,6 +1,10 @@
 import { bookingApi, getPrice, holdBookingApi } from "@/apis/booking";
-import { getCusomtersApi, postCustomer } from "@/apis/customer";
-import { Loading } from "@/components";
+import {
+  deleteCustomerApi,
+  getCusomtersApi,
+  postCustomer,
+} from "@/apis/customer";
+import { DeleteConfirmationModal, Loading } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
 import useToast from "@/hooks/useToast";
@@ -9,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Modal,
   Pressable,
@@ -18,6 +23,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 interface DayFormProps {
   checkin?: string;
@@ -30,11 +39,13 @@ const DayInfo = ({
   name,
   setSelectedDayForm,
   isHost,
+  RefreshCalendar,
 }: {
   selectedDayForm: DayFormProps;
   name: string;
   setSelectedDayForm: (value: React.SetStateAction<DayFormProps>) => void;
   isHost: boolean;
+  RefreshCalendar?: () => void;
 }) => {
   const { showToast } = useToast();
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +54,7 @@ const DayInfo = ({
   const [price, setPrice] = useState<number>(0);
   const [modalVisibleBooking, setModalVisibleBooking] = useState(false);
 
-  const handleHolding = async () => {
+  const handleHolding = async (expire: number) => {
     setLoading(true);
     const data = {
       residence_id: selectedDayForm.residence_id,
@@ -67,6 +78,7 @@ const DayInfo = ({
             .split("/")
             .join("-") // to convert the slashes to dashes
         : undefined,
+      expire: expire,
     };
 
     const response = await holdBookingApi(data);
@@ -79,6 +91,7 @@ const DayInfo = ({
         checkout: null,
       });
     }
+    RefreshCalendar();
     setLoading(false);
     setModalVisible(false);
   };
@@ -118,6 +131,7 @@ const DayInfo = ({
     }
     setLoading(false);
   };
+
   const RenderBookingForm = () => {
     const [guest_phone, setPhone] = useState("");
     const [guest_name, setName] = useState("");
@@ -126,7 +140,22 @@ const DayInfo = ({
     const [note, setNote] = useState("");
     const [selectedCustomerId, setSelectedCustomerId] = useState(null);
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [visible, setVisible] = useState(false);
 
+    const deleteCustomer = async (id: number) => {
+      const response = await deleteCustomerApi(id);
+      if (response.success) {
+        const newCustomers = customers.filter((c) => c.id !== id);
+        setCustomers(newCustomers);
+        showToast(response);
+      } else {
+        showToast(response);
+      }
+    };
+    const handleConfirmDelete = (id: number) => {
+      deleteCustomer(id); // Perform delete action
+      setVisible(false); // Hide modal
+    };
     const [customers, setCustomers] = useState<any[]>([]);
     useEffect(() => {
       setLoading(true);
@@ -159,56 +188,67 @@ const DayInfo = ({
       setSelectedCustomerId,
       setDropdownVisible,
     }) => (
-      <TouchableOpacity
-        onPress={() => {
-          setSelectedCustomerId(item.id);
-          setDropdownVisible(false);
-        }}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          padding: 15,
-          backgroundColor: "#fff",
-          borderBottomWidth: 1,
-          borderBottomColor: "#eee",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.1,
-          shadowRadius: 2,
-          elevation: 2, // For Android shadow
-          borderRadius: 8,
-          marginHorizontal: 10,
-          marginVertical: 5,
-        }}
-        activeOpacity={0.7}
-        accessibilityLabel={`Select customer ${item.name}`}
-      >
-        {/* Customer Icon */}
-        <Ionicons
-          name="person-circle-outline"
-          size={40}
-          color="#4F8EF7"
-          style={{ marginRight: 15 }}
-        />
+      <>
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedCustomerId(item.id);
+            setDropdownVisible(false);
+          }}
+          onLongPress={() => {
+            setVisible(true);
+          }}
+          delayLongPress={1000}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            padding: 15,
+            backgroundColor: "#fff",
+            borderBottomWidth: 1,
+            borderBottomColor: "#eee",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 2,
+            elevation: 2,
+            borderRadius: 8,
+            marginHorizontal: 10,
+            marginVertical: 5,
+          }}
+          activeOpacity={0.7}
+          accessibilityLabel={`Select customer ${item.name}`}
+        >
+          {/* Customer Icon */}
+          <Ionicons
+            name="person-circle-outline"
+            size={40}
+            color="#4F8EF7"
+            style={{ marginRight: 15 }}
+          />
 
-        {/* Customer Details */}
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 18, fontWeight: "600", color: "#333" }}>
-            {item.name}
-          </Text>
-          <Text style={{ fontSize: 14, color: "#666", marginTop: 4 }}>
-            {item.phone}
-          </Text>
-        </View>
+          {/* Customer Details */}
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 18, fontWeight: "600", color: "#333" }}>
+              {item.name}
+            </Text>
+            <Text style={{ fontSize: 14, color: "#666", marginTop: 4 }}>
+              {item.phone}
+            </Text>
+          </View>
 
-        {/* Chevron Icon */}
-        <Ionicons
-          name="chevron-forward"
-          size={20}
-          color="#ccc"
-          style={{ marginLeft: 10 }}
+          {/* Chevron Icon */}
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color="#ccc"
+            style={{ marginLeft: 10 }}
+          />
+        </TouchableOpacity>
+        <DeleteConfirmationModal
+          visible={visible}
+          onConfirm={() => handleConfirmDelete(item.id)}
+          onCancel={() => setVisible(false)}
         />
-      </TouchableOpacity>
+      </>
     );
 
     return (
@@ -370,16 +410,28 @@ const DayInfo = ({
                         <TouchableOpacity
                           onPress={() => setDropdownVisible(!dropdownVisible)}
                           style={{
-                            backgroundColor: "#fff",
-                            padding: 10,
-                            borderRadius: 8,
-                            borderWidth: 1,
+                            flexDirection: "row",
+                            alignItems: "center",
                             borderColor: Colors.primary,
+                            borderWidth: 2,
+                            borderRadius: 25,
+                            paddingHorizontal: 10,
+                            paddingVertical: 5,
+                            marginVertical: 5,
+                            width: wp(80),
                           }}
                         >
+                          <Icon
+                            type={Icons.Feather}
+                            name="user"
+                            size={20}
+                            color={Colors.primary}
+                          />
                           <Text
                             style={{
-                              fontSize: 16,
+                              flex: 1,
+                              marginLeft: 10,
+                              paddingVertical: 8,
                               color: guest_name ? "#000" : "#6c757d",
                             }}
                           >
@@ -437,6 +489,9 @@ const DayInfo = ({
                                         ...customers,
                                         response.data,
                                       ]);
+                                      setSelectedCustomerId(response.data.id);
+                                      setName(response.data.name);
+                                      setPhone(response.data.phone);
                                     } else {
                                       showToast(response);
                                     }
@@ -546,31 +601,77 @@ const DayInfo = ({
                           {errors.guest_name}
                         </Text>
                       )}
-
                       <Text className="text-lg font-bold"> Guest Count </Text>
-                      <TextInput
-                        className="bg-white p-2 rounded-lg border-2 py-2"
-                        style={{ borderColor: Colors.primary }}
-                        value={guest_count.toString()}
-                        placeholder="Guest Count"
-                        keyboardType="numeric"
-                        onChangeText={(text) => setCount(parseInt(text))}
-                      />
-                      {errors.guest_count && (
-                        <Text style={{ color: "red" }}>
-                          {errors.guest_count}
-                        </Text>
-                      )}
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          borderColor: Colors.primary,
+                          borderWidth: 2,
+                          borderRadius: 25,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          marginVertical: 5,
+                          width: wp(80),
+                        }}
+                      >
+                        <Icon
+                          type={Icons.Feather}
+                          name="users"
+                          size={20}
+                          color={Colors.primary}
+                        />
+                        <TextInput
+                          style={{
+                            flex: 1,
+                            marginLeft: 10,
+                            color: Colors.black,
+                            paddingVertical: 8,
+                          }}
+                          value={guest_count.toString()}
+                          placeholder="Guest Count"
+                          keyboardType="numeric"
+                          onChangeText={(text) => setCount(parseInt(text))}
+                        />
+                        {errors.guest_count && (
+                          <Text style={{ color: "red" }}>
+                            {errors.guest_count}
+                          </Text>
+                        )}
+                      </View>
 
                       <Text className="text-lg font-bold"> Note </Text>
 
-                      <TextInput
-                        className="bg-white p-2 rounded-lg border-2 py-2"
-                        style={{ borderColor: Colors.primary }}
-                        value={note}
-                        placeholder="Note"
-                        onChangeText={(text) => setNote(text)}
-                      />
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          borderColor: Colors.primary,
+                          borderWidth: 2,
+                          borderRadius: 25,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          marginVertical: 5,
+                          width: wp(80),
+                        }}
+                      >
+                        <Icon
+                          type={Icons.Feather}
+                          name="file-text"
+                          size={20}
+                          color={Colors.primary}
+                        />
+                        <TextInput
+                          style={{
+                            flex: 1,
+                            color: Colors.black,
+                            paddingVertical: 8,
+                          }}
+                          value={note}
+                          placeholder="Note"
+                          onChangeText={(text) => setNote(text)}
+                        />
+                      </View>
                     </View>
 
                     {/* Buttons */}
@@ -685,6 +786,7 @@ const DayInfo = ({
         checkout: null,
       });
     }
+    RefreshCalendar();
     setLoading(false);
   };
   return (
@@ -886,63 +988,126 @@ const DayInfo = ({
                   </Text>
                 </View>
 
-                {/* Buttons */}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: 20,
+                <Formik
+                  initialValues={{ expire: "" }}
+                  onSubmit={(values) => {
+                    handleHolding(parseInt(values.expire));
+                  }}
+                  validate={(value) => {
+                    const errors: any = {};
+                    if (!value.expire) {
+                      errors.expire = "Required";
+                    }
+                    if (!/^\d+$/.test(value.expire)) {
+                      errors.expire = "Invalid number";
+                    }
+
+                    return errors;
                   }}
                 >
-                  <Pressable
-                    onPress={() => setModalVisible(!modalVisible)}
-                    style={{
-                      backgroundColor: "#dc3545", // Red background for Close
-                      paddingVertical: 10,
-                      paddingHorizontal: 20,
-                      borderRadius: 10,
-                      shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "white",
-                        fontSize: 16,
-                        fontWeight: "600",
-                      }}
-                    >
-                      Close
-                    </Text>
-                  </Pressable>
+                  {({
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    values,
+                    errors,
+                  }) => (
+                    <>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          borderColor: Colors.primary,
+                          borderWidth: 2,
+                          borderRadius: 25,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          marginVertical: 5,
+                          width: wp(80),
+                        }}
+                      >
+                        <Icon
+                          type={Icons.Feather}
+                          name="calendar"
+                          size={20}
+                          color={Colors.primary}
+                        />
+                        <TextInput
+                          style={{
+                            flex: 1,
+                            marginLeft: 10,
+                            color: Colors.black,
+                            paddingVertical: 8,
+                          }}
+                          keyboardType="numeric"
+                          value={values.expire}
+                          placeholder="Expire( minute)"
+                          onChangeText={handleChange("expire")}
+                        />
+                        {errors.expire && (
+                          <Text style={{ color: "red" }}>{errors.expire}</Text>
+                        )}
+                      </View>
+                      {/* Buttons */}
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginTop: 20,
+                        }}
+                      >
+                        <Pressable
+                          onPress={() => setModalVisible(!modalVisible)}
+                          style={{
+                            backgroundColor: "#dc3545",
+                            paddingVertical: 10,
+                            paddingHorizontal: 20,
+                            borderRadius: 10,
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.2,
+                            shadowRadius: 5,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 16,
+                              fontWeight: "600",
+                            }}
+                          >
+                            Close
+                          </Text>
+                        </Pressable>
 
-                  <Pressable
-                    onPress={handleHolding}
-                    style={{
-                      backgroundColor: "#007bff",
-                      paddingVertical: 10,
-                      paddingHorizontal: 20,
-                      borderRadius: 10,
-                      shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "white",
-                        fontSize: 16,
-                        fontWeight: "600",
-                      }}
-                    >
-                      Book
-                    </Text>
-                  </Pressable>
-                </View>
+                        <Pressable
+                          onPress={() => handleSubmit()}
+                          style={{
+                            backgroundColor: "#007bff",
+                            paddingVertical: 10,
+                            paddingHorizontal: 20,
+                            borderRadius: 10,
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.2,
+                            shadowRadius: 5,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 16,
+                              fontWeight: "600",
+                            }}
+                          >
+                            Book
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </>
+                  )}
+                </Formik>
               </Pressable>
             </View>
           </View>

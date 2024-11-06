@@ -46,7 +46,6 @@ const Booking = () => {
         setTotalPage(response.data.pagination.total_pages);
       }
     } catch (error) {
-      // Xử lý lỗi nếu có
       console.error("Failed to fetch bookings:", error);
       Toast.show({
         type: "error",

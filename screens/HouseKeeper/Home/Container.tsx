@@ -35,12 +35,12 @@ const Container = () => {
   return (
     <SafeAreaView className="h-full p-5 pb-24">
       {/*  select date */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         className="bg-blue-500 p-2 rounded-3xl items-center justify-center h-12"
         onPress={() => setShowDatePicker(true)}
       >
         <Text>{parseDate(date.toISOString())}</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {RenderModalDatePick()}
       {/*  select date */}
       <Bookings />

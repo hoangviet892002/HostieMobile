@@ -17,13 +17,15 @@ import { authActions } from "@/redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/Colors";
 import { decodeJWT } from "@/utils/decodeJWT";
+import Icon, { Icons } from "@/components/Icons";
 
 const LoginForm = () => {
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const [loginForm, setLoginForm] = useState<SignInRequest>({
-    username: "host",
-    password: "host",
+    username: "quangia1",
+    password: "quangia1",
   });
 
   const handleChange = (key: string, value: string) => {
@@ -35,9 +37,11 @@ const LoginForm = () => {
       await AsyncStorage.setItem("session", JSON.stringify(response.result));
 
       const decodedToken = decodeJWT(response.result.token);
+      console.log(response.result.token);
 
       // ROLE_SELLER
       // ROLE_HOST
+      //ROLE_HOUSEKEEPER
       console.log(decodedToken);
 
       dispatch(authActions.login(decodedToken));
@@ -48,7 +52,6 @@ const LoginForm = () => {
         text2: response.message,
         position: "top",
       });
-      router.push("/housekeeper");
     }
   };
 
@@ -56,36 +59,102 @@ const LoginForm = () => {
     <View>
       <Animatable.View delay={120} animation="slideInDown" className="w-full">
         <View className="py-3">
-          <View>
-            <Text className="text-lg font-bold"> {t("User name")} </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderColor: Colors.primary,
+              borderWidth: 2,
+              borderRadius: 25,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              marginVertical: 5,
+              width: wp(80),
+            }}
+          >
+            <Icon
+              type={Icons.AntDesign}
+              name="user"
+              size={20}
+              color={Colors.primary}
+            />
+
             <TextInput
-              className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-              style={{ width: wp(80), borderColor: Colors.primary }}
+              style={{
+                flex: 1,
+                marginLeft: 10,
+                color: Colors.black,
+                paddingVertical: 8,
+              }}
+              placeholder="Username"
+              placeholderTextColor={Colors.primary}
               value={loginForm.username}
-              placeholder="User name"
               onChangeText={(text) => handleChange("username", text)}
             />
           </View>
-
-          <View>
-            <Text className="text-lg font-bold"> {t("Password")} </Text>
-            <TextInput
-              secureTextEntry={true}
-              className="bg-white p-2 rounded-lg border-2  py-2 my-2"
-              style={{
-                width: wp(80),
-                borderColor: Colors.primary,
-              }}
-              value={loginForm.password}
-              placeholder={t("Password")}
-              onChangeText={(text) => handleChange("password", text)}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderColor: Colors.primary,
+              borderWidth: 2,
+              borderRadius: 25,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              marginVertical: 5,
+              width: wp(80),
+            }}
+          >
+            <Icon
+              type={Icons.AntDesign}
+              name="lock"
+              size={20}
+              color={Colors.primary}
             />
+            <TextInput
+              style={{
+                flex: 1,
+                marginLeft: 10,
+                color: Colors.black,
+                paddingVertical: 8,
+              }}
+              placeholder="Password"
+              placeholderTextColor={Colors.primary}
+              value={loginForm.password}
+              onChangeText={(text) => handleChange("password", text)}
+              secureTextEntry={!passwordVisible}
+            />
+            <TouchableOpacity
+              onPress={() => setPasswordVisible(!passwordVisible)}
+            >
+              <Text style={{ color: Colors.primary, fontWeight: "bold" }}>
+                {passwordVisible ? (
+                  <>
+                    <Icon
+                      type={Icons.Feather}
+                      name="eye-off"
+                      size={20}
+                      color={Colors.primary}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Icon
+                      type={Icons.Feather}
+                      name="eye"
+                      size={20}
+                      color={Colors.primary}
+                    />
+                  </>
+                )}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Animatable.View>
       <Animatable.View delay={120} animation="slideInDown">
         <TouchableOpacity
-          className="bg-black p-2 rounded-lg items-center justify-center"
+          className="flex justify-center items-center py-3 rounded-3xl"
           style={{ width: wp(80), backgroundColor: Colors.primary }}
           onPress={() => {
             onSubmit();
