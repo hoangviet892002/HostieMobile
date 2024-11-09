@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
+
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -21,7 +22,7 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "permissions": ["CAMERA", "CAMERA_ROLL"],
+    "permissions": ["CAMERA", "CAMERA_ROLL", "INTERNET"],
     "web": {
       "bundler": "metro",
       "output": "static",

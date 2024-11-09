@@ -24,8 +24,8 @@ const LoginForm = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const [loginForm, setLoginForm] = useState<SignInRequest>({
-    username: "quangia1",
-    password: "quangia1",
+    username: "seller",
+    password: "seller",
   });
 
   const handleChange = (key: string, value: string) => {

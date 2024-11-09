@@ -20,8 +20,8 @@ import { decodeJWT } from "@/utils/decodeJWT";
 import { authActions } from "@/redux/slices/authSlice";
 
 LogBox.ignoreAllLogs(true);
-// 10 seconds
-const TOKEN_REFRESH_INTERVAL = 10 * 1000;
+// 1 minute
+const TOKEN_REFRESH_INTERVAL = 1 * 60 * 1000;
 const AppWrapper = () => {
   const element = [
     {
@@ -78,6 +78,12 @@ const AppWrapper = () => {
     {
       name: "BookingDetail",
     },
+    {
+      name: "DashBoard",
+    },
+    {
+      name: "dashboard",
+    },
   ];
 
   const { scheduleNotification } = useNotification();
@@ -119,11 +125,10 @@ const AppWrapper = () => {
     socketEvents.RecieveChangeCalendar,
   ]);
 
-  // refresh token with api refresh token
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    let isMounted = true; // Flag to track if the component is still mounted
+    let isMounted = true;
     let timeoutId;
 
     const refreshToken = async () => {
@@ -133,7 +138,6 @@ const AppWrapper = () => {
       if (session) {
         const sessionData = JSON.parse(session);
         const response = await refreshTokenApi(sessionData.token);
-
         if (response.result) {
           await AsyncStorage.setItem(
             "session",

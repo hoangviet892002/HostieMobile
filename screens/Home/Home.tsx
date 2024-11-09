@@ -1,21 +1,21 @@
 import { getResidencesBySellerApi } from "@/apis/residences";
 import { DateRangePicker, EmptyData, Loading, VillaCard } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
+import PackageCompoent from "@/components/PackageComponent";
 import { Colors } from "@/constants/Colors";
 import { Residence } from "@/types/response/Residences";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { Text, TouchableOpacity } from "react-native";
 import {
   ActivityIndicator,
   FlatList,
   Modal,
   Pressable,
-  TextInput,
+  Text,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {

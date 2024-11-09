@@ -17,6 +17,9 @@ import BookingForHost from "./BookingForHost";
 import Hold from "./Hold";
 import Booking from "./Booking";
 import BookingDetail from "./BookingDetail";
+import Package from "./Package";
+import DashBoardTag1 from "./DashBoardTag1";
+
 export {
   VillaDetail,
   CalendarDetail,
@@ -37,4 +40,6 @@ export {
   Hold,
   Booking,
   BookingDetail,
+  Package,
+  DashBoardTag1,
 };

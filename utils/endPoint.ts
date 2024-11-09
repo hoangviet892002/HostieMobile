@@ -81,6 +81,17 @@ const endPoint = {
     update: (id: string) => `/customers/${id}`,
     delete: (id: string) => `/customers/${id}`,
   },
+  package: {
+    getPackages: (page: number) => `/v1/api/package?page=${page}&size=10&sort=`,
+  },
+  registers: {
+    getRegisters: (page: number) =>
+      `/v1/api/registers?page=${page}&size=10&sort=`,
+    postRegister: `/v1/api/registers`,
+  },
+  payment: {
+    getUrlVnpay: (id: number) => `/v1/api/payment/vn-pay?registerId=${id}`,
+  },
 };
 
 export { endPoint, baseURL, coreURL, socketURL };

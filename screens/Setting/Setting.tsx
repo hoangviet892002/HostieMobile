@@ -1,29 +1,25 @@
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { AccountInformation } from "@/types";
-import { Colors } from "@/constants/Colors";
-import { ScrollView } from "react-native";
+import { getMyInfoApi } from "@/apis/users";
 import Icon, { Icons } from "@/components/Icons";
-import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  languageActions,
-  selectCurrentLanguage,
-} from "@/redux/slices/languageSlice";
+import { Colors } from "@/constants/Colors";
+import { Roles } from "@/constants/enums/roles";
 import {
   authActions,
   selectIsAuthenticated,
   selectRole,
 } from "@/redux/slices/authSlice";
+import {
+  languageActions,
+  selectCurrentLanguage,
+} from "@/redux/slices/languageSlice";
+import { AccountInformation } from "@/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useNavigation } from "expo-router";
-import { useNotification } from "@/context/NotificationContext";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
-import { useSocket } from "@/context/SocketProvider";
-import { Roles } from "@/constants/enums/roles";
-import { getMyInfoApi } from "@/apis/users";
+import { useNavigation } from "expo-router";
+import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 interface menu {
   title: string;
   icon: string;
@@ -104,6 +100,13 @@ const Setting = () => {
       handle: () => {},
     },
     {
+      title: t("Dashboard"),
+      icon: "home",
+      handle: () => {
+        navigation.navigate("dashboard");
+      },
+    },
+    {
       title: t("Logout"),
       icon: "log-out",
       handle: () => {
@@ -115,7 +118,11 @@ const Setting = () => {
 
   return (
     <SafeAreaView>
-      <ScrollView className=" m-[50px] my-6 ">
+      <ScrollView
+        className=" m-[50px] my-6 "
+        showsVerticalScrollIndicator={false} // Ẩn thanh cuộn dọc
+        showsHorizontalScrollIndicator={false} // Ẩn thanh cuộn ngang
+      >
         <View className="flex flex-row">
           <Image
             source={{
@@ -161,7 +168,7 @@ const Setting = () => {
           </View>
         </View>
         {role === Roles.ROLE_HOST && (
-          <View className="flex flex-row">
+          <View className="flex flex-row mb-4">
             <TouchableOpacity
               className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-l-xl"
               onPress={() => {
@@ -181,7 +188,7 @@ const Setting = () => {
           </View>
         )}
 
-        <View className="flex flex-col mt-8">
+        <ScrollView className="flex flex- mb-9">
           {optionMenu.map((item, index) => (
             <TouchableOpacity
               key={index}
@@ -199,7 +206,7 @@ const Setting = () => {
               </View>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
