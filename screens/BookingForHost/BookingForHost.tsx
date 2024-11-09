@@ -173,18 +173,6 @@ const BookingForHost = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loading loading={loading} />
-      <Animatable.View
-        className="flex flex-row items-center px-4"
-        delay={120}
-        animation="slideInDown"
-      >
-        <BackButton />
-        <View className="flex flex-row items-center ">
-          <View className="flex ">
-            <Text className="text-3xl font-bold ">Booking</Text>
-          </View>
-        </View>
-      </Animatable.View>
 
       <FlatList
         data={books}

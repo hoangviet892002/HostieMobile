@@ -1,34 +1,30 @@
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AccountInformation } from "@/types";
-import { Colors } from "@/constants/Colors";
-import { ScrollView } from "react-native";
 import Icon, { Icons } from "@/components/Icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  languageActions,
-  selectCurrentLanguage,
-} from "@/redux/slices/languageSlice";
 import {
   authActions,
   selectIsAuthenticated,
   selectRole,
 } from "@/redux/slices/authSlice";
+import {
+  languageActions,
+  selectCurrentLanguage,
+} from "@/redux/slices/languageSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useNavigation } from "expo-router";
-import { useNotification } from "@/context/NotificationContext";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
-import { useSocket } from "@/context/SocketProvider";
-import { Roles } from "@/constants/enums/roles";
+import { useNavigation } from "expo-router";
 import { getMyInfoApi } from "@/apis/users";
+import { AccountInformation } from "@/types";
+
 interface menu {
   title: string;
   icon: string;
   handle: () => void;
 }
+
 const Setting = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -63,6 +59,7 @@ const Setting = () => {
       SetAccount(response.result);
     }
   };
+
   useFocusEffect(
     useCallback(() => {
       fetchMyInfo();
@@ -75,17 +72,10 @@ const Setting = () => {
 
   const optionMenu: menu[] = [
     {
-      title: t("Booking"),
-      icon: "calendar",
+      title: t("Dashboard"),
+      icon: "home",
       handle: () => {
-        navigation.navigate("Booking");
-      },
-    },
-    {
-      title: t("Hold"),
-      icon: "bookmark",
-      handle: () => {
-        navigation.navigate("Hold");
+        navigation.navigate("dashboard");
       },
     },
     {
@@ -103,6 +93,7 @@ const Setting = () => {
       icon: "sun",
       handle: () => {},
     },
+
     {
       title: t("Logout"),
       icon: "log-out",
@@ -114,88 +105,87 @@ const Setting = () => {
   ];
 
   return (
-    <SafeAreaView>
-      <ScrollView className=" m-[50px] my-6 ">
-        <View className="flex flex-row">
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <ScrollView
+        className="m-6"
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        {/* User Info */}
+        <View
+          className="flex flex-row items-center p-5 bg-white rounded-lg shadow-lg mb-6 "
+          style={{
+            elevation: 5,
+          }}
+        >
           <Image
             source={{
               uri:
                 Account.urlAvatar ||
                 "https://www.w3schools.com/w3images/avatar6.png",
             }}
-            className="h-[100px] w-[100px] rounded-full"
+            className="h-24 w-24 rounded-full"
           />
-          <View className="flex justify-center ml-8  ">
-            <Text className="text-lg font-semibold text-gray-500">
+          <View className="ml-6">
+            <Text className="text-xl font-bold text-gray-800">
               {Account.firstName} {Account.middleName} {Account.lastName}
             </Text>
-
-            <Text className="text-lg font-semibold text-gray-500">{role}</Text>
+            <Text className="text-lg text-gray-500 mt-1">{role}</Text>
           </View>
         </View>
 
-        <View className="flex justify-center my-8">
+        {/* Contact Info */}
+        <View className="p-5 bg-white rounded-lg shadow-lg mb-6">
           {Account.phones.map((phone, index) => (
-            <View key={index} className="flex flex-row my-4">
+            <View key={index} className="flex flex-row items-center mb-4">
               <Icon
                 type={Icons.Feather}
                 name="phone"
                 size={24}
-                color={Colors.primary}
+                color="#007aff"
               />
-              <Text className="text-lg font-semibold text-gray-500 mx-7">
+              <Text className="text-lg font-semibold text-gray-700 ml-4">
                 {phone.phone}
               </Text>
             </View>
           ))}
-          <View className="flex flex-row my-4">
-            <Icon
-              type={Icons.Feather}
-              name="mail"
-              size={24}
-              color={Colors.primary}
-            />
-            <Text className="text-lg font-semibold text-gray-500 mx-7">
+          <View className="flex flex-row items-center">
+            <Icon type={Icons.Feather} name="mail" size={24} color="#007aff" />
+            <Text className="text-lg font-semibold text-gray-700 ml-4">
               {Account.email}
             </Text>
           </View>
         </View>
-        {role === Roles.ROLE_HOST && (
-          <View className="flex flex-row">
-            <TouchableOpacity
-              className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-l-xl"
-              onPress={() => {
-                navigation.navigate("BookingForHost");
-              }}
-            >
-              <Text className="text-lg font-semibold">Booking</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="flex w-1/2 justify-center items-center border border-gray-300 p-4 rounded-r-xl"
-              onPress={() => {
-                navigation.navigate("HoldForHost");
-              }}
-            >
-              <Text className="text-lg font-semibold">Hold</Text>
-            </TouchableOpacity>
-          </View>
-        )}
 
-        <View className="flex flex-col mt-8">
+        {/* Options Menu */}
+        <View className="bg-white rounded-lg shadow-lg p-3">
           {optionMenu.map((item, index) => (
             <TouchableOpacity
               key={index}
-              className="flex flex-row justify-between items-center border-b border-gray-300 p-4"
+              className={`flex flex-row justify-between items-center border-b border-gray-200 p-4 ${
+                item.icon === "log-out" ? "border-b-0" : ""
+              }`}
               onPress={item.handle}
             >
-              <View className="flex flex-row items-center">
+              <View className="flex flex-row justify-between w-full">
+                <View className="flex flex-row items-center">
+                  <Icon
+                    type={Icons.Feather}
+                    name={item.icon}
+                    size={24}
+                    color={item.icon === "log-out" ? "#e74c3c" : "#007aff"}
+                  />
+                  <Text className="text-lg font-semibold text-gray-800 ml-4">
+                    {item.title}
+                  </Text>
+                </View>
+
                 <Icon
                   type={Icons.Feather}
-                  name={item.icon}
+                  name="chevron-right"
                   size={24}
-                  color={item.icon === "log-out" ? Colors.red : Colors.primary}
+                  color="#007aff"
                 />
-                <Text className="text-lg font-semibold mx-4">{item.title}</Text>
               </View>
             </TouchableOpacity>
           ))}

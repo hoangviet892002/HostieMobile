@@ -32,10 +32,31 @@ const refreshTokenApi = async (token: string) => {
     token: token,
   });
 };
+
+const postBankAccountApi = async (payload: any, userID: string) => {
+  return await axiosClient.post(endPoint.user.postBank(userID), payload);
+};
+const editBankAccountApi = async (
+  payload: any,
+  userID: string,
+  accountID: string
+) => {
+  return await axiosClient.put(
+    endPoint.user.editBank(userID, accountID),
+    payload
+  );
+};
+
+const deleteBankAccountApi = async (userID: string, accountID: string) => {
+  return await axiosClient.delete(endPoint.user.editBank(userID, accountID));
+};
 export {
   registerApi,
   signInApi,
   getMyInfoApi,
   getMyBankAccountsApi,
   refreshTokenApi,
+  postBankAccountApi,
+  editBankAccountApi,
+  deleteBankAccountApi,
 };

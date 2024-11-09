@@ -19,6 +19,9 @@ import DayInfo from "./DayInfo";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/stores";
 import { Colors } from "@/constants/Colors";
+import { getStatusStyle } from "@/constants/getStatusStyle";
+import { parseStatusBooking } from "@/utils/parseStatusBooking";
+import Icon, { Icons } from "@/components/Icons";
 type RouteParams = {
   params: {
     ids: string;
@@ -151,6 +154,27 @@ const CalendarsBooking = () => {
       });
     }
     setModalVisible(false);
+  };
+
+  const Status = (item: Calendar) => {
+    console.log(item);
+    const status = parseStatusBooking(item);
+    const { icon, color, textColor } = getStatusStyle(status);
+
+    return (
+      <View
+        style={{
+          backgroundColor: color,
+          padding: 5,
+          borderRadius: 5,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Icon name={icon} size={20} color={textColor} type={Icons.Feather} />
+        <Text style={{ color: textColor }}>{status}</Text>
+      </View>
+    );
   };
 
   return (
@@ -355,6 +379,7 @@ const CalendarsBooking = () => {
                   </View>
 
                   {/* status is book  */}
+
                   <Text
                     style={{
                       fontSize: 18,
@@ -365,14 +390,7 @@ const CalendarsBooking = () => {
                   >
                     Status:
                   </Text>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: selectedDay?.is_booked ? "#ff5a5f" : "#4CAF50",
-                    }}
-                  >
-                    {selectedDay?.is_booked ? "Unavailable" : "Available"}
-                  </Text>
+                  <Status {...(selectedDay as Calendar)} />
 
                   {/* Avatar */}
                   {selectedDay?.avatar_seller && (

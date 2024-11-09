@@ -14,6 +14,9 @@ const endPoint = {
     info: `/v1/api/users/my-info`,
     update: `/v1/api/users/update`,
     getBanks: `/v1/api/users/bank-accounts`,
+    postBank: (userID: string) => `/v1/api/users/${userID}/bank-accounts`,
+    editBank: (userID: string, accountID: string) =>
+      `/v1/api/users/${userID}/bank-accounts/${accountID}`,
     refreshToken: `/v1/api/auth/refresh-token`,
   },
   admin: {
@@ -74,12 +77,30 @@ const endPoint = {
       `/booking/housekeeper?page=${page}`,
     checkin: `/booking/checkin`,
     checkout: `/booking/checkout`,
+    getHoldDetail: (id: string) => `/booking/hold/${id}`,
   },
   customer: {
     create: `/customers`,
     getAll: `/customers`,
     update: (id: string) => `/customers/${id}`,
     delete: (id: string) => `/customers/${id}`,
+  },
+  package: {
+    getPackages: (page: number) => `/v1/api/package?page=${page}&size=10&sort=`,
+  },
+  registers: {
+    getRegisters: (page: number) =>
+      `/v1/api/registers?page=${page}&size=10&sort=`,
+    postRegister: `/v1/api/registers`,
+  },
+  payment: {
+    getUrlVnpay: (id: number) => `/v1/api/payment/vn-pay?registerId=${id}`,
+  },
+  notification: {
+    getNotification: (page: number) => `/notification?page=${page}`,
+  },
+  bank: {
+    getBanks: `/v1/api/banks?page=0&size=20&sort=`,
   },
 };
 

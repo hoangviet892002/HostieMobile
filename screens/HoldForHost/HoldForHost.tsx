@@ -344,16 +344,6 @@ const HoldForHost = () => {
   return (
     <SafeAreaView className="flex-1">
       <Loading loading={loading} />
-      <Animatable.View
-        className="flex flex-row items-center px-4"
-        delay={120}
-        animation="slideInDown"
-      >
-        <BackButton navigateTo="(tabs)" />
-        <View className="flex flex-row items-center">
-          <Text className="text-3xl font-bold">Danh sách Hold</Text>
-        </View>
-      </Animatable.View>
 
       <FlatList
         data={holds}

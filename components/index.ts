@@ -9,6 +9,7 @@ import MonthNavigator from "./MonthNavigator";
 import Loading from "./Loading";
 import EmptyData from "./EmptyData";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import PackageComponent from "./PackageComponent";
 export {
   DateRangePicker,
   VillaCard,
@@ -21,4 +22,5 @@ export {
   Loading,
   EmptyData,
   DeleteConfirmationModal,
+  PackageComponent,
 };
