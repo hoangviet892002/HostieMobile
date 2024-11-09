@@ -18,6 +18,8 @@ import { BankAccountsType } from "./Bank-accounts";
 import { QRType } from "./QRType";
 import PackageType from "./PackageType";
 import { RegisterType } from "./RegisterType";
+import { NotificationType } from "./NotificationType";
+import { Bank } from "./Bank-accounts";
 export type {
   Calendar,
   AmenityType,
@@ -39,4 +41,6 @@ export type {
   QRType,
   PackageType,
   RegisterType,
+  NotificationType,
+  Bank,
 };

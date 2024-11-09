@@ -19,6 +19,8 @@ import Booking from "./Booking";
 import BookingDetail from "./BookingDetail";
 import Package from "./Package";
 import DashBoardTag1 from "./DashBoardTag1";
+import Notifications from "./Notifications";
+import ManagerBank from "./ManagerBank";
 
 export {
   VillaDetail,
@@ -42,4 +44,6 @@ export {
   BookingDetail,
   Package,
   DashBoardTag1,
+  Notifications,
+  ManagerBank,
 };

@@ -87,6 +87,10 @@ const checkinApi = async (data: any): Promise<InfoResponse<any>> => {
 const checkoutApi = async (data: any): Promise<InfoResponse<any>> => {
   return await axiosCore.post(`${endPoint.booking.checkout}`, data);
 };
+
+const getHoldDetailApi = async (id: string): Promise<InfoResponse<any>> => {
+  return await axiosCore.get(`${endPoint.booking.getHoldDetail(id)}`);
+};
 export {
   holdBookingApi,
   getPrice,
@@ -106,4 +110,5 @@ export {
   getBookForHouseKeeperApi,
   checkinApi,
   checkoutApi,
+  getHoldDetailApi,
 };

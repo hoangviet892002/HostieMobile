@@ -56,7 +56,7 @@ const handleError = (error: { response: { data: any } }) => {
     return data;
   } catch (error) {
     // clear session
-    AsyncStorage.removeItem("session");
+    // AsyncStorage.removeItem("session");
     return { result: null, message: "Server error" };
   }
 };
@@ -66,7 +66,7 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     console.log("error", error);
-    AsyncStorage.removeItem("session");
+    // AsyncStorage.removeItem("session");
     return handleError(error);
   }
 );
