@@ -22,6 +22,8 @@ import { Colors } from "@/constants/Colors";
 import { getStatusStyle } from "@/constants/getStatusStyle";
 import { parseStatusBooking } from "@/utils/parseStatusBooking";
 import Icon, { Icons } from "@/components/Icons";
+import { parseStatusCalendar } from "@/utils/parseStatusCalendar";
+import { getCalendarStyle } from "@/constants/getCalendarStyle";
 type RouteParams = {
   params: {
     ids: string;
@@ -157,22 +159,18 @@ const CalendarsBooking = () => {
   };
 
   const Status = (item: Calendar) => {
-    console.log(item);
-    const status = parseStatusBooking(item);
-    const { icon, color, textColor } = getStatusStyle(status);
+    const status = parseStatusCalendar(item.background_color || "");
+    const { color, icon, textColor } = getCalendarStyle(status);
 
     return (
       <View
-        style={{
-          backgroundColor: color,
-          padding: 5,
-          borderRadius: 5,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        className={`flex-row items-center p-2 rounded shadow-md mb-2`}
+        accessibilityLabel={`Status: ${status}`}
       >
-        <Icon name={icon} size={20} color={textColor} type={Icons.Feather} />
-        <Text style={{ color: textColor }}>{status}</Text>
+        <Icon name={icon} size={20} color={color} type={Icons.Feather} />
+        <Text className={`text-base font-medium`} style={{ color: color }}>
+          {status}
+        </Text>
       </View>
     );
   };
@@ -301,160 +299,69 @@ const CalendarsBooking = () => {
             animationType="slide"
           >
             <View
+              className="flex-1 justify-center items-center  bg-opacity-50"
               style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
                 backgroundColor: "rgba(0,0,0,0.5)",
               }}
             >
-              <View
-                style={{
-                  width: "90%",
-                  height: "80%",
-                  backgroundColor: "white",
-                  borderRadius: 20,
-                  padding: 20,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 5,
-                  elevation: 5,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 20,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 22,
-                      fontWeight: "bold",
-                      color: "#333",
-                    }}
-                  >
+              <View className="w-11/12  bg-white rounded-2xl p-5 shadow-lg">
+                {/* Header */}
+                <View className="flex-row justify-between items-center mb-5">
+                  <Text className="text-2xl font-bold text-gray-800">
                     {selectedDay?.date
                       ? moment(selectedDay?.date).format("DD/MM/YYYY")
                       : ""}
                   </Text>
                   <Pressable onPress={() => setModalVisible(false)}>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: "#ff5a5f",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Đóng
+                    <Text className="text-lg font-bold text-red-500">
+                      Close
                     </Text>
                   </Pressable>
                 </View>
 
-                <ScrollView style={{ marginTop: 10 }}>
+                <ScrollView className="mt-2">
                   {/* Thông tin giá */}
-                  <View
-                    style={{
-                      backgroundColor: "#f9fafb",
-                      padding: 15,
-                      borderRadius: 10,
-                      marginBottom: 20,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        color: "#4CAF50",
-                      }}
-                    >
+                  <View className="bg-gray-100 p-4 rounded-lg mb-5 items-center">
+                    <Text className="text-2xl font-bold text-green-600">
                       {selectedDay?.price
                         ? `${parsePrice(selectedDay?.price)} VND`
                         : ""}
                     </Text>
                   </View>
 
-                  {/* status is book  */}
-
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "bold",
-                      color: "#333",
-                      marginBottom: 10,
-                    }}
-                  >
+                  {/* Status */}
+                  <Text className="text-lg font-bold text-gray-800 mb-3">
                     Status:
                   </Text>
                   <Status {...(selectedDay as Calendar)} />
 
                   {/* Avatar */}
                   {selectedDay?.avatar_seller && (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginTop: 20,
-                      }}
-                    >
+                    <View className="flex-row items-center mt-5">
                       <Image
-                        source={{
-                          uri: selectedDay?.avatar_seller || "",
-                        }}
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 30,
-                          marginRight: 10,
-                        }}
+                        source={{ uri: selectedDay?.avatar_seller }}
+                        className="w-15 h-15 rounded-full mr-3"
+                        accessibilityLabel="Seller Avatar"
                       />
-                      <Text
-                        style={{
-                          fontSize: 18,
-                          fontWeight: "bold",
-                          color: "#333",
-                        }}
-                      >
+                      <Text className="text-lg font-bold text-gray-800">
                         {selectedDay?.seller_username}
                       </Text>
                     </View>
                   )}
 
-                  {/* Button  with disabled */}
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      marginTop: 20,
-                    }}
-                  >
+                  {/* Button with disabled state */}
+                  <View className="flex items-center justify-center mt-5">
                     <Pressable
-                      style={{
-                        backgroundColor: selectedDay?.is_booked
-                          ? "#6c757d"
-                          : "#007bff",
-                        paddingVertical: 10,
-                        paddingHorizontal: 20,
-                        borderRadius: 10,
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.2,
-                        shadowRadius: 5,
-                      }}
+                      className={`w-full flex items-center justify-center rounded-3xl h-14 my-2 ${
+                        selectedDay?.is_booked ? "bg-gray-500" : "bg-blue-600"
+                      } shadow-md`}
                       disabled={selectedDay?.is_booked}
                       onPress={() => handleSelectDay(selectedDay as Calendar)}
+                      accessibilityLabel={
+                        selectedDay?.is_booked ? "Booked" : "Book Now"
+                      }
                     >
-                      <Text
-                        style={{
-                          color: "white",
-                          fontSize: 16,
-                          fontWeight: "600",
-                        }}
-                      >
+                      <Text className="text-white text-lg font-semibold">
                         Book
                       </Text>
                     </Pressable>

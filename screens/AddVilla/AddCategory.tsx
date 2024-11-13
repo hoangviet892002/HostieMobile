@@ -7,6 +7,7 @@ import { AmenityType } from "@/types";
 import { CategoryType } from "@/types/CategoryType";
 import { ResidencesStep3 } from "@/types/request/ResidencesRequest";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   ScrollView,
@@ -44,6 +45,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
 }) => {
   const [options, setOptions] = useState<CategoryType[]>([]);
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   const fetchIcon = async () => {
     const response = await getIcons();
@@ -152,7 +154,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
               color: Colors.black,
               paddingVertical: 8,
             }}
-            placeholder="Name"
+            placeholder={t("Name")}
             value={form.name}
             onChangeText={(text) => {
               setForm({ ...form, name: text });
@@ -187,7 +189,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
               color: Colors.black,
               paddingVertical: 8,
             }}
-            placeholder="Description"
+            placeholder={t("Description")}
             value={form.description}
             onChangeText={(text) => {
               setForm({ ...form, description: text });
@@ -229,7 +231,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
           size={20}
           color={Colors.white}
         />
-        <Text>Add</Text>
+        <Text> {t("Add")}</Text>
       </TouchableOpacity>
 
       <ScrollView>
@@ -298,7 +300,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
                 fontWeight: "bold",
               }}
             >
-              Back
+              {t("Back")}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -327,7 +329,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
                 fontWeight: "bold",
               }}
             >
-              Next
+              {t("Next")}
             </Text>
             <Icon
               name="arrow-right"

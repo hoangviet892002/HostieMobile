@@ -15,6 +15,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import Icon, { Icons } from "@/components/Icons";
+import { useTranslation } from "react-i18next";
 
 interface InterfaceType {
   name: string;
@@ -48,6 +49,7 @@ const Infomation: React.FC<InfomationProps> = ({
   setId,
   id,
 }) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [initialValues, setInitialValues] = useState<InterfaceType>(data);
   useFocusEffect(
@@ -58,7 +60,7 @@ const Infomation: React.FC<InfomationProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const element: RenderInputProps[] = [
     {
-      name: "Tên",
+      name: t("Name"),
       label: "name",
       type: "text",
       onChange: (value) => {
@@ -71,7 +73,7 @@ const Infomation: React.FC<InfomationProps> = ({
       icon: "home",
     },
     {
-      name: "Loại",
+      name: t("Type"),
       label: "type",
       type: "select",
       onChange: (value) => {
@@ -84,7 +86,7 @@ const Infomation: React.FC<InfomationProps> = ({
       icon: "home",
     },
     {
-      name: "Số phòng tắm",
+      name: t("Number of bath rooms"),
       label: "num_bath_room",
       type: "number",
       onChange: (value) => {
@@ -97,7 +99,7 @@ const Infomation: React.FC<InfomationProps> = ({
       icon: "droplet",
     },
     {
-      name: "Số phòng ngủ",
+      name: t("Number of bed rooms"),
       label: "num_bed_room",
       type: "number",
       onChange: (value) => {
@@ -110,7 +112,7 @@ const Infomation: React.FC<InfomationProps> = ({
       icon: "moon",
     },
     {
-      name: "Số giường",
+      name: t("Number of beds"),
       label: "num_of_beds",
       type: "number",
       onChange: (value) => {
@@ -123,7 +125,7 @@ const Infomation: React.FC<InfomationProps> = ({
       icon: "layers",
     },
     {
-      name: "Số khách tối đa",
+      name: t("Max guests"),
       label: "max_guests",
       type: "number",
       onChange: (value) => {
@@ -186,7 +188,7 @@ const Infomation: React.FC<InfomationProps> = ({
             />
 
             <TextInput
-              placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+              placeholder={name}
               onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
@@ -205,7 +207,7 @@ const Infomation: React.FC<InfomationProps> = ({
           <View className="mx-5">
             <Text className="text-lg font-bold">{name}</Text>
             <TextInput
-              placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+              placeholder={name}
               onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
@@ -239,7 +241,7 @@ const Infomation: React.FC<InfomationProps> = ({
               color={Colors.primary}
             />
             <TextInput
-              placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+              placeholder={name}
               onChangeText={onChange}
               value={String(value)}
               autoCapitalize="none"
@@ -403,22 +405,22 @@ const Infomation: React.FC<InfomationProps> = ({
         validate={(values) => {
           const errors: any = {};
           if (!values.name) {
-            errors.name = "Name is required";
+            errors.name = t("Required");
           }
           if (!values.type || values.type.id === "") {
-            errors.type = "Type is required";
+            errors.type = t("Required");
           }
           if (!values.num_bath_room) {
-            errors.num_bath_room = "Number of bath room is required";
+            errors.num_bath_room = t("Required");
           }
           if (!values.num_bed_room) {
-            errors.num_bed_room = "Number of bed room is required";
+            errors.num_bed_room = t("Required");
           }
           if (!values.num_of_beds) {
-            errors.num_of_beds = "Number of beds is required";
+            errors.num_of_beds = t("Required");
           }
           if (!values.max_guests) {
-            errors.max_guests = "Max guests is required";
+            errors.max_guests = t("Required");
           }
 
           return errors;
@@ -483,7 +485,7 @@ const Infomation: React.FC<InfomationProps> = ({
                     fontWeight: "bold",
                   }}
                 >
-                  Next
+                  {t("Next")}
                 </Text>
                 <Icon
                   type={Icons.Feather}

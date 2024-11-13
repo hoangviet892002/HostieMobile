@@ -1,9 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { useTranslation } from "react-i18next";
 
 const ProgressBar = ({ step }: { step: number }) => {
   const stepBar = [1, 2, 3, 4, 5];
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
@@ -31,7 +33,7 @@ const ProgressBar = ({ step }: { step: number }) => {
                 {item}
               </Text>
             </View>
-            <Text style={styles.stepText}>{`Bước ${item}`}</Text>
+            <Text style={styles.stepText}>{`${t("Step")} ${item}`}</Text>
           </View>
 
           {/* Line Between Steps */}

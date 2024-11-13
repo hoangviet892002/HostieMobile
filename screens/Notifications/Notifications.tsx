@@ -1,3 +1,4 @@
+// src/screens/Notifications.tsx
 import { View, Text, ActivityIndicator, FlatList } from "react-native";
 import React, { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
@@ -8,6 +9,16 @@ import { EmptyData, Loading } from "@/components";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import moment from "moment";
 import Icon, { Icons } from "@/components/Icons";
+import {
+  EventBookNotification,
+  EventHoldNotification,
+} from "@/constants/enums/eventNotification";
+import {
+  BookDetailNotification,
+  HoldDetailNotification,
+} from "@/types/NotificationType";
+import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import { useTranslation } from "react-i18next";
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
@@ -16,6 +27,8 @@ const Notifications = () => {
   const [totalPage, setTotalPage] = useState<number>(1);
 
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const { t } = useTranslation();
+
   const fetchNotifications = async (pageNumber = 1) => {
     if (pageNumber === 1) {
       setLoading(true);
@@ -67,70 +80,173 @@ const Notifications = () => {
   useFocusEffect(
     useCallback(() => {
       setPage(1);
-
       fetchNotifications(1);
     }, [])
   );
 
   const renderItem = ({ item }: { item: NotificationType }) => {
-    return (
-      <View className="flex-row justify-between items-center bg-white p-4 mb-2 rounded-lg shadow-sm">
-        {/* Icon and Title */}
-        <View className="flex-row items-center">
-          <View className="mr-3">
-            {/* Placeholder for icon */}
-            <View
-              className={`w-8 h-8 rounded-full items-center justify-center ${
-                item.status === 1
-                  ? "bg-green-100"
-                  : item.status === 2
-                  ? "bg-red-100"
-                  : "bg-yellow-100"
-              }`}
-            >
-              <View
-                className={`${
-                  item.is_read ? "text-gray-400" : "text-gray-900"
-                }`}
-              >
-                {item.is_read ? (
-                  <Icon
-                    type={Icons.Feather}
-                    name="check"
-                    size={20}
-                    color={Colors.primary}
-                  />
-                ) : (
-                  <Icon
-                    type={Icons.Feather}
-                    name="alert-circle"
-                    size={20}
-                    color={Colors.primary}
-                  />
-                )}
-              </View>
-            </View>
-          </View>
-          <View>
-            <Text className="text-gray-900 font-semibold">
-              {item.event_code}
-            </Text>
-            <Text className="text-gray-500 text-sm">
-              {item.entity_details.description}
-            </Text>
-          </View>
-        </View>
+    const isBooking = item.entity_type_code === "bookings";
+    const eventCode = item.event_code as
+      | EventBookNotification
+      | EventHoldNotification;
+    const details = item.entity_details as
+      | BookDetailNotification
+      | HoldDetailNotification;
 
-        {/* Timestamp */}
-        <Text className="text-gray-400 text-xs">
-          {moment(item.created_at).fromNow()}
-        </Text>
-      </View>
+    const getTitle = () => {
+      if (isBooking) {
+        switch (eventCode) {
+          case EventBookNotification.Created:
+            return t("Booking.Created");
+          case EventBookNotification.Updated:
+            return t("Booking.Updated");
+          case EventBookNotification.Cancelled:
+            return t("Booking.Cancelled");
+          case EventBookNotification.HostAccepted:
+            return t("Booking.HostAccepted");
+          case EventBookNotification.HostRejected:
+            return t("Booking.HostRejected");
+          case EventBookNotification.SellerTransferred:
+            return t("Booking.SellerTransferred");
+          case EventBookNotification.HostReceived:
+            return t("Booking.HostReceived");
+          case EventBookNotification.HostDontReceived:
+            return t("Booking.HostDontReceived");
+          case EventBookNotification.CustomerCheckin:
+            return t("Booking.CustomerCheckin");
+          case EventBookNotification.CustomerCheckout:
+            return t("Booking.CustomerCheckout");
+          default:
+            return t("Booking.Notification");
+        }
+      } else {
+        switch (eventCode) {
+          case EventHoldNotification.Created:
+            return t("Hold.Created");
+          case EventHoldNotification.HostAccepted:
+            return t("Hold.HostAccepted");
+          case EventHoldNotification.HostRejected:
+            return t("Hold.HostRejected");
+          case EventHoldNotification.Cancelled:
+            return t("Hold.Cancelled");
+          default:
+            return t("Hold.Notification");
+        }
+      }
+    };
+
+    const getDescription = () => {
+      if (isBooking) {
+        const book = details as BookDetailNotification;
+        return `${t("Booking.ID")}: ${book.id}\n${t("Booking.Checkin")}: ${
+          book.checkin
+        }\n${t("Booking.Checkout")}: ${book.checkout}`;
+      } else {
+        const hold = details as HoldDetailNotification;
+        return `${t("Hold.ID")}: ${hold.id}\n${t("Hold.Checkin")}: ${
+          hold.checkin
+        }\n${t("Hold.Checkout")}: ${hold.checkout}`;
+      }
+    };
+
+    const getIcon = () => {
+      if (isBooking) {
+        switch (eventCode) {
+          case EventBookNotification.Created:
+            return {
+              type: Icons.AntDesign,
+              name: "calendar",
+              color: Colors.primary,
+            };
+          case EventBookNotification.Cancelled:
+            return {
+              type: Icons.AntDesign,
+              name: "closecircle",
+              color: Colors.error,
+            };
+          case EventBookNotification.HostAccepted:
+            return {
+              type: Icons.AntDesign,
+              name: "checkcircle",
+              color: Colors.success,
+            };
+          case EventBookNotification.HostRejected:
+            return {
+              type: Icons.AntDesign,
+              name: "closecircle",
+              color: Colors.error,
+            };
+          // Add more cases as needed
+          default:
+            return {
+              type: Icons.AntDesign,
+              name: "notification",
+              color: Colors.gray,
+            };
+        }
+      } else {
+        switch (eventCode) {
+          case EventHoldNotification.Created:
+            return {
+              type: Icons.AntDesign,
+              name: "book",
+              color: Colors.primary,
+            };
+          case EventHoldNotification.Cancelled:
+            return {
+              type: Icons.AntDesign,
+              name: "closecircle",
+              color: Colors.error,
+            };
+          case EventHoldNotification.HostAccepted:
+            return {
+              type: Icons.AntDesign,
+              name: "checkcircle",
+              color: Colors.success,
+            };
+          case EventHoldNotification.HostRejected:
+            return {
+              type: Icons.AntDesign,
+              name: "closecircle",
+              color: Colors.error,
+            };
+          // Add more cases as needed
+          default:
+            return {
+              type: Icons.AntDesign,
+              name: "notification",
+              color: Colors.gray,
+            };
+        }
+      }
+    };
+
+    return (
+      <TouchableOpacity className="flex-row items-start p-4 border-b border-gray-200 bg-white">
+        <Icon
+          type={getIcon().type}
+          name={getIcon().name}
+          size={24}
+          color={getIcon().color}
+        />
+        <View className="flex-1">
+          <Text className="text-lg font-semibold text-gray-800">
+            {getTitle()}
+          </Text>
+          <Text className="text-sm text-gray-600 mt-1">{getDescription()}</Text>
+          <Text className="text-xs text-gray-400 mt-2">
+            {moment(item.created_at).fromNow()}
+          </Text>
+          {!item.is_read && (
+            <View className="absolute top-4 right-4 w-3 h-3 bg-blue-500 rounded-full" />
+          )}
+        </View>
+      </TouchableOpacity>
     );
   };
 
   return (
-    <View>
+    <View className="flex-1">
       <Loading loading={loading} />
       <FlatList
         data={notifications}

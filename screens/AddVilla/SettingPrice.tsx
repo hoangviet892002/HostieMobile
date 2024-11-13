@@ -23,6 +23,7 @@ import { parseDate, parseDateDDMMYYYY } from "@/utils/parseDate";
 import { Formik } from "formik";
 import Toast from "react-native-toast-message";
 import useToast from "@/hooks/useToast";
+import { useTranslation } from "react-i18next";
 
 interface PriceType {
   price_default: number;
@@ -33,6 +34,7 @@ interface PriceType {
   price_season: { start_date: string; end_date: string; price: string }[];
 }
 interface RenderInputProps {
+  name: string;
   label: string;
   value: any;
   onChange: (value: any) => void;
@@ -74,6 +76,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
   const data: PriceType = price;
 
   const RenderInput = ({
+    name,
     label,
     value,
     onChange,
@@ -88,9 +91,9 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
       case "text":
         return (
           <View className="mx-5">
-            <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+            <Text>{name}</Text>
             <TextInput
-              placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+              placeholder={name}
               onChangeText={onChange}
               value={value}
               autoCapitalize="none"
@@ -129,7 +132,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
               color={Colors.primary}
             />
             <TextInput
-              placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+              placeholder={name}
               onChangeText={onChange}
               value={String(value)}
               keyboardType="numeric"
@@ -157,7 +160,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                 width: wp(80),
               }}
             >
-              <Text>{label.charAt(0).toUpperCase() + label.slice(1)}</Text>
+              <Text>{name}</Text>
             </View>
 
             <View
@@ -196,7 +199,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                       }}
                     >
                       <TextInput
-                        placeholder="Date"
+                        placeholder={t("Day")}
                         onChangeText={(text) => {
                           const newValue = [...value];
                           newValue[index].day = text;
@@ -216,7 +219,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                         }}
                       />
                       <TextInput
-                        placeholder="Price"
+                        placeholder={t("Price")}
                         onChangeText={(text) => {
                           const newValue = [...value];
                           newValue[index].price = text;
@@ -318,14 +321,14 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                                 fontSize: 16,
                               }}
                             >
-                              Pick Date
+                              {t("Pick Date")}
                             </Text>
                           )}
                         </TouchableOpacity>
 
                         {/* Price Input */}
                         <TextInput
-                          placeholder="Price"
+                          placeholder={t("Price")}
                           onChangeText={(text) => {
                             const newValue = [...value];
                             newValue[index].price = text;
@@ -447,13 +450,13 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                           >
                             {value[index].day
                               ? parseDateDDMMYYYY(value[index].day)
-                              : "Pick Date"}
+                              : t("Pick Date")}
                           </Text>
                         </TouchableOpacity>
 
                         {/* Price Input */}
                         <TextInput
-                          placeholder="Price"
+                          placeholder={t("Price")}
                           onChangeText={(text) => {
                             const newValue = [...value];
                             newValue[index].price = text;
@@ -543,9 +546,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                       <View className="flex w-full flex-row justify-between">
                         <TextInput
                           className="w-1/2"
-                          placeholder={
-                            label.charAt(0).toUpperCase() + label.slice(1)
-                          }
+                          placeholder={name}
                           onChangeText={(text) => {
                             const newValue = [...value];
                             newValue[index].price = text;
@@ -598,7 +599,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                 alignItems: "center",
               }}
             >
-              <Text style={{ color: "white" }}>Add</Text>
+              <Text style={{ color: "white" }}>{t("Add")}</Text>
             </TouchableOpacity>
           </>
         );
@@ -606,8 +607,10 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
         return <Text>Not found</Text>;
     }
   };
+  const { t } = useTranslation();
   const element: RenderInputProps[] = [
     {
+      name: t("Price Default"),
       label: "price_default",
       value: data.price_default,
       onChange: (value) => {},
@@ -615,6 +618,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
       icon: "dollar-sign",
     },
     {
+      name: t("Price Weekend"),
       label: "price_weekend",
       value: data.price_weekend,
       onChange: (value) => {},
@@ -624,6 +628,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
     },
 
     {
+      name: t("Price Special"),
       label: "price_special",
       value: data.price_special,
       onChange: (value) => {},
@@ -633,6 +638,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
     },
 
     {
+      name: t("Price Season"),
       label: "price_season",
       value: data.price_season,
       onChange: (value) => {},
@@ -680,10 +686,10 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
         validate={(values) => {
           const errors: any = {};
           if (!values.price_default) {
-            errors.price_default = "Required";
+            errors.price_default = t("Required");
           }
           if (values.price_default <= 0) {
-            errors.price_default = "Must be > 0";
+            errors.price_default = t("Must be > 0");
           }
 
           return errors;
@@ -700,6 +706,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
           <View className="flex justify-center items-center">
             {element.map((item, index) => (
               <RenderInput
+                name={item.name}
                 icon={item.icon}
                 key={index}
                 label={item.label}
@@ -749,7 +756,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                     fontWeight: "bold",
                   }}
                 >
-                  Back
+                  {t("Back")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -777,7 +784,7 @@ const SettingPrice: React.FC<SettingPriceProps> = ({
                     fontWeight: "bold",
                   }}
                 >
-                  Next
+                  {t("Next")}
                 </Text>
                 <Icon
                   name="arrow-right"

@@ -8,9 +8,10 @@ export const eventConfig = [
       message: (data: any) =>
         `You have a hold request from residence: ${data.residence_id}`,
       navigateTo: (data: any) => {
-        const href = "HoldForHost";
+        const href = "HoldDetail";
+        const params = `?id=${data.DataJson.id}`;
         return {
-          href,
+          href: href + params,
           params: data,
         };
       },
@@ -25,7 +26,7 @@ export const eventConfig = [
         `Mr/Mrs ${data.seller_id} has requested to book residence: ${data.residence_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.id}`;
+        const params = `?id=${data.DataJson.id}`;
         return {
           href: href + params,
           params: { id: data.id },
@@ -42,7 +43,7 @@ export const eventConfig = [
         `You have a seller transfer from seller ID: ${data.seller_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.id}`;
+        const params = `?id=${data.DataJson.id}`;
         return {
           href: href + params,
           params: { data },
@@ -61,10 +62,9 @@ export const eventConfig = [
           data.is_host_accept ? "accepted" : "rejected"
         }`,
       navigateTo: (data: any) => {
-        const href = "BookingDetail";
-        const params = `?id=${data.id}`;
+        const href = "Hold";
         return {
-          href: href + params,
+          href: href,
           params: { data },
         };
       },
@@ -81,7 +81,7 @@ export const eventConfig = [
         }`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.id}`;
+        const params = `?id=${data.DataJson.id}`;
         return {
           href: href + params,
           params: { data },
@@ -98,7 +98,7 @@ export const eventConfig = [
         `You have received a transfer from seller: ${data.seller_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.id}`;
+        const params = `?id=${data.DataJson.id}`;
         return {
           href: href + params,
           params: { data },
@@ -115,7 +115,7 @@ export const eventConfig = [
         `You have not received the transfer from seller: ${data.seller_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.id}`;
+        const params = `?id=${data.DataJson.id}`;
         return {
           href: href + params,
           params: { data },

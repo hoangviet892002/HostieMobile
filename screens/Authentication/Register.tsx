@@ -21,14 +21,14 @@ const Register = () => {
   const [registerForm, setRegisterForm] = useState<
     RegisterRequest & { checked: boolean }
   >({
-    email: "hostvietx@example.comx",
-    password: "hostviet111x",
-    reference_code: "5LLYP",
-    retype_password: "hostviet111x",
+    email: "sellervet@gmail.com",
+    password: "sellerviet",
+    reference_code: "T68V9",
+    retype_password: "sellerviet",
     social_urls: [
       { social_name: "Facebook", url: "https://facebook.com/user1" },
     ],
-    username: "hostvietsadsax",
+    username: "sellerviet",
     checked: false,
   });
   // const [checked, setChecked] = useState(false);
@@ -66,8 +66,10 @@ const Register = () => {
             username: values.username,
             retype_password: values.retype_password,
           };
+          console.log(data);
 
           const res = await registerApi(data);
+          console.log(res);
 
           if (res.result) {
             Toast.show({

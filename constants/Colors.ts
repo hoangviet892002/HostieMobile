@@ -64,4 +64,9 @@ export const Colors = {
   bag9Bg: "#eb849c",
   bag10Bg: "#979dc1",
   bag11Bg: "#c7d3c0",
+
+  error: "#EF4444",
+  success: "#10B981",
+
+  blue: "#3B82F6",
 };

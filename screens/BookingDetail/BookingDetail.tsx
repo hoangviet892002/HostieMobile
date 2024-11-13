@@ -8,9 +8,10 @@ import {
   hostReceiveApi,
   sellerCancelApi,
   sellerTransferApi,
+  updateBookingApi,
 } from "@/apis/booking";
 import { getMyBankAccountsApi } from "@/apis/users";
-import { BackButton, EmptyData, Loading } from "@/components";
+import { BackButton, DateTimePicker, EmptyData, Loading } from "@/components";
 import Icon, { Icons } from "@/components/Icons";
 import { Colors } from "@/constants/Colors";
 import { Roles } from "@/constants/enums/roles";
@@ -20,14 +21,14 @@ import {
 } from "@/constants/enums/statusBookingEnums";
 import { getStatusStyle } from "@/constants/getStatusStyle";
 import useToast from "@/hooks/useToast";
-import { selectRole } from "@/redux/slices/authSlice";
+import { selectRole, selectUserId } from "@/redux/slices/authSlice";
 import {
   BankAccountsType,
   BookingType,
   DetailBookingType,
   QRType,
 } from "@/types";
-import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import { parseDateDDMMYYYY, parseDateString } from "@/utils/parseDate";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -37,7 +38,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { Formik } from "formik";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -47,11 +48,19 @@ import {
   Modal,
   FlatList,
   TextInput,
+  Alert,
+  Pressable,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
-
+import ViewShot, { captureRef } from "react-native-view-shot";
+import * as MediaLibrary from "expo-media-library";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import { Residence } from "@/types/response/Residences";
+import { getResidence } from "@/apis/residences";
+import { parsePrice } from "@/utils/parsePrice";
+import { getCusomtersApi } from "@/apis/customer";
 
 interface Data {
   booking: BookingType;
@@ -83,6 +92,8 @@ const BookingDetail = () => {
     booking: {
       checkin: "",
       checkout: "",
+      seller_id: 0,
+      host_id: 0,
     },
   } as Data);
   const route = useRoute<RouteProp<RouteParams, "params">>();
@@ -90,10 +101,12 @@ const BookingDetail = () => {
   const [icon, setIcon] = useState("");
   const [color, setColor] = useState("");
   const [textColor, setTextColor] = useState("");
-
+  const idUser = useSelector(selectUserId);
+  const { t } = useTranslation();
   const role = useSelector(selectRole);
   const [permission, setPermission] = useState<string[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [residence, setResidence] = useState<Residence | null>(null);
 
   const [visibleQR, setVisibleQR] = useState(false);
 
@@ -101,7 +114,31 @@ const BookingDetail = () => {
   const updatePermission = () => {
     let newPermissions: string[] = [];
 
-    if (role === Roles.ROLE_HOST) {
+    console.log("booking: ", data.booking);
+
+    if (role === Roles.ROLE_HOUSEKEEPER) {
+      const status = parseStatusBooking(data.booking);
+      if (status === StatusBooking.SUCCESS) {
+        newPermissions.push(ActionStatusBooking.CHECKIN);
+      }
+      if (status === StatusBooking.CHECKIN) {
+        newPermissions.push(ActionStatusBooking.CHECKOUT);
+      }
+    } else if (idUser === data.booking.seller_id) {
+      const status = parseStatusBooking(data.booking);
+      if (status !== StatusBooking.CANCEL && status !== StatusBooking.REJECT) {
+        newPermissions.push(ActionStatusBooking.CANCEL);
+      }
+      if (status === StatusBooking.WAIT_TRANSFER) {
+        newPermissions.push(ActionStatusBooking.TRANSFER);
+        newPermissions.push(ActionStatusBooking.OPENQR);
+      }
+      if (status !== StatusBooking.CANCEL && status !== StatusBooking.REJECT) {
+        newPermissions.push(ActionStatusBooking.UPDATE);
+      }
+    }
+    // if (idUser === data.booking.host_id)
+    else {
       const status = parseStatusBooking(data.booking);
 
       if (status === StatusBooking.WAIT_ACCEPT) {
@@ -117,25 +154,10 @@ const BookingDetail = () => {
           ActionStatusBooking.NOT_RECEIVE,
         ];
       }
-    } else if (role === Roles.ROLE_SELLER) {
-      const status = parseStatusBooking(data.booking);
-      if (status !== StatusBooking.CANCEL && status !== StatusBooking.REJECT) {
-        newPermissions.push(ActionStatusBooking.CANCEL);
-      }
-      if (status === StatusBooking.WAIT_TRANSFER) {
-        newPermissions.push(ActionStatusBooking.TRANSFER);
-        newPermissions.push(ActionStatusBooking.OPENQR);
-      }
-    } else if (role === Roles.ROLE_HOUSEKEEPER) {
-      const status = parseStatusBooking(data.booking);
-      if (status === StatusBooking.SUCCESS) {
-        newPermissions.push(ActionStatusBooking.CHECKIN);
-      }
-      if (status === StatusBooking.CHECKIN) {
-        newPermissions.push(ActionStatusBooking.CHECKOUT);
-      }
     }
 
+    newPermissions.push(ActionStatusBooking.OPENDETAIL);
+    newPermissions.push(ActionStatusBooking.OPENTRACKING);
     setPermission(newPermissions);
   };
 
@@ -161,6 +183,16 @@ const BookingDetail = () => {
       setColor(color);
       setTextColor(textColor);
       updatePermission();
+
+      const fetchRessidence = async () => {
+        const response = await getResidence(
+          data.booking.residence_id.toString()
+        );
+        if (response.success) {
+          setResidence(response.data);
+        }
+      };
+      fetchRessidence();
     }
   }, [data.booking]);
   const fetchData = async () => {
@@ -171,6 +203,9 @@ const BookingDetail = () => {
     }
     fetchDataLog();
   };
+
+  const [visibleLog, setVisibleLog] = useState(false);
+  const [visibleDetail, setVisibleDetail] = useState(false);
   const action = [
     {
       title: ActionStatusBooking.ACCEPT,
@@ -337,6 +372,27 @@ const BookingDetail = () => {
       },
       color: "bg-red-500",
     },
+    {
+      title: ActionStatusBooking.OPENTRACKING,
+      onPress: () => {
+        setVisibleLog(true);
+      },
+      color: "bg-blue-500",
+    },
+    {
+      title: ActionStatusBooking.OPENDETAIL,
+      onPress: () => {
+        setVisibleDetail(true);
+      },
+      color: "bg-blue-500",
+    },
+    {
+      title: ActionStatusBooking.UPDATE,
+      onPress: () => {
+        setVisibleUpdate(true);
+      },
+      color: "bg-blue-500",
+    },
   ];
 
   useEffect(() => {
@@ -431,8 +487,454 @@ const BookingDetail = () => {
       }
     }
   }, [bank_account_id]);
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const viewShotRef = useRef<ViewShot>(null);
+
+  const captureScrollView = async () => {
+    const uri = await captureRef(viewShotRef, {
+      format: "jpg",
+      quality: 0.8,
+    });
+    console.log(uri);
+    const asset = await MediaLibrary.createAssetAsync(uri);
+    await MediaLibrary.createAlbumAsync("Download", asset, false);
+    Alert.alert("Success", "Image saved to gallery");
+  };
+
+  const [visibleUpdate, setVisibleUpdate] = useState(false);
+  const [fieldUpdate, setFieldUpdate] = useState<string[]>([]);
+  useEffect(() => {
+    setField(parseStatusBooking(data.booking));
+  }, [data.booking]);
+  const setField = (status: string) => {
+    let newField = [];
+    newField.push("description");
+    newField.push("guest_count");
+    newField.push("guest_id");
+    if (status === StatusBooking.WAIT_ACCEPT) {
+      newField.push("checkin");
+      newField.push("checkout");
+      newField.push("paid_amount");
+    }
+    setFieldUpdate(newField);
+  };
+  const [customers, setCustomers] = useState<any[]>([]);
+  useEffect(() => {
+    setLoading(true);
+    const fetchCustomers = async () => {
+      const response = await getCusomtersApi();
+
+      if (response.success) {
+        setCustomers(response.data.data);
+      }
+    };
+    fetchCustomers();
+    setLoading(false);
+  }, []);
+  const ModalUpdate = () => {
+    const [values, setValues] = useState({
+      checkin: data.booking.checkin,
+      checkout: data.booking.checkout,
+      description: data.booking.description,
+      guest_count: data.booking.guest_count,
+      paid_amount: data.booking.paid_amount,
+      guest_id: data.booking.guest_id,
+      guest_name: data.booking.guest_name,
+      guest_phone: data.booking.guest_phone,
+    });
+
+    const elememt: Element[] = [
+      {
+        icon: "calendar",
+        title: "Check-in",
+        type: "date",
+        name: "checkin",
+      },
+      {
+        icon: "calendar",
+        title: "Check-out",
+        type: "date",
+        name: "checkout",
+      },
+      {
+        icon: "file-text",
+        title: "Description",
+        type: "text",
+        name: "description",
+      },
+      {
+        icon: "user",
+        title: "Guest Count",
+        type: "number",
+        name: "guest_count",
+      },
+      {
+        icon: "dollar-sign",
+        title: "Paid Amount",
+        type: "number",
+        name: "paid_amount",
+      },
+      {
+        icon: "user",
+        title: "Guest ID",
+        type: "special",
+        name: "guest_id",
+      },
+      {
+        icon: "user",
+        title: "Guest Name",
+        type: "text",
+        name: "guest_name",
+      },
+    ];
+    interface Element {
+      icon: string;
+      title: string;
+      type: string;
+      name: keyof typeof values;
+    }
+
+    const renderElement = (item: Element) => {
+      const [visibleDatePick, setVisibleDatePick] = useState(false);
+      const [visibleCustomer, setVisibleCustomer] = useState(false);
+      if (fieldUpdate.includes(item.name)) {
+        switch (item.type) {
+          case "date":
+            return (
+              <View className="mb-2 ">
+                <Text className="text-gray-700 text-lg font-semibold ">
+                  {item.title}:
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setVisibleDatePick(true)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon type={Icons.Feather} name={item.icon} size={20} />
+                  <Text
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
+                  >
+                    {values[item.name]}
+                  </Text>
+                </TouchableOpacity>
+                <Modal visible={visibleDatePick} transparent>
+                  <View
+                    className="flex justify-center items-center flex-1"
+                    style={{
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    <DateTimePicker
+                      initialRange={parseDateString(values[item.name])}
+                      onSuccess={(date) => {
+                        setValues({
+                          ...values,
+                          [item.name]: parseDateDDMMYYYY(date),
+                        });
+                        setVisibleDatePick(false);
+                      }}
+                    />
+                  </View>
+                </Modal>
+              </View>
+            );
+          case "text":
+            return (
+              <View className="mb-2">
+                <Text className="text-gray-700 text-lg font-semibold ">
+                  {item.title}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon type={Icons.Feather} name={item.icon} size={20} />
+                  <TextInput
+                    value={values[item.name].toString()}
+                    onChangeText={(text) =>
+                      setValues({ ...values, [item.name]: text })
+                    }
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
+                  />
+                </View>
+              </View>
+            );
+          case "number":
+            return (
+              <View className="mb-2">
+                <Text className="text-gray-700 text-lg font-semibold ">
+                  {item.title}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                >
+                  <Icon type={Icons.Feather} name={item.icon} size={20} />
+                  <TextInput
+                    value={values[item.name].toString()}
+                    onChangeText={(text) =>
+                      setValues({ ...values, [item.name]: text })
+                    }
+                    keyboardType="number-pad"
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
+                  />
+                </View>
+              </View>
+            );
+          case "special":
+            return (
+              <View className="mb-2">
+                <Text className="text-gray-700 text-lg font-semibold ">
+                  {t("Guest")}
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderColor: Colors.primary,
+                    borderWidth: 2,
+                    borderRadius: 25,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginVertical: 5,
+                    width: wp(80),
+                  }}
+                  onPress={() => setVisibleCustomer(true)}
+                >
+                  <Icon type={Icons.Feather} name={item.icon} size={20} />
+                  <Text
+                    style={{
+                      flex: 1,
+                      marginLeft: 10,
+                      color: Colors.black,
+                      paddingVertical: 8,
+                    }}
+                  >
+                    {values["guest_name"] + " - " + values["guest_phone"]}
+                  </Text>
+                </TouchableOpacity>
+                <Modal visible={visibleCustomer} transparent>
+                  <View
+                    className="flex justify-center items-center flex-1"
+                    style={{
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    <View className="w-full bg-white">
+                      <FlatList
+                        className="w-full"
+                        data={customers}
+                        renderItem={({ item }) => (
+                          <View
+                            className="flex items-center justify-center w-full"
+                            style={{
+                              elevation: 2,
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => {
+                                setValues({
+                                  ...values,
+                                  guest_id: item.id,
+                                  guest_name: item.name,
+                                  guest_phone: item.phone,
+                                });
+                                setVisibleCustomer(false);
+                              }}
+                              onLongPress={() => {
+                                setVisible(true);
+                              }}
+                              delayLongPress={1000}
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                padding: 15,
+                                backgroundColor: "#fff",
+                                borderBottomWidth: 1,
+                                borderBottomColor: "#eee",
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 2,
+                                elevation: 2,
+                                borderRadius: 8,
+                                marginHorizontal: 10,
+                                marginVertical: 5,
+                              }}
+                              activeOpacity={0.7}
+                              accessibilityLabel={`Select customer ${item.name}`}
+                            >
+                              {/* Customer Icon */}
+                              <Ionicons
+                                name="person-circle-outline"
+                                size={40}
+                                color="#4F8EF7"
+                                style={{ marginRight: 15 }}
+                              />
+
+                              {/* Customer Details */}
+                              <View style={{ flex: 1 }}>
+                                <Text
+                                  style={{
+                                    fontSize: 18,
+                                    fontWeight: "600",
+                                    color: "#333",
+                                  }}
+                                >
+                                  {item.name}
+                                </Text>
+                                <Text
+                                  style={{
+                                    fontSize: 14,
+                                    color: "#666",
+                                    marginTop: 4,
+                                  }}
+                                >
+                                  {item.phone}
+                                </Text>
+                              </View>
+
+                              {/* Chevron Icon */}
+                              <Ionicons
+                                name="chevron-forward"
+                                size={20}
+                                color="#ccc"
+                                style={{ marginLeft: 10 }}
+                              />
+                            </TouchableOpacity>
+                            {/* <DeleteConfirmationModal
+                            visible={visible}
+                            onConfirm={() => handleConfirmDelete(item.id)}
+                            onCancel={() => setVisible(false)}
+                          /> */}
+                          </View>
+                        )}
+                        keyExtractor={(item) => item.id.toString()}
+                      />
+                    </View>
+                  </View>
+                </Modal>
+              </View>
+            );
+        }
+      }
+    };
+    return (
+      <Modal visible={visibleUpdate} transparent>
+        <View
+          className="flex justify-center items-center flex-1"
+          style={{
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <ScrollView className="bg-white p-5  shadow-lg w-full h-full ">
+            <View className="flex justify-between items-center flex-row">
+              <Text className="text-2xl font-semibold mb-5">Update</Text>
+              <Pressable onPress={() => setVisibleUpdate(false)}>
+                <Text className="text-red-500 font-semibold text-xl">
+                  Close
+                </Text>
+              </Pressable>
+            </View>
+            <Formik
+              initialValues={values}
+              onSubmit={() => {
+                // build data follow field update
+
+                console.log("values: ", values);
+                const dataSolve = {
+                  id: parseInt(id, 10),
+                  ...Object.keys(values)
+                    .filter((key) => fieldUpdate.includes(key))
+                    .reduce((obj, key) => {
+                      obj[key] = values[key];
+                      return obj;
+                    }, {}),
+                };
+                console.log("data: ", dataSolve);
+                const callApi = async () => {
+                  const response = await updateBookingApi(dataSolve);
+
+                  if (response.success) {
+                    fetchData();
+                    showToast(response);
+                  } else {
+                    showToast(response);
+                  }
+                };
+                callApi();
+                setVisibleUpdate(false);
+              }}
+              validate={(values) => {}}
+            >
+              {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+                <View className="flex justify-center items-center">
+                  {elememt.map((item) => renderElement(item))}
+                  <TouchableOpacity
+                    onPress={handleSubmit}
+                    className="flex items-center justify-center p-4 rounded-3xl w-full bg-blue-500 "
+                    style={{
+                      width: wp(80),
+                    }}
+                  >
+                    <Text className=" text-white font-semibold text-base">
+                      Update
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </Formik>
+          </ScrollView>
+        </View>
+      </Modal>
+    );
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <ModalUpdate />
       <ScrollView>
         <Loading loading={loading} />
         <Animatable.View
@@ -440,7 +942,7 @@ const BookingDetail = () => {
           delay={120}
           animation="slideInDown"
         >
-          <BackButton navigateTo="(tabs)" />
+          <BackButton navigateTo="dashboard" />
           <View className="flex flex-row items-center ">
             <View className="flex ">
               <Text className="text-3xl font-bold ">Booking Detail</Text>
@@ -510,7 +1012,7 @@ const BookingDetail = () => {
             ) : null}
 
             {/* Action button flow permistion */}
-            <View className="flex flex-row justify-between items-center space-x-4 px-4 py-6">
+            <View className="flex flex-col justify-center items-center px-4 py-6">
               {permission.map((item) => {
                 const actionItem = action.find(
                   (action) => action.title === item
@@ -519,9 +1021,9 @@ const BookingDetail = () => {
                   <TouchableOpacity
                     key={item}
                     onPress={actionItem?.onPress}
-                    className={`flex  items-center justify-center p-3 rounded-lg ${actionItem?.color} `}
+                    className={`flex  items-center justify-center p-3 rounded-3xl ${actionItem?.color} my-1   w-full p-4`}
                   >
-                    <Text className=" text-white font-semibold text-sm">
+                    <Text className=" text-white font-semibold text-lg">
                       {actionItem?.title}
                     </Text>
                   </TouchableOpacity>
@@ -534,75 +1036,105 @@ const BookingDetail = () => {
         )}
 
         {/* Detail booking */}
+        <Modal visible={visibleDetail} transparent>
+          <View
+            className="flex flex-1 justify-center items-center bg-opacity-50"
+            style={{
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <View className="bg-white p-5 rounded-2xl shadow-lg w-11/12">
+              <Text className="text-2xl font-semibold mb-5">Detail</Text>
 
-        {data.details && data.details.length > 0 ? (
-          <ScrollView className="bg-white p-6 mx-4 rounded-2xl shadow-lg max-h-56">
-            <Text className="text-2xl font-semibold text-gray-800 mb-5">
-              Booking Details
-            </Text>
-            {data.details.map((item, index) => (
-              <View
-                key={index}
-                className="flex flex-row justify-between items-center border-b border-gray-200 py-3"
-              >
-                <View className="flex flex-row items-center">
-                  <Icon
-                    type={Icons.Feather}
-                    name="calendar"
-                    size={20}
-                    color={Colors.primary}
-                  />
-                  <Text className="text-gray-700 text-base">
-                    {parseDateDDMMYYYY(item.date)}
+              <ScrollView className="max-h-96">
+                <FlatList
+                  className="w-full m-2"
+                  data={data.details}
+                  renderItem={({ item, index }) => (
+                    <View
+                      key={index}
+                      className="flex flex-row justify-between items-center border-b border-gray-200 py-3 w-11/12"
+                    >
+                      <View className="flex flex-row items-center">
+                        <Icon
+                          type={Icons.Feather}
+                          name="calendar"
+                          size={20}
+                          color={Colors.primary}
+                        />
+                        <Text className="text-gray-700 text-base">
+                          {parseDateDDMMYYYY(item.date)}
+                        </Text>
+                      </View>
+                      <Text className="text-gray-700 text-base font-medium">
+                        {item.price} VND
+                      </Text>
+                    </View>
+                  )}
+                />
+              </ScrollView>
+
+              <View className="">
+                <TouchableOpacity
+                  onPress={() => setVisibleDetail(false)}
+                  className="flex items-center justify-center p-4 rounded-3xl w-full bg-red-500 "
+                >
+                  <Text className=" text-white font-semibold text-base">
+                    Close
                   </Text>
-                </View>
-                <Text className="text-gray-700 text-base font-medium">
-                  {item.price} VND
-                </Text>
+                </TouchableOpacity>
               </View>
-            ))}
-          </ScrollView>
-        ) : (
-          <></>
-        )}
+            </View>
+          </View>
+        </Modal>
 
         {/* Log */}
-        {logs && logs.length > 0 ? (
-          <ScrollView className="bg-white p-6 mx-4 rounded-2xl shadow-lg mt-4">
-            <Text className="text-2xl font-semibold text-gray-800 mb-5">
-              Logs
-            </Text>
-            {logs.map((log, index) => (
-              <View
-                key={index}
-                className="flex flex-row items-center border-b border-gray-200 py-3"
-              >
-                <Image
-                  source={{ uri: log.user_avatar }}
-                  className="w-10 h-10 rounded-full"
-                />
-                <View className="flex flex-col ml-4">
-                  <Text className="text-gray-700 text-base font-semibold">
-                    {log.username}
-                  </Text>
-                  <Text> {moment(log?.date).fromNow()}</Text>
+        <Modal visible={visibleLog} transparent>
+          <View
+            className="flex flex-1 justify-center items-center bg-opacity-50"
+            style={{
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <View className="bg-white p-5 rounded-2xl shadow-lg w-11/12">
+              <Text className="text-2xl font-semibold mb-5">Logs</Text>
+              <ScrollView className="max-h-96">
+                {logs.map((log, index) => (
+                  <View
+                    key={index}
+                    className="flex flex-row items-center border-b border-gray-200 py-3"
+                  >
+                    <Image
+                      source={{ uri: log.user_avatar }}
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <View className="flex flex-col ml-4">
+                      <Text className="text-gray-700 text-base font-semibold">
+                        {log.username}
+                      </Text>
+                      <Text> {moment(log?.date).fromNow()}</Text>
 
-                  <Text className="text-gray-500 text-sm">
-                    {log.event_type}
+                      <Text className="text-gray-500 text-sm">
+                        {log.event_type}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+              <View className="">
+                <TouchableOpacity
+                  onPress={() => setVisibleLog(false)}
+                  className="flex items-center justify-center p-4 rounded-3xl w-full bg-red-500 "
+                >
+                  <Text className=" text-white font-semibold text-base">
+                    Close
                   </Text>
-                  {/* {log.data_change.map((item, index) => (
-                    <Text key={index} className="text-gray-500 text-sm">
-                      {item.field} changed from {item.old_value} to{" "}
-                      {item.new_value}
-                    </Text>
-                  ))} */}
-                </View>
+                </TouchableOpacity>
               </View>
-            ))}
-          </ScrollView>
-        ) : (
-          <></>
-        )}
+            </View>
+          </View>
+        </Modal>
+
         <Modal
           visible={visible}
           transparent
@@ -827,47 +1359,199 @@ const BookingDetail = () => {
           </Formik>
         </Modal>
         <Modal visible={visibleQR} transparent>
-          <View
-            className="flex flex-1 justify-center items-center bg-opacity-50"
+          <ScrollView
+            ref={scrollViewRef}
+            className="flex flex-1 bg-opacity-50"
             style={{
               backgroundColor: "rgba(0,0,0,0.5)",
             }}
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <View className="bg-white p-5 rounded-2xl shadow-lg w-11/12">
-              <Text className="text-2xl font-semibold mb-5">QR Code</Text>
-              {qr ? (
-                <View className="flex items-center justify-center">
-                  <Image
-                    source={{ uri: qr.qr }}
-                    className="w-64 h-64"
-                    resizeMode="contain"
-                  />
-                  <Text className="text-gray-700 text-base font-semibold mt-5">
-                    {qr.account_holder}
-                  </Text>
-                  <Text className="text-gray-700 text-base font-semibold mt-2">
-                    {qr.account_no}
-                  </Text>
-                  <Text className="text-gray-700 text-base font-semibold mt-2">
-                    {qr.fullname_bank_vn}
-                  </Text>
-                  <Text className="text-gray-700 text-base font-semibold mt-2">
-                    {qr.final_amount} VND
-                  </Text>
+            <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1 }}>
+              <View className="bg-white p-5 rounded-2xl shadow-lg w-11/12">
+                <Text className="text-2xl font-semibold mb-5">
+                  {" "}
+                  {t("Bill")}
+                </Text>
+                {qr ? (
+                  <View className="flex items-center justify-center w-full">
+                    <View>
+                      <View className="flex items-center justify-center">
+                        <Text className=" font-semibold text-2xl">
+                          {residence?.residence_name}
+                        </Text>
+                      </View>
+
+                      {/* residence address */}
+                      <Text className="text-gray-700 text-base font-semibold mt-2">
+                        {t("Address")}: {residence?.residence_address} ,{" "}
+                        {residence?.ward} , {residence?.district} ,{" "}
+                        {residence?.province}
+                      </Text>
+                    </View>
+
+                    <View className="flex flex-row items-center justify-between  mt-5 w-full">
+                      <View className="flex flex-row items-center">
+                        <Text className="text-gray-700 text-sm font-semibold">
+                          {t("Day")} :{" "}
+                        </Text>
+                        <Text className="text-sm">
+                          {parseDateDDMMYYYY(data.booking.updated_at)}
+                        </Text>
+                      </View>
+                      <View className="flex flex-row items-center">
+                        <Text className="text-gray-700 text-sm font-semibold">
+                          {t("Time")} :{" "}
+                        </Text>
+                        <Text className="text-sm">
+                          {moment(data.booking.updated_at).format("HH:mm")}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Booking information */}
+                    <View className="flex flex-row items-center justify-between mt-5 w-full">
+                      <View>
+                        <View className="flex flex-row">
+                          <Text className="text-gray-700 text-sm font-semibold">
+                            {t("Check-in")} :{" "}
+                          </Text>
+                          <Text className="text-gray-700 text-sm ">
+                            {parseDateDDMMYYYY(data.booking.checkin)}
+                          </Text>
+                        </View>
+                        <View className="flex flex-row">
+                          <Text className="text-gray-700 text-sm font-semibold">
+                            {t("Check-out")} :{" "}
+                          </Text>
+                          <Text className="text-gray-700 text-sm ">
+                            {parseDateDDMMYYYY(data.booking.checkout)}
+                          </Text>
+                        </View>
+                      </View>
+                      <View>
+                        <View className="flex flex-row justify-between items-center ">
+                          <View className="flex flex-row items-center">
+                            <Ionicons name={icon} size={24} color={color} />
+                            <Text className={`font-medium ${textColor}`}>
+                              {parseStatusBooking(data.booking)}
+                            </Text>
+                          </View>
+                        </View>
+                        {/* <Text className="text-gray-700 text-sm font-semibold">
+                        {t("Total")} : {parsePrice(qr.final_amount)} VND
+                      </Text> */}
+                      </View>
+                    </View>
+
+                    <ScrollView className="">
+                      {/* date and price from detail */}
+                      <FlatList
+                        data={data.details}
+                        ListHeaderComponent={() => (
+                          <View className="flex flex-row justify-between items-center border-b border-gray-200 py-3 w-full">
+                            <Text className="text-gray-700 text-base font-semibold">
+                              {t("Date")}
+                            </Text>
+                            <Text className="text-gray-700 text-base font-semibold">
+                              {t("Price")}
+                            </Text>
+                          </View>
+                        )}
+                        renderItem={({ item }) => (
+                          <View className="flex flex-row items-center justify-between border-b border-gray-200 py-3 w-full">
+                            <View className="flex flex-row items-center">
+                              <Icon
+                                type={Icons.Feather}
+                                name="calendar"
+                                size={20}
+                                color={Colors.primary}
+                              />
+                              <Text className="text-gray-700 text-base">
+                                {parseDateDDMMYYYY(item.date)}
+                              </Text>
+                            </View>
+                            <Text className="text-gray-700 text-base font-medium">
+                              {item.price} VND
+                            </Text>
+                          </View>
+                        )}
+                      />
+                    </ScrollView>
+
+                    {/* To */}
+                    <View className="flex flex-row items-center justify-between mt-5 w-full">
+                      <Text className="text-gray-700 text-base font-semibold">
+                        {t("Total")}
+                      </Text>
+                      <Text className="text-gray-700 text-base font-semibold">
+                        {parsePrice(qr.total_amount)} VND
+                      </Text>
+                    </View>
+
+                    {/* commission_rate */}
+                    <View className="flex flex-row items-center justify-between mt-5 w-full">
+                      <Text className="text-gray-700 text-base font-semibold">
+                        {t("Commission Rate")}
+                      </Text>
+                      <Text className="text-gray-700 text-base font-semibold">
+                        {qr.commission_rate} %
+                      </Text>
+                    </View>
+
+                    {/* line */}
+                    <View className="border-b border-gray-500 my-3  "></View>
+                    {/* total */}
+                    <View className="flex flex-row items-center justify-between mt-5 w-full">
+                      <Text className="text-gray-700 text-base font-semibold">
+                        {t("Total")}
+                      </Text>
+                      <Text className="text-gray-700 text-base font-semibold">
+                        {parsePrice(qr.final_amount)} VND
+                      </Text>
+                    </View>
+
+                    <Image
+                      source={{ uri: qr.qr }}
+                      className="w-64 h-64"
+                      resizeMode="contain"
+                    />
+                    <Text className="text-gray-700 text-base font-semibold mt-5">
+                      {qr.account_holder}
+                    </Text>
+                    <Text className="text-gray-700 text-base font-semibold mt-2">
+                      {qr.account_no}
+                    </Text>
+                    <Text className="text-gray-700 text-base font-semibold mt-2">
+                      {qr.fullname_bank_vn}
+                    </Text>
+                  </View>
+                ) : null}
+                <View className="flex flex-row justify-between mt-5">
+                  <TouchableOpacity
+                    onPress={() => captureScrollView()}
+                    className="flex items-center justify-center p-3 rounded-lg bg-green-500"
+                  >
+                    <Text className=" text-white font-semibold text-sm">
+                      Save
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setVisibleQR(false)}
+                    className="flex items-center justify-center p-3 rounded-lg bg-red-500"
+                  >
+                    <Text className=" text-white font-semibold text-sm">
+                      Close
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              ) : null}
-              <View className="flex flex-row justify-end mt-5">
-                <TouchableOpacity
-                  onPress={() => setVisibleQR(false)}
-                  className="flex items-center justify-center p-3 rounded-lg bg-red-500"
-                >
-                  <Text className=" text-white font-semibold text-sm">
-                    Close
-                  </Text>
-                </TouchableOpacity>
               </View>
-            </View>
-          </View>
+            </ViewShot>
+          </ScrollView>
         </Modal>
       </ScrollView>
     </SafeAreaView>

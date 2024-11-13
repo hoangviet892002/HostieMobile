@@ -107,36 +107,39 @@ const Home = () => {
           />
         </Pressable>
       </View> */}
-      <TouchableOpacity
-        className="flex flex-row items-center justify-center mx-2"
-        onPress={() => setShowCalendar(!showCalendar)}
-        style={{
-          borderColor: Colors.primary,
-          borderWidth: 1,
-          borderRadius: 10,
-        }}
-      >
-        <Text
+      <View className="flex flex-row items-center justify-center">
+        <TouchableOpacity
+          className="flex flex-row items-center justify-center mx-2 w-5/6"
+          onPress={() => setShowCalendar(!showCalendar)}
           style={{
-            fontSize: 20,
-            fontWeight: "bold",
-            color: Colors.primary,
-            padding: 10,
+            borderColor: Colors.primary,
+            borderWidth: 1,
+            borderRadius: 10,
           }}
         >
-          {parseDateDDMMYYYY(pickedDate.start_date.toISOString())} -{" "}
-          {parseDateDDMMYYYY(pickedDate.end_date.toISOString())}
-        </Text>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              color: Colors.primary,
+              padding: 10,
+            }}
+          >
+            {parseDateDDMMYYYY(pickedDate.start_date.toISOString())} -{" "}
+            {parseDateDDMMYYYY(pickedDate.end_date.toISOString())}
+          </Text>
 
-        <Pressable style={{ padding: 10 }}>
-          <Icon
-            type={Icons.FontAwesome}
-            name="calendar"
-            size={24}
-            color={Colors.primary}
-          />
-        </Pressable>
-      </TouchableOpacity>
+          <Pressable style={{ padding: 10 }}>
+            <Icon
+              type={Icons.FontAwesome}
+              name="calendar"
+              size={24}
+              color={Colors.primary}
+            />
+          </Pressable>
+        </TouchableOpacity>
+      </View>
+
       <Modal visible={showCalendar} transparent={true}>
         <View
           style={{

@@ -228,7 +228,7 @@ const VillaDetail = () => {
                 router.push(`/CalendarBooking?ids=${villa.residence_id}`);
               }}
             >
-              <Text className="text-base text-white">{t("Booking")}</Text>
+              <Text className="text-base text-white">{t("Booking.Book")}</Text>
             </TouchableOpacity>
           </View>
         </Animatable.View>

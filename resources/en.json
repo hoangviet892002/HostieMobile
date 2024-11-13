@@ -16,6 +16,7 @@
   "Confirm Password": "Confirm Password",
   "Email": "Email",
   "Register": "Register",
+
   "I agree to Terms and Privacy Policy": "I agree to Terms and Privacy Policy",
   "Book Now": "Book Now",
   "Standard Guests": "Standard Guests",
@@ -29,5 +30,36 @@
   "Change Language": "Change Language",
   "Change Theme": "Change Theme",
   "Managers": "Managers villa",
-  "Add Villa": "Add Villa"
+  "Add Villa": "Add Villa",
+  "Booking": {
+    "Book": "Booking",
+    "Created": "Booking Created",
+    "Updated": "Booking Updated",
+    "Cancelled": "Booking Cancelled",
+    "HostAccepted": "Host Accepted Your Booking",
+    "HostRejected": "Host Rejected Your Booking",
+    "SellerTransferred": "Seller Transferred",
+    "HostReceived": "Host Received Your Booking",
+    "HostDontReceived": "Host Did Not Receive Your Booking",
+    "CustomerCheckin": "Customer Checked In",
+    "CustomerCheckout": "Customer Checked Out",
+    "Notification": "Booking Notification",
+    "ID": "Booking ID",
+    "Checkin": "Check-in",
+    "Checkout": "Check-out",
+    "Description": "{{id}}: Booking ID\n{{checkin}}: Check-in\n{{checkout}}: Check-out"
+  },
+  "Hold": {
+    "Created": "Hold Created",
+    "HostAccepted": "Host Accepted Your Hold",
+    "HostRejected": "Host Rejected Your Hold",
+    "Cancelled": "Hold Cancelled",
+    "Notification": "Hold Notification",
+    "ID": "Hold ID",
+    "Checkin": "Check-in",
+    "Checkout": "Check-out",
+    "Description": "{{id}}: Hold ID\n{{checkin}}: Check-in\n{{checkout}}: Check-out"
+  },
+  "EmptyData": "No notifications available.",
+  "Loading": "Loading..."
 }

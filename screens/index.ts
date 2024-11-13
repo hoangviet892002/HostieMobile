@@ -21,6 +21,7 @@ import Package from "./Package";
 import DashBoardTag1 from "./DashBoardTag1";
 import Notifications from "./Notifications";
 import ManagerBank from "./ManagerBank";
+import HoldDetail from "./HoldDetail/";
 
 export {
   VillaDetail,
@@ -46,4 +47,5 @@ export {
   DashBoardTag1,
   Notifications,
   ManagerBank,
+  HoldDetail,
 };

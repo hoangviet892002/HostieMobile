@@ -19,7 +19,7 @@ const VillaManageCard: React.FC<VillaCardProps> = ({ villa }) => {
   const randomAnimation =
     Animations[Math.floor(Math.random() * Animations.length)];
   return (
-    <View className="h-auto m-4 rounded-3xl flex justify-between bg-white shadow-2xl shadow-blue-900  overflow-hidden flex-col w-3/4">
+    <View className="h-auto m-4 rounded-3xl flex justify-between bg-white shadow-2xl shadow-blue-900  overflow-hidden flex-col w-5/6">
       <View className="flex">
         <Image
           source={{

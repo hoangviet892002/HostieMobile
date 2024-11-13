@@ -447,58 +447,41 @@ const Hold = () => {
                   {/* Buttons */}
 
                   <View
+                    className="flex-col justify-center items-center"
                     style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
                       marginTop: 20,
                     }}
                   >
                     <Pressable
-                      onPress={() => setModalVisible(false)}
-                      style={{
-                        backgroundColor: "#dc3545",
-                        paddingVertical: 10,
-                        paddingHorizontal: 20,
-                        borderRadius: 10,
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.2,
-                        shadowRadius: 5,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "white",
-                          fontSize: 16,
-                          fontWeight: "600",
-                        }}
-                      >
-                        Close
-                      </Text>
-                    </Pressable>
-
-                    <Pressable
                       onPress={() => handleSubmit()}
+                      className=" p-4 rounded-3xl w-full flex items-center justify-center my-1"
                       style={{
                         backgroundColor: "#007bff",
-                        paddingVertical: 10,
-                        paddingHorizontal: 20,
-                        borderRadius: 10,
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.2,
-                        shadowRadius: 5,
                       }}
                     >
                       <Text
+                        className="text-white text-lg font-semibold"
                         style={{
                           color: "white",
-                          fontSize: 16,
-                          fontWeight: "600",
                         }}
                       >
                         Book
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => setModalVisible(false)}
+                      className=" p-4 rounded-3xl w-full flex items-center justify-center my-1"
+                      style={{
+                        backgroundColor: "#dc3545",
+                      }}
+                    >
+                      <Text
+                        className="text-white text-lg font-semibold"
+                        style={{
+                          color: "white",
+                        }}
+                      >
+                        Close
                       </Text>
                     </Pressable>
                   </View>
