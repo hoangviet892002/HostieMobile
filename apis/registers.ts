@@ -18,4 +18,8 @@ const getRegistersApi = async (
 const postRegisterApi = async (data: any): Promise<InfoResponse<any>> => {
   return await axiosClient.post(endPoint.registers.postRegister, data);
 };
-export { getRegistersApi, postRegisterApi };
+
+const getMyRegisterApi = async (): Promise<InfoResponse<RegisterType>> => {
+  return await axiosClient.get(endPoint.registers.getMyRegister);
+};
+export { getRegistersApi, postRegisterApi, getMyRegisterApi };

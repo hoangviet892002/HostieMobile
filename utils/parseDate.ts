@@ -22,3 +22,20 @@ export const parseDateDDMMYYYY = (date: string) => {
   const year = dateObj.getFullYear();
   return `${day}-${month}-${year}`;
 };
+export const parseDateString = (dateString: string) => {
+  if (!dateString) return undefined;
+  const [day, month, year] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+export const formatExpireDate = (dateArray: number[]) => {
+  const [year, month, day, hour, minute] = dateArray;
+  const date = new Date(year, month - 1, day, hour, minute);
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+
+  return date.toLocaleDateString(undefined, options);
+};

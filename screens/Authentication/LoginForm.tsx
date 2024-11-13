@@ -18,20 +18,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/Colors";
 import { decodeJWT } from "@/utils/decodeJWT";
 import Icon, { Icons } from "@/components/Icons";
+import { Loading } from "@/components";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [loginForm, setLoginForm] = useState<SignInRequest>({
-    username: "seller",
-    password: "seller",
+    username: "host",
+    password: "host",
   });
 
   const handleChange = (key: string, value: string) => {
     setLoginForm({ ...loginForm, [key]: value });
   };
   const onSubmit = async () => {
+    setLoading(true);
+    AsyncStorage.removeItem("session");
     const response = await signInApi(loginForm);
     if (response.result) {
       await AsyncStorage.setItem("session", JSON.stringify(response.result));
@@ -53,10 +57,12 @@ const LoginForm = () => {
         position: "top",
       });
     }
+    setLoading(false);
   };
 
   return (
     <View>
+      <Loading loading={loading} />
       <Animatable.View delay={120} animation="slideInDown" className="w-full">
         <View className="py-3">
           <View

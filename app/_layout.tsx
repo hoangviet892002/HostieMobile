@@ -18,6 +18,7 @@ import { refreshTokenApi } from "@/apis/users";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { decodeJWT } from "@/utils/decodeJWT";
 import { authActions } from "@/redux/slices/authSlice";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 LogBox.ignoreAllLogs(true);
 // 1 minute
@@ -83,6 +84,9 @@ const AppWrapper = () => {
     },
     {
       name: "dashboard",
+    },
+    {
+      name: "HoldDetail",
     },
   ];
 
@@ -192,7 +196,9 @@ export default function RootLayout() {
     <Provider store={store}>
       <SocketProvider>
         <NotificationProvider>
-          <AppWrapper />
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <AppWrapper />
+          </GestureHandlerRootView>
         </NotificationProvider>
       </SocketProvider>
       <Toast />

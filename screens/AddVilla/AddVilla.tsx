@@ -13,6 +13,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import AddImages from "./AddImages";
 import Infomation from "./Infomation";
 import { getPrice } from "@/apis/residences";
+import { useTranslation } from "react-i18next";
 
 /**
  * AddVilla Screen
@@ -320,6 +321,7 @@ const AddVilla = () => {
       </ScrollView>
     );
   };
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView className="flex-1">
@@ -330,7 +332,7 @@ const AddVilla = () => {
       >
         <BackButton />
         <View className="flex ">
-          <Text className="text-3xl font-bold ">Thêm dịch vụ</Text>
+          <Text className="text-3xl font-bold ">{t(`Add residence`)}</Text>
         </View>
       </Animatable.View>
 

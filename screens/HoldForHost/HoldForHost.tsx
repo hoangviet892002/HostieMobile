@@ -7,9 +7,10 @@ import useToast from "@/hooks/useToast";
 import { HoldType } from "@/types";
 import { parseStatusHold } from "@/utils/parseStatusHold";
 import { Ionicons } from "@expo/vector-icons";
+import { router, useFocusEffect } from "expo-router";
 import { t } from "i18next";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Text,
   TouchableOpacity,
@@ -252,8 +253,7 @@ const HoldForHost = () => {
       <TouchableOpacity
         className="bg-white shadow-md rounded-xl p-4 mb-4"
         onPress={() => {
-          setHoldDetail(item);
-          setModalVisible(true);
+          router.push(`/HoldDetail?id=${item.id}`);
         }}
       >
         <Image
@@ -341,6 +341,13 @@ const HoldForHost = () => {
     );
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      setPage(1);
+      setTotalPage(1);
+      fetchHold();
+    }, [])
+  );
   return (
     <SafeAreaView className="flex-1">
       <Loading loading={loading} />

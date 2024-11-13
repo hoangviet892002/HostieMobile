@@ -294,69 +294,29 @@ const DayInfo = ({
               Booking Form
             </Text>
             <Pressable onPress={() => setModalVisible(!modalVisible)}>
-              <View style={{ marginBottom: 15 }}>
-                {/* Added margin for spacing */}
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "600",
-                    color: "#4a4a4a",
-                  }}
-                >
-                  Name
-                </Text>
-                <Text style={{ fontSize: 16, color: "#6c757d" }}>{name}</Text>
-                {/* Subtle color */}
-              </View>
-              <View style={{ marginBottom: 15 }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "600",
-                    color: "#4a4a4a",
-                  }}
-                >
-                  Checkin
-                </Text>
-                <Text style={{ fontSize: 16, color: "#6c757d" }}>
-                  {selectedDayForm.checkin
+              <InfoRow label="Name" value={name} />
+              <InfoRow
+                label="Checkin"
+                value={
+                  selectedDayForm.checkin
                     ? new Date(selectedDayForm.checkin).toLocaleDateString(
                         "en-GB"
                       )
-                    : "N/A"}
-                </Text>
-              </View>
-              <View style={{ marginBottom: 15 }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "600",
-                    color: "#4a4a4a",
-                  }}
-                >
-                  Checkout
-                </Text>
-                <Text style={{ fontSize: 16, color: "#6c757d" }}>
-                  {selectedDayForm.checkout
+                    : "N/A"
+                }
+              />
+              <InfoRow
+                label="Checkout"
+                value={
+                  selectedDayForm.checkout
                     ? new Date(selectedDayForm.checkout).toLocaleDateString(
                         "en-GB"
                       )
-                    : "N/A"}
-                </Text>
-              </View>
+                    : "N/A"
+                }
+              />
 
-              <View style={{ marginBottom: 15 }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "600",
-                    color: "#4a4a4a",
-                  }}
-                >
-                  Price
-                </Text>
-                <Text style={{ fontSize: 16, color: "#6c757d" }}>{price}</Text>
-              </View>
+              <InfoRow label="Price" value={price.toString()} />
 
               <Formik
                 initialValues={{ guest_phone, guest_name, guest_count, note }}
@@ -678,16 +638,40 @@ const DayInfo = ({
 
                     <View
                       style={{
-                        flexDirection: "row",
+                        flexDirection: "column",
                         justifyContent: "space-between",
                         alignItems: "center",
                         marginTop: 20,
                       }}
                     >
                       <Pressable
+                        className="flex justify-center items-center w-full rounded-3xl h-14 my-1"
+                        style={{
+                          backgroundColor: "#007bff",
+                          paddingVertical: 10,
+                          paddingHorizontal: 20,
+                          shadowColor: "#000",
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.2,
+                          shadowRadius: 5,
+                        }}
+                        onPress={() => handleSubmit()}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 20,
+                            fontWeight: "600",
+                          }}
+                        >
+                          Book
+                        </Text>
+                      </Pressable>
+                      <Pressable
                         onPress={() =>
                           setModalVisibleBooking(!modalVisibleBooking)
                         }
+                        className="flex justify-center items-center w-full rounded-3xl h-14 my-1"
                         style={{
                           backgroundColor: "#dc3545",
                           paddingVertical: 10,
@@ -702,35 +686,11 @@ const DayInfo = ({
                         <Text
                           style={{
                             color: "white",
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: "600",
                           }}
                         >
                           Close
-                        </Text>
-                      </Pressable>
-
-                      <Pressable
-                        onPress={() => handleSubmit()}
-                        style={{
-                          backgroundColor: "#007bff",
-                          paddingVertical: 10,
-                          paddingHorizontal: 20,
-                          borderRadius: 10,
-                          shadowColor: "#000",
-                          shadowOffset: { width: 0, height: 2 },
-                          shadowOpacity: 0.2,
-                          shadowRadius: 5,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: 16,
-                            fontWeight: "600",
-                          }}
-                        >
-                          Book
                         </Text>
                       </Pressable>
                     </View>
@@ -788,6 +748,18 @@ const DayInfo = ({
     }
     RefreshCalendar();
     setLoading(false);
+  };
+  const InfoRow = ({ label, value }: { label: string; value: string }) => {
+    return (
+      <View className="mb-4">
+        <Text className="text-lg font-semibold text-gray-700 mb-1">
+          {label}
+        </Text>
+        <View className="border-b border-gray-300">
+          <Text className="text-base text-gray-600">{value}</Text>
+        </View>
+      </View>
+    );
   };
   return (
     <>
@@ -922,71 +894,29 @@ const DayInfo = ({
                 Hold Form
               </Text>
               <Pressable onPress={() => setModalVisible(!modalVisible)}>
-                <View style={{ marginBottom: 15 }}>
-                  {/* Added margin for spacing */}
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "600",
-                      color: "#4a4a4a",
-                    }}
-                  >
-                    Name
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#6c757d" }}>{name}</Text>
-                  {/* Subtle color */}
-                </View>
-                <View style={{ marginBottom: 15 }}>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "600",
-                      color: "#4a4a4a",
-                    }}
-                  >
-                    Checkin
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#6c757d" }}>
-                    {selectedDayForm.checkin
+                <InfoRow label="Name" value={name} />
+                <InfoRow
+                  label="Checkin"
+                  value={
+                    selectedDayForm.checkin
                       ? new Date(selectedDayForm.checkin).toLocaleDateString(
                           "en-GB"
                         )
-                      : "N/A"}
-                  </Text>
-                </View>
-                <View style={{ marginBottom: 15 }}>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "600",
-                      color: "#4a4a4a",
-                    }}
-                  >
-                    Checkout
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#6c757d" }}>
-                    {selectedDayForm.checkout
+                      : "N/A"
+                  }
+                />
+                <InfoRow
+                  label="Checkout"
+                  value={
+                    selectedDayForm.checkout
                       ? new Date(selectedDayForm.checkout).toLocaleDateString(
                           "en-GB"
                         )
-                      : "N/A"}
-                  </Text>
-                </View>
+                      : "N/A"
+                  }
+                />
 
-                <View style={{ marginBottom: 15 }}>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "600",
-                      color: "#4a4a4a",
-                    }}
-                  >
-                    Price
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#6c757d" }}>
-                    {price}
-                  </Text>
-                </View>
+                <InfoRow label="Price" value={price.toString()} />
 
                 <Formik
                   initialValues={{ expire: "" }}
@@ -1051,43 +981,19 @@ const DayInfo = ({
                       {/* Buttons */}
                       <View
                         style={{
-                          flexDirection: "row",
+                          flexDirection: "column",
                           justifyContent: "space-between",
                           alignItems: "center",
                           marginTop: 20,
                         }}
                       >
                         <Pressable
-                          onPress={() => setModalVisible(!modalVisible)}
-                          style={{
-                            backgroundColor: "#dc3545",
-                            paddingVertical: 10,
-                            paddingHorizontal: 20,
-                            borderRadius: 10,
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.2,
-                            shadowRadius: 5,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: "white",
-                              fontSize: 16,
-                              fontWeight: "600",
-                            }}
-                          >
-                            Close
-                          </Text>
-                        </Pressable>
-
-                        <Pressable
                           onPress={() => handleSubmit()}
+                          className="flex justify-center items-center w-full rounded-3xl h-14 my-1"
                           style={{
                             backgroundColor: "#007bff",
                             paddingVertical: 10,
                             paddingHorizontal: 20,
-                            borderRadius: 10,
                             shadowColor: "#000",
                             shadowOffset: { width: 0, height: 2 },
                             shadowOpacity: 0.2,
@@ -1097,11 +1003,34 @@ const DayInfo = ({
                           <Text
                             style={{
                               color: "white",
-                              fontSize: 16,
+                              fontSize: 20,
                               fontWeight: "600",
                             }}
                           >
                             Book
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          onPress={() => setModalVisible(!modalVisible)}
+                          className="flex justify-center items-center w-full rounded-3xl h-14 my-1"
+                          style={{
+                            backgroundColor: "#dc3545",
+                            paddingVertical: 10,
+                            paddingHorizontal: 20,
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.2,
+                            shadowRadius: 5,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 20,
+                              fontWeight: "600",
+                            }}
+                          >
+                            Close
                           </Text>
                         </Pressable>
                       </View>

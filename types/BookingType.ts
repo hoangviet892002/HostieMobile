@@ -28,4 +28,6 @@ export interface BookingType {
   is_customer_checkin: boolean;
   is_customer_checkout: boolean;
   commission_rate: number | null;
+  guest_count?: number;
+  guest_id?: number;
 }

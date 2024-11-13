@@ -1,5 +1,9 @@
 import { getPackagesApi } from "@/apis/package";
-import { getRegistersApi, postRegisterApi } from "@/apis/registers";
+import {
+  getMyRegisterApi,
+  getRegistersApi,
+  postRegisterApi,
+} from "@/apis/registers";
 import { Loading } from "@/components";
 import { Colors } from "@/constants/Colors";
 import { PackageType, RegisterType } from "@/types";
@@ -17,6 +21,8 @@ import Toast from "react-native-toast-message";
 import { WebView } from "react-native-webview";
 
 import Icon, { Icons } from "@/components/Icons";
+import { formatExpireDate } from "@/utils/parseDate";
+import { ScrollView } from "react-native-gesture-handler";
 const Package = () => {
   const [packages, setPackages] = useState<PackageType[]>([]);
   const [page, setPage] = useState(0);
@@ -140,7 +146,6 @@ const Package = () => {
       console.log(response.result.paymentUrl);
       setPaymentUrl(response.result.paymentUrl);
 
-      fetchRegisters(0);
       setVisible(false);
     } else {
       Toast.show({
@@ -202,92 +207,32 @@ const Package = () => {
       </Modal>
     );
   };
-  const [resgiters, setRegisters] = useState<RegisterType[]>([]);
-  const [pageRegister, setPageRegister] = useState(0);
 
-  const [totalPageRegister, setTotalPageRegister] = useState(0);
+  useFocusEffect(
+    useCallback(() => {
+      setPaymentUrl("");
+      setPage(0);
+      fetchPackages(0);
+    }, [])
+  );
 
-  const fetchRegisters = async (pageNumber = 0) => {
-    if (pageNumber === 1) {
-      setLoading(true);
-    }
-    const response = await getRegistersApi(pageNumber);
+  const [myRegisters, setMyRegisters] = useState<RegisterType | null>(null);
+  const fetchMyRegisters = async () => {
+    const response = await getMyRegisterApi();
     if (response) {
-      if (pageNumber === 1) {
-        setRegisters(response.result);
-        setTotalPageRegister(response.totalPages);
-      } else {
-        setRegisters((prevRegisters) => [...prevRegisters, ...response.result]);
-
-        setTotalPageRegister(response.totalPages);
-      }
-    }
-    setLoading(false);
-  };
-
-  const loadMoreRegisters = () => {
-    if (pageRegister < totalPageRegister - 1 && !loading) {
-      setPageRegister((prevPage) => prevPage + 1);
-      fetchRegisters(pageRegister);
+      setMyRegisters(response.result);
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      setPaymentUrl("");
-      // setPageRegister(0);
-      // fetchRegisters(0);
-      setPage(0);
-      fetchPackages(0);
+      fetchMyRegisters();
     }, [])
   );
-  const RegisterCard = ({ item }: { item: RegisterType }) => {
-    const expirationDate = new Date(
-      item.expireAt[0], // Year
-      item.expireAt[1] - 1, // Month (0-based index)
-      item.expireAt[2] // Day
-    ).toLocaleDateString();
-
-    return (
-      <View
-        className="rounded-lg p-4 m-4 w-72 shadow-lg"
-        style={{ backgroundColor: Colors.primary }}
-      >
-        <Text className="text-lg font-bold text-white mb-2">
-          {item.packageInfo.name}
-        </Text>
-        <Text className="text-sm text-white mb-4">
-          {item.packageInfo.description}
-        </Text>
-        <View className="mb-4">
-          <Text className="text-sm text-white">
-            • Duration: {item.packageInfo.duration} month(s)
-          </Text>
-          <Text className="text-sm text-white">
-            • Price: {item.packageInfo.price.toLocaleString("vi-VN")} VND
-          </Text>
-          <Text className="text-sm text-white">
-            • Total Amount Paid: {item.totalAmount.toLocaleString("vi-VN")} VND
-          </Text>
-          <Text className="text-sm text-white">
-            • Expiration Date: {expirationDate}
-          </Text>
-          <Text className="text-sm text-white">
-            • Status: {item.registerStatus}
-          </Text>
-        </View>
-        <TouchableOpacity className="bg-yellow-400 rounded-full py-2 items-center mt-4">
-          <Text className="text-white font-semibold">
-            {item.active ? "Active" : "Renew"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   return (
     <>
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
         {paymentUrl !== "" ? (
           <View style={{ flex: 1 }}>
             <WebView
@@ -299,6 +244,102 @@ const Package = () => {
           </View>
         ) : (
           <>
+            {/* My register  */}
+            {myRegisters && (
+              <View className="p-6 bg-white mb-6 rounded-lg shadow-md">
+                <Text className="text-2xl font-bold text-gray-800 mb-4">
+                  My Registration
+                </Text>
+                <View className="space-y-4">
+                  {/* Package Name */}
+                  <View className="flex flex-row justify-between items-center">
+                    <Text className="text-base text-gray-600 font-medium">
+                      Package Name:
+                    </Text>
+                    <Text className="text-base text-gray-800">
+                      {myRegisters.packageInfo.name}
+                    </Text>
+                  </View>
+
+                  {/* Description */}
+                  <View className="flex flex-row justify-between items-start">
+                    <Text className="text-base text-gray-600 font-medium">
+                      Description:
+                    </Text>
+                    <Text className="text-base text-gray-800 text-right w-2/3">
+                      {myRegisters.packageInfo.description}
+                    </Text>
+                  </View>
+
+                  {/* Price */}
+                  <View className="flex flex-row justify-between items-center">
+                    <Text className="text-base text-gray-600 font-medium">
+                      Price:
+                    </Text>
+                    <Text className="text-base text-gray-800">
+                      ${myRegisters.packagePrice.toFixed(2)}
+                    </Text>
+                  </View>
+
+                  {/* Total Amount */}
+                  <View className="flex flex-row justify-between items-center">
+                    <Text className="text-base text-gray-600 font-medium">
+                      Total Amount:
+                    </Text>
+                    <Text className="text-base text-gray-800">
+                      ${myRegisters.totalAmount.toFixed(2)}
+                    </Text>
+                  </View>
+
+                  {/* Duration */}
+                  <View className="flex flex-row justify-between items-center">
+                    <Text className="text-base text-gray-600 font-medium">
+                      Duration:
+                    </Text>
+                    <Text className="text-base text-gray-800">
+                      {myRegisters.duration} month(s)
+                    </Text>
+                  </View>
+
+                  {/* Expire At */}
+                  <View className="flex flex-row justify-between items-center">
+                    <Text className="text-base text-gray-600 font-medium">
+                      Expire At:
+                    </Text>
+                    <Text className="text-base text-gray-800">
+                      {formatExpireDate(myRegisters.expireAt)}
+                    </Text>
+                  </View>
+
+                  {/* Payment Expiry Time */}
+                  {myRegisters.paymentExpiryTime && (
+                    <View className="flex flex-row justify-between items-center">
+                      <Text className="text-base text-gray-600 font-medium">
+                        Payment Expiry Time:
+                      </Text>
+                      <Text className="text-base text-gray-800">
+                        {formatExpireDate(myRegisters.paymentExpiryTime)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Status */}
+                  <View className="flex flex-row justify-between items-center">
+                    <Text className="text-base text-gray-600 font-medium">
+                      Status:
+                    </Text>
+                    <Text
+                      className={`text-base font-semibold ${
+                        myRegisters.active ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {myRegisters.registerStatus}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
             <View className="flex-1 bg-gray-100 flex justify-center items-center">
               <Loading loading={loading} />
               <FlatList
@@ -315,27 +356,11 @@ const Package = () => {
                 showsHorizontalScrollIndicator={false}
               />
             </View>
-            {/* <View className="flex-1 bg-gray-100 flex justify-center items-center">
-              <Text className="text-2xl font-bold text-gray-500 mb-4">
-                Registers
-              </Text>
-              <FlatList
-                data={resgiters}
-                renderItem={RegisterCard}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                }}
-                onEndReached={loadMoreRegisters}
-                onEndReachedThreshold={0.5}
-                showsHorizontalScrollIndicator={false}
-              />
-            </View> */}
+
             <ModalRenderBuyPackage />
           </>
         )}
-      </View>
+      </ScrollView>
     </>
   );
 };

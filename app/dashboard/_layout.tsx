@@ -13,82 +13,94 @@ import { getMyInfoApi } from "@/apis/users";
 import { DrawerItemList } from "@react-navigation/drawer";
 import { useSelector } from "react-redux";
 import { selectRole } from "@/redux/slices/authSlice";
-const DrawterElement = [
-  {
-    route: "DashBoard",
-    label: "Dash Board",
-    type: Icons.Feather,
-    icon: "home",
-    component: "tab1",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
-  {
-    router: "Notification",
-    label: "Notification",
-    type: Icons.Feather,
-    icon: "bell",
-    component: "tab8",
-    color: Colors.primary,
-  },
-  {
-    router: "Package",
-    label: "Package",
-    type: Icons.Feather,
-    icon: "package",
-    component: "tab2",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
-  {
-    router: "Booking",
-    label: "Booking Out",
-    type: Icons.Feather,
-    icon: "calendar",
-    component: "tab4",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
-  {
-    router: "Hold Out",
-    label: "Hold Out",
-    type: Icons.Feather,
-    icon: "bookmark",
-    component: "tab5",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
-  {
-    router: "Booking In",
-    label: "Booking In",
-    type: Icons.Feather,
-    icon: "calendar",
-    component: "tab6",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
-  {
-    router: "Hold In",
-    label: "Hold In",
-    type: Icons.Feather,
-    icon: "bookmark",
-    component: "tab7",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
-  {
-    router: "Bank Account",
-    label: "Bank Account",
-    type: Icons.Feather,
-    icon: "credit-card",
-    component: "tab9",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
-];
+import { useTranslation } from "react-i18next";
 
 function DashboardDrawer() {
   const role = useSelector(selectRole);
+  const { t } = useTranslation();
+  const DrawterElement = [
+    {
+      route: "DashBoard",
+      label: t("Dashboard"),
+      type: Icons.Feather,
+      icon: "home",
+      component: "tab1",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+    {
+      router: "Notification",
+      label: t("Notification"),
+      type: Icons.Feather,
+      icon: "bell",
+      component: "tab8",
+      color: Colors.primary,
+    },
+    {
+      router: "Package",
+      label: t("Package"),
+      type: Icons.Feather,
+      icon: "package",
+      component: "tab2",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+    {
+      router: "Residence",
+      label: t("Residence"),
+      type: Icons.Feather,
+      icon: "home",
+      component: "residence",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+
+    {
+      router: "Booking",
+      label: t("Booking out"),
+      type: Icons.Feather,
+      icon: "calendar",
+      component: "tab4",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+    {
+      router: "Hold Out",
+      label: t("Hold Out"),
+      type: Icons.Feather,
+      icon: "bookmark",
+      component: "tab5",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+    {
+      router: "Booking In",
+      label: t("Booking In"),
+      type: Icons.Feather,
+      icon: "calendar",
+      component: "tab6",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+    {
+      router: "Hold In",
+      label: t("Hold In"),
+      type: Icons.Feather,
+      icon: "bookmark",
+      component: "tab7",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+    {
+      router: "Bank Account",
+      label: t("Bank Account"),
+      type: Icons.Feather,
+      icon: "credit-card",
+      component: "tab9",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+  ];
   const [Account, SetAccount] = useState<AccountInformation>({
     email: "",
     username: "",
@@ -134,89 +146,84 @@ function DashboardDrawer() {
   }
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Drawer
-          screenOptions={{
-            drawerPosition: "left",
-            drawerType: "slide",
-            drawerStyle: {
-              width: 240,
-            },
-            header: (props) => (
-              <CustomHeader
-                props={props}
-                label={
-                  DrawterElement.find(
-                    (item) => item.component === props.route.name
-                  )?.label || ""
-                }
-              />
-            ),
-          }}
-          drawerContent={(props) => {
-            return (
-              <SafeAreaView>
-                <View className="flex flex-col items-center justify-center p-4">
-                  <Image
-                    className="h-[130px] w-[130px] rounded-full"
-                    source={{ uri: Account.urlAvatar }}
-                  />
-                  <Text className="text-lg font-bold text-primary">
-                    {Account.firstName} {Account.middleName} {Account.lastName}
-                  </Text>
-                  <Text className="text-lg font-bold text-primary">
-                    {Account.email}
-                  </Text>
-                </View>
-                <DrawerItemList {...props} />
-              </SafeAreaView>
-            );
-          }}
-        >
-          {DrawterElement.map((item, index) => (
-            <Drawer.Screen
-              key={index}
-              name={item.component}
-              options={{
-                headerTitle: item.label,
-                drawerLabel: item.label,
-                drawerIcon: ({ color }) => (
-                  <Icon
-                    type={item.type}
-                    name={item.icon}
-                    size={24}
-                    color={color}
-                  />
-                ),
-              }}
+      <Drawer
+        screenOptions={{
+          drawerPosition: "left",
+          drawerType: "slide",
+          drawerStyle: {
+            width: 240,
+          },
+          header: (props) => (
+            <CustomHeader
+              props={props}
+              label={
+                DrawterElement.find(
+                  (item) => item.component === props.route.name
+                )?.label || ""
+              }
             />
-          ))}
-
-          {/* exit  */}
+          ),
+        }}
+        drawerContent={(props) => {
+          return (
+            <SafeAreaView>
+              <View className="flex flex-col items-center justify-center p-4">
+                <Image
+                  className="h-[130px] w-[130px] rounded-full"
+                  source={{ uri: Account.urlAvatar }}
+                />
+                <Text className="text-lg font-bold text-primary">
+                  {Account.firstName} {Account.middleName} {Account.lastName}
+                </Text>
+              </View>
+              <DrawerItemList {...props} />
+            </SafeAreaView>
+          );
+        }}
+      >
+        {DrawterElement.map((item, index) => (
           <Drawer.Screen
-            name="logout"
+            key={index}
+            name={item.component}
             options={{
-              drawerLabel: "Exit",
+              headerTitle: item.label,
+              drawerLabel: item.label,
               drawerIcon: ({ color }) => (
                 <Icon
-                  type={Icons.Feather}
-                  name="log-out"
+                  type={item.type}
+                  name={item.icon}
                   size={24}
                   color={color}
                 />
               ),
-              headerShown: false,
-              drawerItemStyle: { marginTop: "auto" },
-            }}
-            listeners={{
-              drawerItemPress: (e) => {
-                e.preventDefault();
-                router.replace("/(tabs)");
-              },
             }}
           />
-        </Drawer>
-      </GestureHandlerRootView>
+        ))}
+
+        {/* exit  */}
+        <Drawer.Screen
+          name="logout"
+          options={{
+            drawerLabel: "Exit",
+            drawerIcon: ({ color }) => (
+              <Icon
+                type={Icons.Feather}
+                name="log-out"
+                size={24}
+                color={color}
+              />
+            ),
+            headerShown: false,
+            drawerItemStyle: { marginTop: "auto" },
+          }}
+          listeners={{
+            drawerItemPress: (e) => {
+              e.preventDefault();
+              router.replace("/(tabs)");
+            },
+          }}
+        />
+      </Drawer>
     </SafeAreaView>
   );
 }

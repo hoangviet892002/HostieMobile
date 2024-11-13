@@ -1,41 +1,63 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
-import { router, useNavigation } from "expo-router";
+import { useNavigation } from "expo-router";
+import { ConversationType } from "@/types/ConversationType";
+import { useSelector } from "react-redux";
+import { selectUserId } from "@/redux/slices/authSlice";
 
-interface ConversationProps {
-  name: string;
-  message: string;
-  image: string;
-  lastime: string;
-}
-const Conversation: React.FC<ConversationProps> = ({
-  image,
-  lastime,
-  message,
-  name,
-}) => {
+const Conversation: React.FC<ConversationType> = (
+  conversation: ConversationType
+) => {
   const navigation = useNavigation();
+
+  const userID = useSelector(selectUserId);
+  const partner = conversation.users.find((user) => user.id !== userID);
   return (
     <TouchableOpacity
+      style={styles.container}
       onPress={() => {
-        navigation.navigate("Conversation");
+        navigation.navigate("Conversation", {
+          partner: partner,
+          id: conversation.id,
+        });
       }}
     >
-      <View className="flex flex-row items-center p-2">
-        <View className="flex items-center justify-center">
-          <Image source={{ uri: image }} className="w-20 h-20 rounded-full" />
-        </View>
-        <View className="flex flex-1 ml-4">
-          <Text className="text-lg font-bold">{name}</Text>
-          <Text className="text-gray-500">{message}</Text>
-        </View>
-        <View className="flex items-center">
-          <Text className="text-sm text-gray-500">{lastime}</Text>
-        </View>
+      <Image
+        source={{
+          uri: partner?.avatar,
+        }}
+        style={styles.avatar}
+      />
+      <View style={styles.infoContainer}>
+        <Text style={styles.username}>{partner?.username}</Text>
       </View>
-      <View className="bg-gray-200 h-0.5" />
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#f9f9f9",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  infoContainer: {
+    marginLeft: 15,
+    justifyContent: "center",
+  },
+  username: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+});
 
 export default Conversation;

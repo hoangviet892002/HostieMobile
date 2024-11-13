@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import Icon, { Icons } from "@/components/Icons";
+import { useTranslation } from "react-i18next";
 interface AddressType {
   provide: {
     label: string;
@@ -43,6 +44,7 @@ interface PickAddressProps {
   id: string;
 }
 interface RenderInputProps {
+  name: string;
   label: string;
   value: any;
   onChange: (value: any) => void;
@@ -59,7 +61,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
 }) => {
   const { showToast } = useToast();
   const [data] = useState<AddressType>(formData);
-
+  const { t } = useTranslation();
   const [optionProvide, setOptionProvide] = useState<RegionType[]>([]);
   const [optionDistrict, setOptionDistrict] = useState<RegionType[]>([]);
   const [optionWard, setOptionWard] = useState<RegionType[]>([]);
@@ -101,6 +103,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
   }, [formData.district]);
   const element: RenderInputProps[] = [
     {
+      name: t("provide"),
       label: "provide",
       value: formData.provide,
       type: "select",
@@ -108,6 +111,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
       icon: "map-pin",
     },
     {
+      name: t("district"),
       label: "district",
       value: formData.district,
       type: "select",
@@ -117,6 +121,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
       icon: "map-pin",
     },
     {
+      name: t("ward"),
       label: "ward",
       value: formData.ward,
       type: "select",
@@ -125,6 +130,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
       icon: "map-pin",
     },
     {
+      name: t("address"),
       label: "address",
       value: formData.address,
       type: "text",
@@ -133,6 +139,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
     },
 
     {
+      name: t("phones"),
       label: "phones",
       value: formData.phones,
       type: "multiInput",
@@ -142,6 +149,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
   ];
 
   const RenderInput = ({
+    name,
     label,
     value,
     onChange,
@@ -175,7 +183,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
               color={Colors.primary}
             />
             <TextInput
-              placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+              placeholder={name}
               onChangeText={onChange}
               value={value}
               autoCapitalize="none"
@@ -380,7 +388,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
                 >
                   <TextInput
                     className="w-4/5"
-                    placeholder={label.charAt(0).toUpperCase() + label.slice(1)}
+                    placeholder={name}
                     onChangeText={(text) => {
                       const newPhones = [...value];
                       newPhones[index] = text;
@@ -422,7 +430,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
                   onChange([...value, ""]);
                 }}
               >
-                <Text className="text-white"> Add Phone</Text>
+                <Text className="text-white">{t("Add")}</Text>
               </TouchableOpacity>
 
               {error && <Text style={{ color: "red" }}>{error}</Text>}
@@ -485,30 +493,30 @@ const PickAddress: React.FC<PickAddressProps> = ({
         validate={(values) => {
           const errors: any = {};
           if (!values.provide.value) {
-            errors.provide = "Provide is required";
+            errors.provide = t("Required");
           }
           if (!values.district.value) {
-            errors.district = "District is required";
+            errors.district = t("Required");
           }
           if (!values.ward.value) {
-            errors.ward = "Ward is required";
+            errors.ward = t("Required");
           }
           if (!values.address) {
-            errors.address = "address is required";
+            errors.address = t("Required");
           }
           if (values.phones.length === 0) {
-            errors.phones = "Phone is required";
+            errors.phones = t("Required");
           }
           // check phone is valid
           values.phones.forEach((item: string, index: number) => {
             if (!item) {
-              errors.phones = "Phone is required";
+              errors.phones = t("Required");
             }
           });
           // check format phone
           values.phones.forEach((item: string, index: number) => {
             if (!/^\d{10}$/.test(item)) {
-              errors.phones = "Phone is invalid";
+              errors.phones = t("Phone is invalid");
             }
           });
           return errors;
@@ -526,6 +534,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
             {element.map((item, index) => (
               <>
                 <RenderInput
+                  name={item.name}
                   key={index}
                   label={item.label}
                   value={
@@ -581,7 +590,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
                     fontWeight: "bold",
                   }}
                 >
-                  Back
+                  {t("Back")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -607,7 +616,7 @@ const PickAddress: React.FC<PickAddressProps> = ({
                     fontWeight: "bold",
                   }}
                 >
-                  Next
+                  {t("Next")}
                 </Text>
                 <Icon
                   type={Icons.Feather}

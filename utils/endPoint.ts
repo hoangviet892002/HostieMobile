@@ -92,6 +92,7 @@ const endPoint = {
     getRegisters: (page: number) =>
       `/v1/api/registers?page=${page}&size=10&sort=`,
     postRegister: `/v1/api/registers`,
+    getMyRegister: "/v1/api/registers/my-register",
   },
   payment: {
     getUrlVnpay: (id: number) => `/v1/api/payment/vn-pay?registerId=${id}`,
@@ -101,6 +102,10 @@ const endPoint = {
   },
   bank: {
     getBanks: `/v1/api/banks?page=0&size=20&sort=`,
+  },
+  chat: {
+    getConversations: `/chats/groups`,
+    getMessages: (id: string) => `/chats/groups/${id}/messages`,
   },
 };
 

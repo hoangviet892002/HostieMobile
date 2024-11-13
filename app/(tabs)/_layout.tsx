@@ -15,15 +15,7 @@ const TabArr = [
     color: Colors.primary,
     alphaClr: Colors.primaryAlpha,
   },
-  {
-    route: "Search",
-    label: "Search",
-    type: Icons.Feather,
-    icon: "search",
-    component: "Tab2",
-    color: Colors.primary,
-    alphaClr: Colors.primaryAlpha,
-  },
+
   {
     route: "Add",
     label: "Add New",

@@ -16,6 +16,7 @@ import { Residence } from "@/types/response/Residences";
 import { getResidences } from "@/apis/residences";
 import { Loading } from "@/components";
 import { Colors } from "@/constants/Colors";
+import Icon, { Icons } from "@/components/Icons";
 
 const Managers = () => {
   const [loading, setLoading] = useState(false);
@@ -107,18 +108,33 @@ const Managers = () => {
   return (
     <>
       <Loading loading={loading} />
-      <SafeAreaView>
+      <SafeAreaView className="flex-1">
         <FlatList
           className="flex"
           data={villas}
           keyExtractor={(item) => item.residence_id.toString()}
           renderItem={renderItem}
-          ListHeaderComponent={renderHeader}
           ListFooterComponent={renderFooter}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListEmptyComponent={() => <EmptyData />}
         />
+
+        {/* Absulute button add */}
+        <TouchableOpacity
+          className="absolute bottom-4 right-4 bg-white p-2 rounded-lg h-12 w-12 items-center justify-center"
+          style={{ backgroundColor: Colors.primary }}
+          onPress={() => {
+            navigation.navigate("AddVilla");
+          }}
+        >
+          <Icon
+            type={Icons.Feather}
+            name="plus"
+            size={24}
+            color={Colors.white}
+          />
+        </TouchableOpacity>
       </SafeAreaView>
     </>
   );

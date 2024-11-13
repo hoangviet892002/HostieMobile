@@ -18,4 +18,7 @@ export enum ActionStatusBooking {
   CHECKOUT = "Checkout",
   CHECKIN = "Checkin",
   OPENQR = "OpenQR",
+  OPENTRACKING = "Open Tracking",
+  OPENDETAIL = "Open Detail",
+  UPDATE = "Update",
 }
