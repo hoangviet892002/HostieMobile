@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { BackButton } from "@/components";
+import { BackButton, Loading } from "@/components";
 import { Colors } from "@/constants/Colors";
 import * as Animatable from "react-native-animatable";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,8 +17,13 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { MessageType } from "@/types/MessageType";
 import { FlatList } from "react-native-gesture-handler";
 import useToast from "@/hooks/useToast";
-import { getMessagesApi } from "@/apis/chat";
+import { chatApi, getMessagesApi } from "@/apis/chat";
 import Message from "./Message";
+import { generateUUID } from "@/utils/generateUUID";
+import useSocketListener from "@/hooks/useListen";
+import { useDispatch, useSelector } from "react-redux";
+import { messageActions, selectMessage } from "@/redux/slices/messageSlice";
+import { Skeleton } from "@rneui/base";
 
 type RouteParams = {
   params: {
@@ -35,27 +40,65 @@ const Conversation = () => {
   const route = useRoute<RouteProp<RouteParams, "params">>();
   const { id, partner } = route.params;
 
-  const [messages, setMessages] = useState<MessageType[]>([]);
+  const messages = useSelector(selectMessage);
   const [loading, setLoading] = useState<boolean>(true);
   const { showToast } = useToast();
   const [page, setPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const dispatch = useDispatch();
 
+  const chatsocketEvent = useSocketListener("common.chat.receive_message");
+  useEffect(() => {
+    if (chatsocketEvent) {
+      console.log("New message received:", chatsocketEvent);
+      const message = chatsocketEvent.message;
+      const file = chatsocketEvent.files ? chatsocketEvent.files : [];
+      const created_at = chatsocketEvent.created_at;
+      const newMessage: MessageType = {
+        created_at: created_at,
+        files: file,
+        sender_id: chatsocketEvent.sender_id,
+        message: message,
+      };
+      console.log(newMessage);
+      dispatch(messageActions.receiveMessage([newMessage]));
+    }
+  }, [chatsocketEvent]);
   const RenderInput = () => {
+    const [sendLoading, setSendLoading] = useState<boolean>(false);
     const [message, setMessage] = useState("");
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-    const handleSend = () => {
+    const handleSend = async () => {
+      setSendLoading(true);
       if (message.trim() || selectedImage) {
         // Send message and image if available
         console.log("Message sent:", message);
         console.log("Image sent:", selectedImage);
 
+        const formData = new FormData();
+        formData.append("message", message);
+        formData.append("group_id", id);
+        formData.append("receiver_id", partner.id);
+        formData.append("uuid", generateUUID());
+        if (selectedImage) {
+          const uriParts = selectedImage.split(".");
+          const fileType = uriParts[uriParts.length - 1];
+          formData.append("files", {
+            uri: selectedImage,
+            name: `photo.${fileType}`,
+            type: `image/${fileType}`,
+          });
+        }
+
+        const res = await chatApi(formData);
+
         // Clear the input fields
         setMessage("");
         setSelectedImage(null);
       }
+      setSendLoading(false);
     };
 
     const pickImage = async () => {
@@ -119,8 +162,16 @@ const Conversation = () => {
         )}
 
         {/* Send Button */}
-        <TouchableOpacity onPress={handleSend} style={{ marginLeft: 10 }}>
-          <Ionicons name="send" size={24} color={Colors.primary} />
+        <TouchableOpacity
+          onPress={handleSend}
+          style={{ marginLeft: 10 }}
+          disabled={sendLoading}
+        >
+          {sendLoading ? (
+            <ActivityIndicator size="small" color={Colors.primary} />
+          ) : (
+            <Ionicons name="send" size={24} color={Colors.primary} />
+          )}
         </TouchableOpacity>
       </View>
     );
@@ -137,18 +188,16 @@ const Conversation = () => {
     setLoading(page === 1);
 
     const res = await getMessagesApi(id, page);
+    console.log(page);
     if (res.success) {
-      setMessages((prevMessages) =>
-        page === 1 ? res.data.result : [...prevMessages, ...res.data.result]
-      );
+      let messages = res.data.result;
+      if (page !== 1) {
+        dispatch(messageActions.loadMessages(messages));
+      } else {
+        dispatch(messageActions.addMessage(messages));
+      }
       setTotalPage(res.data.total_pages);
       // sort messages by created_at
-      setMessages((prevMessages) =>
-        prevMessages.sort(
-          (a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-        )
-      );
     } else {
       showToast(res);
     }
@@ -170,6 +219,14 @@ const Conversation = () => {
     );
   };
 
+  const RenderSkeleton = () => {
+    return (
+      <View className="flex-1">
+        <Loading loading={loading} />
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Animatable.View
@@ -185,15 +242,20 @@ const Conversation = () => {
         </View>
       </Animatable.View>
 
-      <FlatList
-        data={messages}
-        renderItem={({ item }) => <Message {...item} />}
-        keyExtractor={(item) => item.id.toString()}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={renderFooter}
-        style={{ flex: 1 }}
-      />
+      {loading ? (
+        <RenderSkeleton />
+      ) : (
+        <FlatList
+          data={messages}
+          renderItem={({ item }) => <Message {...item} />}
+          // keyExtractor={(item) => item.id.toString()}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={renderFooter}
+          style={{ flex: 1 }}
+          inverted
+        />
+      )}
 
       <RenderInput />
     </SafeAreaView>

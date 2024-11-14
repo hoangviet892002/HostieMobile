@@ -17,10 +17,10 @@ const TabArr = [
   },
 
   {
-    route: "Add",
-    label: "Add New",
+    route: "Chat",
+    label: "Chat",
     type: Icons.Feather,
-    icon: "plus-square",
+    icon: "message-circle",
     component: "Tab3",
     color: Colors.primary,
     alphaClr: Colors.primaryAlpha,

@@ -6,10 +6,10 @@ export const eventConfig = [
     notification: {
       title: "Hold Request",
       message: (data: any) =>
-        `You have a hold request from residence: ${data.residence_id}`,
+        `You have a hold request from residence: ${data.data_json.residence_id}`,
       navigateTo: (data: any) => {
         const href = "HoldDetail";
-        const params = `?id=${data.DataJson.id}`;
+        const params = `?id=${data.data_json.id}`;
         return {
           href: href + params,
           params: data,
@@ -23,10 +23,10 @@ export const eventConfig = [
     notification: {
       title: "Booking Request",
       message: (data: any) =>
-        `Mr/Mrs ${data.seller_id} has requested to book residence: ${data.residence_id}`,
+        `Mr/Mrs ${data.data_json.seller_id} has requested to book residence: ${data.data_json.residence_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.DataJson.id}`;
+        const params = `?id=${data.data_json.id}`;
         return {
           href: href + params,
           params: { id: data.id },
@@ -40,10 +40,10 @@ export const eventConfig = [
     notification: {
       title: "Seller Transfer",
       message: (data: any) =>
-        `You have a seller transfer from seller ID: ${data.seller_id}`,
+        `You have a seller transfer from seller ID: ${data.data_json.seller_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.DataJson.id}`;
+        const params = `?id=${data.data_json.id}`;
         return {
           href: href + params,
           params: { data },
@@ -77,11 +77,11 @@ export const eventConfig = [
       title: "Booking Update",
       message: (data: any) =>
         `Your booking request has been ${
-          data.accepted ? "accepted" : "rejected"
+          data.data_json.accepted ? "accepted" : "rejected"
         }`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.DataJson.id}`;
+        const params = `?id=${data.data_json.id}`;
         return {
           href: href + params,
           params: { data },
@@ -95,10 +95,10 @@ export const eventConfig = [
     notification: {
       title: "Transfer Received",
       message: (data: any) =>
-        `You have received a transfer from seller: ${data.seller_id}`,
+        `You have received a transfer from seller: ${data.data_json.seller_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.DataJson.id}`;
+        const params = `?id=${data.data_json.id}`;
         return {
           href: href + params,
           params: { data },
@@ -112,30 +112,12 @@ export const eventConfig = [
     notification: {
       title: "Transfer Not Received",
       message: (data: any) =>
-        `You have not received the transfer from seller: ${data.seller_id}`,
+        `You have not received the transfer from seller: ${data.data_json.seller_id}`,
       navigateTo: (data: any) => {
         const href = "BookingDetail";
-        const params = `?id=${data.DataJson.id}`;
+        const params = `?id=${data.data_json.id}`;
         return {
           href: href + params,
-          params: { data },
-        };
-      },
-    },
-  },
-
-  //   common
-  {
-    key: "RecieveChangeCalendar",
-    log: "common.receive_change_calendar",
-    notification: {
-      title: "Calendar Update",
-      message: (data: any) =>
-        `The calendar of residence: ${data.residence_id} has been updated`,
-      navigateTo: (data: any) => {
-        const href = "HoldForHost";
-        return {
-          href,
           params: { data },
         };
       },

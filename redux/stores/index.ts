@@ -4,6 +4,8 @@ import languageSlice from "../slices/languageSlice";
 
 import authSlice from "../slices/authSlice";
 
+import messageSlice from "../slices/messageSlice";
+
 import {
   Action,
   combineReducers,
@@ -14,6 +16,7 @@ import {
 const rootReducer = combineReducers({
   language: languageSlice,
   auth: authSlice,
+  message: messageSlice,
 });
 
 const store = configureStore({

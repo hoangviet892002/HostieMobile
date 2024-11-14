@@ -2,20 +2,22 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation } from "expo-router";
 import { ConversationType } from "@/types/ConversationType";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectUserId } from "@/redux/slices/authSlice";
+import { messageActions } from "@/redux/slices/messageSlice";
 
 const Conversation: React.FC<ConversationType> = (
   conversation: ConversationType
 ) => {
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
   const userID = useSelector(selectUserId);
   const partner = conversation.users.find((user) => user.id !== userID);
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
+        dispatch(messageActions.loadUser(conversation.users));
         navigation.navigate("Conversation", {
           partner: partner,
           id: conversation.id,

@@ -32,4 +32,12 @@ const getMessagesApi = async (
     `${endPoint.chat.getMessages(id)}?page=${page}&page_size=20`
   );
 };
-export { getConversationsApi, getMessagesApi };
+
+const chatApi = async (data: FormData) => {
+  return await axiosCore.post(endPoint.chat.chat, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+export { getConversationsApi, getMessagesApi, chatApi };

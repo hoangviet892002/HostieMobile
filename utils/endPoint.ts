@@ -106,6 +106,7 @@ const endPoint = {
   chat: {
     getConversations: `/chats/groups`,
     getMessages: (id: string) => `/chats/groups/${id}/messages`,
+    chat: `/chats/messages`,
   },
 };
 

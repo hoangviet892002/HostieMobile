@@ -24,6 +24,7 @@ import { parseStatusBooking } from "@/utils/parseStatusBooking";
 import Icon, { Icons } from "@/components/Icons";
 import { parseStatusCalendar } from "@/utils/parseStatusCalendar";
 import { getCalendarStyle } from "@/constants/getCalendarStyle";
+import useSocketListener from "@/hooks/useListen";
 type RouteParams = {
   params: {
     ids: string;
@@ -36,6 +37,7 @@ const CalendarsBooking = () => {
 
   const route = useRoute<RouteProp<RouteParams, "params">>();
   const { ids } = route.params;
+  console.log("id residence: ", ids);
 
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
@@ -53,6 +55,29 @@ const CalendarsBooking = () => {
   const [name, setName] = useState<string>("");
 
   const [isHost, setIsHost] = useState<boolean>(false);
+
+  const RecieveChangeCalendar = useSocketListener(
+    "common.receive_change_calendar"
+  );
+
+  useEffect(() => {
+    if (RecieveChangeCalendar) {
+      console.log(RecieveChangeCalendar.id);
+      console.log(parseInt(ids));
+      if (RecieveChangeCalendar.id === parseInt(ids)) {
+        const calanderChange = RecieveChangeCalendar.calendar;
+        console.log(calanderChange);
+        setElement((prev) => {
+          return prev.map((item) => {
+            if (item.date === calanderChange.date) {
+              return calanderChange;
+            }
+            return item;
+          });
+        });
+      }
+    }
+  }, [RecieveChangeCalendar]);
 
   const getCalendar = async () => {
     setIsLoad(true);
