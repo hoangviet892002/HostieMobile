@@ -59,9 +59,15 @@ export const VillaCard: React.FC<VillaCardProps> = ({ villa }) => {
             height: 50,
           }}
           onPress={() => {
-            (navigate as any).navigate("VillaDetail", {
-              itemId: villa.residence_id,
-            });
+            setTimeout(() => {
+              navigate.push("VillaDetail", {
+                itemId: villa.residence_id,
+              });
+            }, 0);
+            // router.navigate(`/VillaDetail?itemId=${villa.residence_id}`);
+            // (navigate as any).navigate("VillaDetail", {
+            //   itemId: villa.residence_id,
+            // });
           }}
         >
           <Text className="text-sm text-white">{t("Book Now")}</Text>

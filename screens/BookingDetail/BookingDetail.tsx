@@ -206,6 +206,7 @@ const BookingDetail = () => {
 
   const [visibleLog, setVisibleLog] = useState(false);
   const [visibleDetail, setVisibleDetail] = useState(false);
+  const [visibleReject, setVisibleReject] = useState(false);
   const action = [
     {
       title: ActionStatusBooking.ACCEPT,
@@ -217,26 +218,7 @@ const BookingDetail = () => {
     {
       title: ActionStatusBooking.REJECT,
       onPress: () => {
-        const dataSolve = {
-          id: parseInt(id),
-          accept: false,
-          checkin: parseDateDDMMYYYY(data.booking.checkin),
-          checkout: parseDateDDMMYYYY(data.booking.checkout),
-          commission_rate: parseInt("1"),
-          bank_account_id: 25,
-        };
-
-        console.log(dataSolve);
-
-        const callApi = async () => {
-          const response = await acceptBookingApi(dataSolve);
-          if (response.success) {
-            fetchData();
-          } else {
-            showToast(response);
-          }
-        };
-        callApi();
+        setVisibleReject(true);
       },
       color: "bg-red-500",
     },
@@ -932,9 +914,123 @@ const BookingDetail = () => {
       </Modal>
     );
   };
+
+  const ModalReject = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visibleReject}
+        onRequestClose={() => {
+          setVisibleReject(!visibleReject);
+        }}
+      >
+        {/* Formik with reason reject */}
+        <View
+          className="flex-1 justify-center items-center  bg-opacity-60"
+          style={{
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <Formik
+            initialValues={{ reason: "" }}
+            onSubmit={(values) => {
+              const dataSolve = {
+                id: parseInt(id),
+                accept: false,
+                checkin: parseDateDDMMYYYY(data.booking.checkin),
+                checkout: parseDateDDMMYYYY(data.booking.checkout),
+                reason_reject: values.reason,
+              };
+
+              console.log(dataSolve);
+
+              const callApi = async () => {
+                const response = await acceptBookingApi(dataSolve);
+                if (response.success) {
+                  fetchData();
+                } else {
+                  showToast(response);
+                }
+              };
+              callApi();
+              setVisibleReject(false);
+            }}
+            validate={(values) => {
+              const errors: any = {};
+              if (!values.reason) {
+                errors.reason = t("Required");
+              }
+              return errors;
+            }}
+          >
+            {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+              <View className="bg-white p-4 w-11/12 rounded-lg">
+                <Text className="text-xl font-semibold text-gray-800 mb-4">
+                  {t("Reason for reject")}
+                </Text>
+                {/* close modal */}
+                <TouchableOpacity
+                  onPress={() => setVisibleReject(false)}
+                  className="absolute top-2 right-2"
+                >
+                  <Ionicons name="close" size={24} color="black" />
+                </TouchableOpacity>
+                <View className="flex flex-col items-center">
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      borderColor: Colors.primary,
+                      borderWidth: 2,
+                      borderRadius: 25,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      marginVertical: 5,
+                      width: "auto",
+                    }}
+                  >
+                    <Icon
+                      type={Icons.AntDesign}
+                      // icon for reason
+                      name="closecircle"
+                      size={20}
+                      color={Colors.primary}
+                    />
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        marginLeft: 10,
+                        color: Colors.black,
+                        paddingVertical: 8,
+                      }}
+                      placeholder={t("Reason for reject")}
+                      onChangeText={handleChange("reason")}
+                      onBlur={handleBlur("reason")}
+                      value={values.reason}
+                    />
+                    {errors.reason && (
+                      <Text style={{ color: "red" }}>{errors.reason}</Text>
+                    )}
+                  </View>
+                </View>
+                <TouchableOpacity
+                  className="bg-red-500 p-4 rounded-3xl ml-2 flex justify-center items-center my-3"
+                  onPress={() => handleSubmit()}
+                >
+                  <Text className="text-white">{t("Submit")}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </Formik>
+        </View>
+      </Modal>
+    );
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ModalUpdate />
+      <ModalReject />
       <ScrollView>
         <Loading loading={loading} />
         <Animatable.View

@@ -61,5 +61,7 @@
     "Description": "{{id}}: Hold ID\n{{checkin}}: Check-in\n{{checkout}}: Check-out"
   },
   "EmptyData": "No notifications available.",
-  "Loading": "Loading..."
+  "Loading": "Loading...",
+  "mustBeGreaterThan": "Must be greater than {{minAmount}}",
+  "mustBeLessThan": "Must be less than {{maxAmount}}"
 }

@@ -22,6 +22,9 @@ import DashBoardTag1 from "./DashBoardTag1";
 import Notifications from "./Notifications";
 import ManagerBank from "./ManagerBank";
 import HoldDetail from "./HoldDetail/";
+import FillFormBooking from "./FillFormBooking";
+import BookSuccessScreen from "./BookSuccessScreen";
+import HoldSuccessScreen from "./HoldSuccessScreen";
 
 export {
   VillaDetail,
@@ -48,4 +51,7 @@ export {
   Notifications,
   ManagerBank,
   HoldDetail,
+  FillFormBooking,
+  BookSuccessScreen,
+  HoldSuccessScreen,
 };

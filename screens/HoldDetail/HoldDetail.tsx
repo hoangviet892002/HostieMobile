@@ -1,4 +1,11 @@
-import { View, Text, Image, Modal } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { HoldType } from "@/types";
 import { useTranslation } from "react-i18next";
@@ -8,7 +15,7 @@ import { Loading } from "@/components";
 import { Ionicons } from "@expo/vector-icons";
 import { parseStatusHold } from "@/utils/parseStatusHold";
 import moment from "moment";
-import { TouchableOpacity } from "react-native-gesture-handler";
+
 import { getStatusHoldStyle } from "@/constants/getStatusHoldStyle";
 import { StatusHold } from "@/constants/enums/statusHoldEnums";
 import useToast from "@/hooks/useToast";
@@ -16,6 +23,8 @@ import Icon, { Icons } from "@/components/Icons";
 import { BackButton } from "@/components";
 import * as Animatable from "react-native-animatable";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Formik } from "formik";
+import { Colors } from "@/constants/Colors";
 type RouteParams = {
   params: {
     id: string;
@@ -46,6 +55,7 @@ const HoldDetail = () => {
   useEffect(() => {
     fetchHold();
   }, [id]);
+  const [visible, setVisible] = useState(false);
   const renderHoldItem = ({ item }: { item: HoldType }) => {
     const { color, icon, textColor } = getStatusHoldStyle(
       parseStatusHold(item)
@@ -158,7 +168,8 @@ const HoldDetail = () => {
 
               <TouchableOpacity
                 className=" bg-red-500 p-3 rounded-3xl flex-row justify-center items-center w-full"
-                onPress={() => acceptBooking(false)}
+                // onPress={() => acceptBooking(false)}
+                onPress={() => setModalVisible(true)}
                 activeOpacity={0.8}
               >
                 <Icon
@@ -174,17 +185,114 @@ const HoldDetail = () => {
             </View>
           ) : null}
         </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setModalVisible(false)}
+            className="absolute top-2 right-2"
+          >
+            <Ionicons name="close" size={24} color="black" />
+          </TouchableOpacity>
+          {/* Formik with reason reject */}
+          <View
+            className="flex-1 justify-center items-center  bg-opacity-60"
+            style={{
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <Formik
+              initialValues={{ reason: "" }}
+              onSubmit={(values) => {
+                acceptBooking(false, values.reason);
+              }}
+              validate={(values) => {
+                const errors: any = {};
+                if (!values.reason) {
+                  errors.reason = "Required";
+                }
+                return errors;
+              }}
+            >
+              {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+                <View className="bg-white p-4 w-11/12 rounded-lg">
+                  <Text className="text-xl font-semibold text-gray-800 mb-4">
+                    {t("Reason for reject")}
+                  </Text>
+                  <View className="flex flex-col items-center">
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderColor: Colors.primary,
+                        borderWidth: 2,
+                        borderRadius: 25,
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        marginVertical: 5,
+                        width: "auto",
+                      }}
+                    >
+                      <Icon
+                        type={Icons.AntDesign}
+                        // icon for reason
+                        name="closecircle"
+                        size={20}
+                        color={Colors.primary}
+                      />
+                      <TextInput
+                        style={{
+                          flex: 1,
+                          marginLeft: 10,
+                          color: Colors.black,
+                          paddingVertical: 8,
+                        }}
+                        placeholder={t("Reason for reject")}
+                        onChangeText={handleChange("reason")}
+                        onBlur={handleBlur("reason")}
+                        value={values.reason}
+                      />
+                      {errors.reason && (
+                        <Text style={{ color: "red" }}>{errors.reason}</Text>
+                      )}
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    className="bg-red-500 p-4 rounded-3xl ml-2 flex justify-center items-center my-3"
+                    onPress={() => handleSubmit()}
+                  >
+                    <Text className="text-white">{t("Submit")}</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </Formik>
+          </View>
+        </Modal>
       </View>
     );
   };
-  const acceptBooking = async (accept: boolean) => {
+  const acceptBooking = async (accept: boolean, reason?: string) => {
     setLoading(true);
-    const data = {
+    const data: {
+      hold_id: number | undefined;
+      checkin: string | undefined;
+      checkout: string | undefined;
+      accept: boolean;
+      reason_reject?: string;
+    } = {
       hold_id: Hold?.id,
       checkin: Hold?.checkin,
       checkout: Hold?.checkout,
       accept: accept,
     };
+    if (!accept && reason) {
+      data["reason_reject"] = reason;
+    }
 
     const res = await acceptHoldApi(data);
     showToast(res);

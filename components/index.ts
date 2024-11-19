@@ -10,6 +10,7 @@ import Loading from "./Loading";
 import EmptyData from "./EmptyData";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import PackageComponent from "./PackageComponent";
+import RangeSlider from "./RangeSlider";
 export {
   DateRangePicker,
   VillaCard,
@@ -23,4 +24,5 @@ export {
   EmptyData,
   DeleteConfirmationModal,
   PackageComponent,
+  RangeSlider,
 };

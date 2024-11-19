@@ -11,6 +11,7 @@ interface IHold {
   residence_id: number;
   checkin: string;
   checkout: string;
+  expire: number;
 }
 interface IPrice {
   residence_ids: number[];
@@ -22,6 +23,9 @@ interface IBooked {
   residence_id: number;
   checkin: string;
   checkout: string;
+  guest_id: number;
+  guest_count: number;
+  note: string;
 }
 const holdBookingApi = async (booking: IHold): Promise<InfoResponse<any>> => {
   return await axiosCore.post(endPoint.booking.hold, booking);

@@ -20,6 +20,12 @@ import { useTranslation } from "react-i18next";
 import Icon, { Icons } from "@/components/Icons";
 import { router } from "expo-router";
 import { getImages, getResidence } from "@/apis/residences";
+import { useSelector } from "react-redux";
+import { selectFilter } from "@/redux/slices/filterSlice";
+import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import useToast from "@/hooks/useToast";
+import { getPrice } from "@/apis/booking";
+import { parsePrice } from "@/utils/parsePrice";
 
 type RouteParams = {
   params: {
@@ -82,6 +88,30 @@ const VillaDetail = () => {
       setVilla(res.data);
     }
   };
+  const pickDate = useSelector(selectFilter);
+  const [price, setPrice] = useState(0);
+  const { showToast } = useToast();
+  useEffect(() => {
+    getPriceApi();
+  }, [pickDate]);
+  const getPriceApi = async () => {
+    setLoading(true);
+    const data = {
+      checkin: parseDateDDMMYYYY(pickDate.start_date.toISOString()),
+      checkout: parseDateDDMMYYYY(pickDate.end_date.toISOString()),
+      residence_ids: [parseInt(itemId)],
+    };
+
+    const response = await getPrice(data);
+
+    if (response.success) {
+      setPrice(response.data[0].total_price);
+    } else {
+      showToast(response);
+    }
+    setLoading(false);
+  };
+
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<{ id: string; image: string }[]>([]);
   const fetchImages = async (id: string) => {
@@ -145,7 +175,7 @@ const VillaDetail = () => {
       </Animatable.View>
       <ImageCustom images={images.map((img) => img.image) || []} />
 
-      <ScrollView style={{ padding: 16, margin: 20, flex: 1 }}>
+      <ScrollView style={{ padding: 16, margin: 20, height: "auto" }}>
         <Animatable.View delay={120} animation={"slideInUp"}>
           <Text className="text-3xl font-bold">{villa.residence_name}</Text>
           <Text className="text-sm text-gray-600">
@@ -197,38 +227,30 @@ const VillaDetail = () => {
             <RenderPhoneContact />
           </View>
 
-          <View>
+          <View className="">
             <Text className="text-base font-semibold">{t("Utilities")}</Text>
             {renderUtilities()}
           </View>
-          <View className="flex flex-row mt-5 justify-between">
+          <View className="flex flex-row justify-between items-center mb-14">
+            <View>
+              <Text className="text-base font-semibold">{t("Price")}</Text>
+              <Text className="text-base font-semibold">
+                {parsePrice(price)} VND
+              </Text>
+            </View>
             <TouchableOpacity
-              className=" bg-white flex justify-center items-center h-[50px] mb-6 w-[50px] "
+              className="bg-primary p-5 rounded-3xl flex items-center justify-center w-[150px] "
               style={{
-                borderBlockColor: Colors.primary,
-                borderRadius: 16,
-                borderWidth: 1,
+                backgroundColor: Colors.primary,
+                padding: 16,
+                alignItems: "center",
+                justifyContent: "center",
               }}
               onPress={() => {
-                router.push(`/CalendarBooking?ids=${villa.residence_id}`);
+                router.push("FillFormBooking?itemId=" + itemId);
               }}
             >
-              <Icon
-                type={Icons.Feather}
-                name={"bookmark"}
-                size={35}
-                color={Colors.primary}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="p-2 rounded-3xl items-center justify-center h-[50px] mb-6 w-2/4"
-              style={{ backgroundColor: Colors.primary }}
-              onPress={() => {
-                router.push(`/CalendarBooking?ids=${villa.residence_id}`);
-              }}
-            >
-              <Text className="text-base text-white">{t("Booking.Book")}</Text>
+              <Text className="text-sm text-white">{t("Book Now")}</Text>
             </TouchableOpacity>
           </View>
         </Animatable.View>

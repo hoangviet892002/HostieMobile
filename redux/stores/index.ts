@@ -6,6 +6,8 @@ import authSlice from "../slices/authSlice";
 
 import messageSlice from "../slices/messageSlice";
 
+import filterSlice from "../slices/filterSlice";
+
 import {
   Action,
   combineReducers,
@@ -17,6 +19,7 @@ const rootReducer = combineReducers({
   language: languageSlice,
   auth: authSlice,
   message: messageSlice,
+  filter: filterSlice,
 });
 
 const store = configureStore({

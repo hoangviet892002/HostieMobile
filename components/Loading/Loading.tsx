@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   Text,
@@ -14,6 +15,7 @@ interface LoadingProps {
 const Loading = ({ loading }: LoadingProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  const { t } = useTranslation();
   useEffect(() => {
     if (loading) {
       Animated.timing(fadeAnim, {
@@ -45,7 +47,7 @@ const Loading = ({ loading }: LoadingProps) => {
     >
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#ffffff" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>{t("Loading")}</Text>
       </View>
     </Animated.View>
   );

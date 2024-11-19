@@ -104,5 +104,20 @@
     "Description": "{{id}}: Mã giữ chỗ\n{{checkin}}: Ngày nhận phòng\n{{checkout}}: Ngày trả phòng"
   },
   "EmptyData": "Không có thông báo nào.",
-  "Loading": "Đang tải..."
+  "Loading": "Đang tải...",
+  "Guests": "Khách",
+  "Booking Information": "Thông tin đặt phòng",
+  "Paid Amount": "Số tiền thanh toán",
+  "Select Customer": "Chọn khách hàng",
+  "Note": "Ghi chú",
+  "Submit": "Gửi",
+  "Schedule": "Lịch trình",
+  "You wanna hold?": "Bạn muốn giữ chỗ?",
+  "You wanna book?": "Bạn muốn đặt phòng?",
+  "Thanks, your booking has been confirmed.": "Cảm ơn, đặt phòng của bạn đã được xác nhận.",
+  "Add booking": "Thêm đặt phòng",
+  "mustBeGreaterThan": "Phải lớn hơn {{minAmount}}",
+  "mustBeLessThan": "Phải nhỏ hơn {{maxAmount}}",
+  "Hold Information": "Thông tin giữ chỗ",
+  "Expire": "Hết hạn"
 }

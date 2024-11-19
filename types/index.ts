@@ -20,6 +20,7 @@ import PackageType from "./PackageType";
 import { RegisterType } from "./RegisterType";
 import { NotificationType } from "./NotificationType";
 import { Bank } from "./Bank-accounts";
+import { CustomerType } from "./CustomerType";
 export type {
   Calendar,
   AmenityType,
@@ -43,4 +44,5 @@ export type {
   RegisterType,
   NotificationType,
   Bank,
+  CustomerType,
 };

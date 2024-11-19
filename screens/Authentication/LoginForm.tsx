@@ -62,7 +62,7 @@ const LoginForm = () => {
 
   return (
     <View>
-      <Loading loading={loading} />
+      {/* <Loading loading={loading} /> */}
       <Animatable.View delay={120} animation="slideInDown" className="w-full">
         <View className="py-3">
           <View
@@ -166,7 +166,10 @@ const LoginForm = () => {
             onSubmit();
           }}
         >
-          <Text className="text-white text-2xl font-bold"> {t("Login")} </Text>
+          <Text className="text-white text-2xl font-bold">
+            {" "}
+            {!loading ? t("Login") : t("Loading")}{" "}
+          </Text>
         </TouchableOpacity>
       </Animatable.View>
     </View>
