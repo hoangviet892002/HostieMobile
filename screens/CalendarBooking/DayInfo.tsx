@@ -735,6 +735,7 @@ const DayInfo = ({
       guest_count: dataSolve.guest_count,
       note: dataSolve.note,
     };
+    console.log("dataSolve", data);
 
     const response = await bookingApi(data);
 

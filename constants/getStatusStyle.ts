@@ -51,6 +51,13 @@ export const getStatusStyle = (status: string) => {
         color: "#38A169",
         textColor: "text-green-600",
       };
+
+    case StatusBooking.BOOKING_SYSTEM_CANCELLED:
+      return {
+        icon: "close-circle",
+        color: "#E53E3E",
+        textColor: "text-red-600",
+      };
     default:
       return {
         icon: "help-circle",

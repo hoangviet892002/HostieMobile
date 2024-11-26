@@ -9,4 +9,8 @@ interface PackageType {
   status: number;
   roleId: number;
 }
+export interface UpgradePackageType {
+  newPackage: PackageType;
+  upgradeCost: number;
+}
 export default PackageType;

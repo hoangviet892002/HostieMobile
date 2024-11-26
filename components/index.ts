@@ -11,6 +11,8 @@ import EmptyData from "./EmptyData";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import PackageComponent from "./PackageComponent";
 import RangeSlider from "./RangeSlider";
+import ModalPolicy from "./ModalPolicy";
+
 export {
   DateRangePicker,
   VillaCard,
@@ -25,4 +27,5 @@ export {
   DeleteConfirmationModal,
   PackageComponent,
   RangeSlider,
+  ModalPolicy,
 };

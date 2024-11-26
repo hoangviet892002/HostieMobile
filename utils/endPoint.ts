@@ -55,6 +55,7 @@ const endPoint = {
       `/residences/seller?page=${page}&checkin=${checkin}&checkout=${checkout}`,
     getResidencesByHouseKeeper: (page: number) =>
       `/residences/housekeeper?page=${page}`,
+    getPolicy: (id: number) => `/residences/${id}/policy`,
   },
   booking: {
     book: "/booking",
@@ -78,6 +79,8 @@ const endPoint = {
     checkin: `/booking/checkin`,
     checkout: `/booking/checkout`,
     getHoldDetail: (id: string) => `/booking/hold/${id}`,
+    statisticsSeller: `/booking/statistics`,
+    statisticsHost: `/booking/statistics/host`,
   },
   customer: {
     create: `/customers`,
@@ -93,6 +96,8 @@ const endPoint = {
       `/v1/api/registers?page=${page}&size=10&sort=`,
     postRegister: `/v1/api/registers`,
     getMyRegister: "/v1/api/registers/my-register",
+    getPackageUpgrades: `/v1/api/registers/upgradable-packages`,
+    upgrade: `/v1/api/registers/upgrade`,
   },
   payment: {
     getUrlVnpay: (id: number) => `/v1/api/payment/vn-pay?registerId=${id}`,
@@ -107,6 +112,17 @@ const endPoint = {
     getConversations: `/chats/groups`,
     getMessages: (id: string) => `/chats/groups/${id}/messages`,
     chat: `/chats/messages`,
+  },
+  housekeeper: {
+    addResidence: `/v1/api/housekeepers/add-residence`,
+    getHouseKepper: `/v1/api/housekeepers/approved-housekeepers`,
+    getHousekeeperRequests: `/v1/api/housekeepers/housekeeper-requests`,
+    rejectRequest: `/v1/api/housekeepers/reject-housekeeper`,
+    approveRequest: `/v1/api/housekeepers/accept-housekeeper`,
+  },
+  report: {
+    getMyReport: `/v1/api/reports/my-reports`,
+    postReport: `/v1/api/reports`,
   },
 };
 

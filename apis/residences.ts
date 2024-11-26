@@ -1,4 +1,5 @@
 import { CalendarResponse } from "@/types";
+import { PolicyType } from "@/types/PolicyType";
 import { ResidencesRequest } from "@/types/request/ResidencesRequest";
 import { Residence } from "@/types/response/Residences";
 import { endPoint } from "@/utils/endPoint";
@@ -91,6 +92,12 @@ const getResidencesByHouseKeeperApi = async (
     `${endPoint.residences.getResidencesByHouseKeeper(page)}`
   );
 };
+
+const getPolicy = async (id: number): Promise<InfoResponse<PolicyType>> => {
+  console.log(`${endPoint.residences.getPolicy(id)}`);
+  return await axiosCore.get(`${endPoint.residences.getPolicy(id)}`);
+};
+
 export {
   postResidence,
   getResidences,
@@ -104,4 +111,5 @@ export {
   deleteBlockApi,
   getResidencesBySellerApi,
   getResidencesByHouseKeeperApi,
+  getPolicy,
 };

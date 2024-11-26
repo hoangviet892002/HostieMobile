@@ -1,4 +1,5 @@
 import { PackageType, RegisterType } from "@/types";
+import { UpgradePackageType } from "@/types/PackageType";
 import { endPoint } from "@/utils/endPoint";
 import axiosClient from "@/utils/httpClient";
 
@@ -9,6 +10,7 @@ interface InfoResponse<T> {
   totalElements: number;
   totalPages: number;
 }
+
 const getRegistersApi = async (
   page: number
 ): Promise<InfoResponse<RegisterType[]>> => {
@@ -22,4 +24,22 @@ const postRegisterApi = async (data: any): Promise<InfoResponse<any>> => {
 const getMyRegisterApi = async (): Promise<InfoResponse<RegisterType>> => {
   return await axiosClient.get(endPoint.registers.getMyRegister);
 };
-export { getRegistersApi, postRegisterApi, getMyRegisterApi };
+
+const getPackageUpgradesApi = async (): Promise<
+  InfoResponse<UpgradePackageType[]>
+> => {
+  return await axiosClient.get(endPoint.registers.getPackageUpgrades);
+};
+const upGradeResgisterApi = async (data: any): Promise<InfoResponse<any>> => {
+  return await axiosClient.put(
+    endPoint.registers.upgrade + "?packageId=" + data.packageId
+  );
+};
+
+export {
+  getRegistersApi,
+  postRegisterApi,
+  getMyRegisterApi,
+  getPackageUpgradesApi,
+  upGradeResgisterApi,
+};

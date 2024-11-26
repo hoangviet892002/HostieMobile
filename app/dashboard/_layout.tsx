@@ -12,7 +12,7 @@ import { AccountInformation } from "@/types";
 import { getMyInfoApi } from "@/apis/users";
 import { DrawerItemList } from "@react-navigation/drawer";
 import { useSelector } from "react-redux";
-import { selectRole } from "@/redux/slices/authSlice";
+import { selectIsAuthenticated, selectRole } from "@/redux/slices/authSlice";
 import { useTranslation } from "react-i18next";
 
 function DashboardDrawer() {
@@ -100,6 +100,24 @@ function DashboardDrawer() {
       color: Colors.primary,
       alphaClr: Colors.primaryAlpha,
     },
+    {
+      router: "Bank Account",
+      label: t("Manager Housekepper"),
+      type: Icons.Feather,
+      icon: "user-check",
+      component: "housekeeperManager",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
+    {
+      router: "Bank Account",
+      label: t("Report"),
+      type: Icons.Feather,
+      icon: "file-text",
+      component: "report",
+      color: Colors.primary,
+      alphaClr: Colors.primaryAlpha,
+    },
   ];
   const [Account, SetAccount] = useState<AccountInformation>({
     email: "",
@@ -123,6 +141,14 @@ function DashboardDrawer() {
     useCallback(() => {
       fetchMyInfo();
     }, [])
+  );
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  useFocusEffect(
+    useCallback(() => {
+      if (!isAuthenticated) {
+        router.replace("/Authentication");
+      }
+    }, [isAuthenticated])
   );
 
   function CustomHeader({ props, label }: { props: any; label: string }) {
@@ -168,10 +194,10 @@ function DashboardDrawer() {
           return (
             <SafeAreaView>
               <View className="flex flex-col items-center justify-center p-4">
-                <Image
+                {/* <Image
                   className="h-[130px] w-[130px] rounded-full"
                   source={{ uri: Account.urlAvatar }}
-                />
+                /> */}
                 <Text className="text-lg font-bold text-primary">
                   {Account.firstName} {Account.middleName} {Account.lastName}
                 </Text>

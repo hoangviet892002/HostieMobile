@@ -26,8 +26,8 @@ const LoginForm = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [loginForm, setLoginForm] = useState<SignInRequest>({
-    username: "host",
-    password: "host",
+    username: "",
+    password: "",
   });
 
   const handleChange = (key: string, value: string) => {
@@ -41,7 +41,7 @@ const LoginForm = () => {
       await AsyncStorage.setItem("session", JSON.stringify(response.result));
 
       const decodedToken = decodeJWT(response.result.token);
-      console.log(response.result.token);
+      console.log("token: ", response.result.token);
 
       // ROLE_SELLER
       // ROLE_HOST
@@ -63,7 +63,7 @@ const LoginForm = () => {
   return (
     <View>
       {/* <Loading loading={loading} /> */}
-      <Animatable.View delay={120} animation="slideInDown" className="w-full">
+      <View className="w-full">
         <View className="py-3">
           <View
             style={{
@@ -157,8 +157,8 @@ const LoginForm = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </Animatable.View>
-      <Animatable.View delay={120} animation="slideInDown">
+      </View>
+      <View>
         <TouchableOpacity
           className="flex justify-center items-center py-3 rounded-3xl"
           style={{ width: wp(80), backgroundColor: Colors.primary }}
@@ -167,11 +167,10 @@ const LoginForm = () => {
           }}
         >
           <Text className="text-white text-2xl font-bold">
-            {" "}
             {!loading ? t("Login") : t("Loading")}{" "}
           </Text>
         </TouchableOpacity>
-      </Animatable.View>
+      </View>
     </View>
   );
 };

@@ -91,6 +91,7 @@ const AppWrapper = () => {
     { name: "FillFormBooking" },
     { name: "BookSuccessScreen" },
     { name: "HoldSuccessScreen" },
+    { name: "HouseKeeperRequest" },
   ];
 
   const { scheduleNotification } = useNotification();

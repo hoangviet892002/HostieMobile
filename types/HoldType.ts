@@ -15,4 +15,5 @@ export interface HoldType {
   host_id: number;
   seller_name: string;
   seller_avatar: string;
+  reason_reject: string | null;
 }

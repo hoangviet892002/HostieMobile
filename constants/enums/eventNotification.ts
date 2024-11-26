@@ -9,6 +9,7 @@ export enum EventBookNotification {
   HostDontReceived = "HOST_DONT_RECEIVED",
   CustomerCheckin = "CUSTOMER_CHECKIN",
   CustomerCheckout = "CUSTOMER_CHECKOUT",
+  SystemCancelled = "BOOKING_SYSTEM_CANCELLED",
 }
 export enum EventHoldNotification {
   Created = "HOLD_CREATED",

@@ -34,6 +34,11 @@ export interface BookDetailNotification {
   commission_rate: number;
   created_at: string;
   updated_at: string;
+  seller_name: string;
+  seller_avatar: string;
+  host_name: string;
+  host_avatar: string;
+  residence_name: string;
 }
 export interface HoldDetailNotification {
   id: number;
@@ -52,6 +57,8 @@ export interface HoldDetailNotification {
   status: number;
   created_at: string;
   updated_at: string;
+  host_name: string;
+  host_avatar: string;
 }
 export interface NotificationType {
   id: number;

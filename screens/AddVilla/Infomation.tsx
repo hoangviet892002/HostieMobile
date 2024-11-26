@@ -141,6 +141,7 @@ const Infomation: React.FC<InfomationProps> = ({
   const [optionSelect, setOptionSelect] = useState<Type[]>([]);
   const fetchType = async () => {
     const response = await getTypes();
+    console.log(response);
     if (response.data) {
       setOptionSelect(response.data);
     }

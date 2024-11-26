@@ -1,3 +1,5 @@
+import { StaticTypeHost } from "@/types/StaticTypeHost";
+import { StaticTypeSeller } from "@/types/StaticTypeSeller";
 import { endPoint } from "@/utils/endPoint";
 import axiosCore from "@/utils/httpCore";
 
@@ -19,7 +21,6 @@ interface IPrice {
   checkout: string;
 }
 interface IBooked {
-  paid_amount: number;
   residence_id: number;
   checkin: string;
   checkout: string;
@@ -98,6 +99,16 @@ const getHoldDetailApi = async (id: string): Promise<InfoResponse<any>> => {
 const updateBookingApi = async (data: any): Promise<InfoResponse<any>> => {
   return await axiosCore.put(`${endPoint.booking.book}`, data);
 };
+
+const getStaticSellerApi = async (): Promise<
+  InfoResponse<StaticTypeSeller>
+> => {
+  return await axiosCore.get(`${endPoint.booking.statisticsSeller}`);
+};
+
+const getStaticHostApi = async (): Promise<InfoResponse<StaticTypeHost>> => {
+  return await axiosCore.get(`${endPoint.booking.statisticsHost}`);
+};
 export {
   holdBookingApi,
   getPrice,
@@ -119,4 +130,6 @@ export {
   checkoutApi,
   getHoldDetailApi,
   updateBookingApi,
+  getStaticSellerApi,
+  getStaticHostApi,
 };

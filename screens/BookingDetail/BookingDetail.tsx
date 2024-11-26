@@ -58,9 +58,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Residence } from "@/types/response/Residences";
-import { getResidence } from "@/apis/residences";
+import { getPolicy, getResidence } from "@/apis/residences";
 import { parsePrice } from "@/utils/parsePrice";
 import { getCusomtersApi } from "@/apis/customer";
+import { parseLogsEvent } from "@/utils/parseLogsEvent";
+import { PolicyType } from "@/types/PolicyType";
+import { ModalPolicy } from "@/components";
+import ReportModal from "./ReportModal";
 
 interface Data {
   booking: BookingType;
@@ -136,6 +140,9 @@ const BookingDetail = () => {
       if (status !== StatusBooking.CANCEL && status !== StatusBooking.REJECT) {
         newPermissions.push(ActionStatusBooking.UPDATE);
       }
+      if (status === StatusBooking.SUCCESS) {
+        newPermissions.push(ActionStatusBooking.OPENPOLICY);
+      }
     }
     // if (idUser === data.booking.host_id)
     else {
@@ -169,6 +176,7 @@ const BookingDetail = () => {
         (a: Log, b: Log) =>
           new Date(b.date).getTime() - new Date(a.date).getTime()
       );
+      console.log("logs: ", response.data);
       setLogs(response.data);
     }
   };
@@ -200,6 +208,12 @@ const BookingDetail = () => {
 
     if (response.success && response.data) {
       setData(response.data);
+
+      const res = await getPolicy(response.data.booking.residence_id);
+
+      if (res) {
+        setPolicy(res.data);
+      }
     }
     fetchDataLog();
   };
@@ -375,6 +389,13 @@ const BookingDetail = () => {
       },
       color: "bg-blue-500",
     },
+    {
+      title: ActionStatusBooking.OPENPOLICY,
+      onPress: () => {
+        setVisiblePolicy(true);
+      },
+      color: "bg-blue-500",
+    },
   ];
 
   useEffect(() => {
@@ -497,7 +518,6 @@ const BookingDetail = () => {
     if (status === StatusBooking.WAIT_ACCEPT) {
       newField.push("checkin");
       newField.push("checkout");
-      newField.push("paid_amount");
     }
     setFieldUpdate(newField);
   };
@@ -520,7 +540,7 @@ const BookingDetail = () => {
       checkout: data.booking.checkout,
       description: data.booking.description,
       guest_count: data.booking.guest_count,
-      paid_amount: data.booking.paid_amount,
+
       guest_id: data.booking.guest_id,
       guest_name: data.booking.guest_name,
       guest_phone: data.booking.guest_phone,
@@ -551,12 +571,7 @@ const BookingDetail = () => {
         type: "number",
         name: "guest_count",
       },
-      {
-        icon: "dollar-sign",
-        title: "Paid Amount",
-        type: "number",
-        name: "paid_amount",
-      },
+
       {
         icon: "user",
         title: "Guest ID",
@@ -857,7 +872,7 @@ const BookingDetail = () => {
               <Text className="text-2xl font-semibold mb-5">Update</Text>
               <Pressable onPress={() => setVisibleUpdate(false)}>
                 <Text className="text-red-500 font-semibold text-xl">
-                  Close
+                  {t("Close")}
                 </Text>
               </Pressable>
             </View>
@@ -1027,8 +1042,23 @@ const BookingDetail = () => {
       </Modal>
     );
   };
+
+  const [policy, setPolicy] = useState<PolicyType | null>(null);
+  const [visiblePolicy, setVisiblePolicy] = useState<boolean>(false);
+  const [visibleReport, setVisibleReport] = useState<boolean>(false);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <ModalPolicy
+        visiblePolicy={visiblePolicy}
+        setVisiblePolicy={setVisiblePolicy}
+        policyData={policy}
+      />
+      <ReportModal
+        visibleReport={visibleReport}
+        setVisibleReport={setVisibleReport}
+        reportData={data.booking}
+      />
       <ModalUpdate />
       <ModalReject />
       <ScrollView>
@@ -1044,6 +1074,28 @@ const BookingDetail = () => {
               <Text className="text-3xl font-bold ">Booking Detail</Text>
             </View>
           </View>
+
+          {idUser === data.booking.seller_id ? (
+            <TouchableOpacity
+              className="bg-white h-[60px] w-[60px] m-5 flex justify-center items-center"
+              style={{
+                borderBlockColor: Colors.primary,
+                borderRadius: 16,
+                borderWidth: 1,
+              }}
+              onPress={() => {
+                setVisibleReport(true);
+              }}
+            >
+              {/* report icon */}
+              <Icon
+                type={Icons.Feather}
+                name="alert-triangle"
+                size={24}
+                color={Colors.red}
+              />
+            </TouchableOpacity>
+          ) : null}
         </Animatable.View>
         {data.booking ? (
           <View className="bg-white p-5 mb-5 mx-4 rounded-2xl shadow-lg">
@@ -1070,42 +1122,59 @@ const BookingDetail = () => {
               <View className="flex-row items-center mb-2">
                 <Ionicons name="calendar-outline" size={20} color="#4A5568" />
                 <Text className="ml-2 text-gray-700">
-                  <Text className="font-medium">Check-in:</Text>
+                  <Text className="font-medium">Check-in: </Text>
                   {parseDateDDMMYYYY(data.booking.checkin)}
                 </Text>
               </View>
               <View className="flex-row items-center mb-2">
                 <Ionicons name="calendar-outline" size={20} color="#4A5568" />
                 <Text className="ml-2 text-gray-700">
-                  <Text className="font-medium">Check-out:</Text>
+                  <Text className="font-medium">Check-out: </Text>
                   {parseDateDDMMYYYY(data.booking.checkout)}
-                </Text>
-              </View>
-
-              <View className="flex-row items-center mb-2">
-                <Ionicons name="sunny-outline" size={20} color="#4A5568" />
-                <Text className="ml-2 text-gray-700">
-                  <Text className="font-medium">Số ngày:</Text>
-                  {data.booking.total_days}
-                </Text>
-              </View>
-              <View className="flex-row items-center mb-2">
-                <Ionicons name="moon-outline" size={20} color="#4A5568" />
-                <Text className="ml-2 text-gray-700">
-                  <Text className="font-medium">Số đêm:</Text>{" "}
-                  {data.booking.total_nights}
                 </Text>
               </View>
             </View>
 
-            {/* Mô tả */}
-            {data.booking.description ? (
-              <View className="mb-4">
-                <Text className="text-gray-600">
-                  {data.booking.description}
+            {/* guest name */}
+            {data.booking.guest_name ? (
+              <View className="flex-row items-center mb-2">
+                <Ionicons name="person" size={20} color="#4A5568" />
+                <Text className="ml-2 text-gray-700">
+                  <Text className="font-medium">{t("Guest")}: </Text>
+                  {data.booking.guest_name} - {data.booking.guest_phone}
                 </Text>
               </View>
             ) : null}
+            {/* Số lượng khách */}
+            <View className="flex-row items-center mb-2">
+              <Icon
+                type={Icons.Feather}
+                name="users"
+                size={20}
+                color="#4A5568"
+              />
+              <Text className="ml-2 text-gray-700">
+                <Text className="font-medium">{t("Guest Count")}: </Text>
+                {data.booking.guest_count}
+              </Text>
+            </View>
+
+            {/* Mô tả */}
+            <View className="mb-4">
+              <Text className="text-gray-700">
+                <Text className="font-medium">{t("Description")}: </Text>
+                {data.booking.description}
+              </Text>
+            </View>
+
+            {/* total_amount and paid_amount */}
+            <View className="flex-row items-center mb-2">
+              <Ionicons name="cash" size={20} color="#4A5568" />
+              <Text className="ml-2 text-gray-700">
+                <Text className="font-medium">{t("Total Amount")}: </Text>
+                {parsePrice(data.booking.total_amount)} VND
+              </Text>
+            </View>
 
             {/* Action button flow permistion */}
             <View className="flex flex-col justify-center items-center px-4 py-6">
@@ -1120,7 +1189,7 @@ const BookingDetail = () => {
                     className={`flex  items-center justify-center p-3 rounded-3xl ${actionItem?.color} my-1   w-full p-4`}
                   >
                     <Text className=" text-white font-semibold text-lg">
-                      {actionItem?.title}
+                      {t(actionItem?.title)}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -1176,7 +1245,7 @@ const BookingDetail = () => {
                   className="flex items-center justify-center p-4 rounded-3xl w-full bg-red-500 "
                 >
                   <Text className=" text-white font-semibold text-base">
-                    Close
+                    {t("Close")}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1193,7 +1262,7 @@ const BookingDetail = () => {
             }}
           >
             <View className="bg-white p-5 rounded-2xl shadow-lg w-11/12">
-              <Text className="text-2xl font-semibold mb-5">Logs</Text>
+              <Text className="text-2xl font-semibold mb-5">{t("Logs")}</Text>
               <ScrollView className="max-h-96">
                 {logs.map((log, index) => (
                   <View
@@ -1211,7 +1280,7 @@ const BookingDetail = () => {
                       <Text> {moment(log?.date).fromNow()}</Text>
 
                       <Text className="text-gray-500 text-sm">
-                        {log.event_type}
+                        {t(parseLogsEvent(log.event_type))}
                       </Text>
                     </View>
                   </View>
@@ -1223,7 +1292,7 @@ const BookingDetail = () => {
                   className="flex items-center justify-center p-4 rounded-3xl w-full bg-red-500 "
                 >
                   <Text className=" text-white font-semibold text-base">
-                    Close
+                    {t("Close")}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1280,9 +1349,11 @@ const BookingDetail = () => {
                 }}
               >
                 <View className="bg-white p-5 rounded-2xl shadow-lg w-11/12">
-                  <Text className="text-2xl font-semibold mb-5">Confirm</Text>
+                  <Text className="text-2xl font-semibold mb-5">
+                    {t("Confirm")}{" "}
+                  </Text>
                   <Text className="text-gray-700 text-base">
-                    Are you sure you want to accept this booking?
+                    {t("Please enter your bank account information")}
                   </Text>
 
                   <View>
@@ -1290,7 +1361,7 @@ const BookingDetail = () => {
                       onPress={() => setDropdownVisible(!dropdownVisible)}
                     >
                       <Text className="text-gray-700 text-base font-semibold mt-5">
-                        Bank Account
+                        {t("Bank Account")}
                       </Text>
                       {bankName === "" ? (
                         <View
@@ -1389,7 +1460,7 @@ const BookingDetail = () => {
                     </Modal>
                   </View>
                   <Text className="text-gray-700 text-base font-semibold mt-5">
-                    Commission Rate
+                    {t("Commission Rate")}
                   </Text>
                   <View
                     style={{
@@ -1429,23 +1500,23 @@ const BookingDetail = () => {
                     )}
                   </View>
 
-                  <View className="flex flex-row justify-end mt-5">
-                    <TouchableOpacity
-                      onPress={() => setVisible(false)}
-                      className="flex items-center justify-center p-3 rounded-lg bg-red-500"
-                    >
-                      <Text className=" text-white font-semibold text-sm">
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
+                  <View className="flex flex-col justify-center items-center mt-5">
                     <TouchableOpacity
                       onPress={() => {
                         handleSubmit();
                       }}
-                      className="flex items-center justify-center p-3 rounded-lg bg-green-500 ml-4"
+                      className="flex items-center justify-center p-4 rounded-3xl bg-green-500 w-full mb-3 "
                     >
-                      <Text className=" text-white font-semibold text-sm">
-                        Accept
+                      <Text className=" text-white font-semibold text-lg">
+                        {t("Confirm")}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setVisible(false)}
+                      className="flex items-center justify-center p-4 rounded-3xl bg-red-500 w-full"
+                    >
+                      <Text className=" text-white font-semibold text-lg">
+                        {t("Cancel")}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1641,7 +1712,7 @@ const BookingDetail = () => {
                     className="flex items-center justify-center p-3 rounded-lg bg-red-500"
                   >
                     <Text className=" text-white font-semibold text-sm">
-                      Close
+                      {t("Close")}
                     </Text>
                   </TouchableOpacity>
                 </View>

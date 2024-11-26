@@ -273,14 +273,18 @@ const HoldForHost = () => {
             </Text>
           </View>
         </View>
+        {item.reason_reject && (
+          <View className="bg-red-100 p-2 rounded-md mb-4">
+            <Text className="text-red-500">{item.reason_reject}</Text>
+          </View>
+        )}
 
         {/* Thông tin ngày tháng */}
         <View className="flex flex-row justify-between items-center mb-2">
           <View className="flex flex-row items-center">
             <Ionicons name="calendar-outline" size={18} color="#4A5568" />
             <Text className="ml-1 text-gray-700">
-              {moment(item.checkin).format("DD-MM-YYYY")} -{" "}
-              {moment(item.checkout).format("DD-MM-YYYY")}
+              {item.checkin} - {item.checkout}
             </Text>
           </View>
           <View className="flex flex-row items-center">
@@ -288,18 +292,6 @@ const HoldForHost = () => {
             <Text className="ml-1 text-gray-700">
               {moment(item.created_at).fromNow()}
             </Text>
-          </View>
-        </View>
-
-        {/* Số đêm và số ngày */}
-        <View className="flex flex-row justify-between items-center mb-2">
-          <View className="flex flex-row items-center">
-            <Ionicons name="moon-outline" size={18} color="#4A5568" />
-            <Text className="ml-1 text-gray-700">{item.total_nights} đêm</Text>
-          </View>
-          <View className="flex flex-row items-center">
-            <Ionicons name="sunny-outline" size={18} color="#4A5568" />
-            <Text className="ml-1 text-gray-700">{item.total_days} ngày</Text>
           </View>
         </View>
 

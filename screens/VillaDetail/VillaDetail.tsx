@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { BackButton, ImageCustom, Loading } from "@/components";
+import { BackButton, ImageCustom, Loading, ModalPolicy } from "@/components";
 import { VillaType } from "@/types";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,13 +19,14 @@ import { useTranslation } from "react-i18next";
 
 import Icon, { Icons } from "@/components/Icons";
 import { router } from "expo-router";
-import { getImages, getResidence } from "@/apis/residences";
+import { getImages, getPolicy, getResidence } from "@/apis/residences";
 import { useSelector } from "react-redux";
 import { selectFilter } from "@/redux/slices/filterSlice";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
 import useToast from "@/hooks/useToast";
 import { getPrice } from "@/apis/booking";
 import { parsePrice } from "@/utils/parsePrice";
+import { PolicyType } from "@/types/PolicyType";
 
 type RouteParams = {
   params: {
@@ -82,10 +83,18 @@ const VillaDetail = () => {
     step: 0,
     ward: "",
   });
+  const [policy, setPolicy] = useState<PolicyType | null>(null);
+  const [visiblePolicy, setVisiblePolicy] = useState<boolean>(false);
   const fetchVillaDetail = async (id: string) => {
     const res = await getResidence(id);
     if (res.success) {
       setVilla(res.data);
+    }
+  };
+  const fetchPolicy = async (id: string) => {
+    const res = await getPolicy(id);
+    if (res.success) {
+      setPolicy(res.data);
     }
   };
   const pickDate = useSelector(selectFilter);
@@ -123,6 +132,7 @@ const VillaDetail = () => {
   useEffect(() => {
     setLoading(true);
     fetchVillaDetail(itemId);
+    fetchPolicy(itemId);
     fetchImages(itemId);
     setLoading(false);
   }, [itemId]);
@@ -160,19 +170,45 @@ const VillaDetail = () => {
       </View>
     );
   };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loading loading={loading} />
       <Animatable.View
-        className="flex flex-row items-center"
+        className="flex flex-row items-center justify-between w-full"
         delay={120}
         animation="slideInDown"
       >
-        <BackButton />
-        <View className="flex ">
-          <Text className="text-3xl font-bold ">{villa.residence_name}</Text>
+        <View className="flex flex-row items-center">
+          <BackButton />
+          <View className="flex ">
+            <Text className="text-3xl font-bold ">{villa.residence_name}</Text>
+          </View>
         </View>
+        <TouchableOpacity
+          className="bg-white h-[60px] w-[60px] m-5 flex justify-center items-center"
+          style={{
+            borderBlockColor: Colors.primary,
+            borderRadius: 16,
+            borderWidth: 1,
+          }}
+          onPress={() => {
+            setVisiblePolicy(true);
+          }}
+        >
+          <Icon
+            type={Icons.Feather}
+            name={"file-text"}
+            color={Colors.primary}
+            size={30}
+          />
+        </TouchableOpacity>
       </Animatable.View>
+      <ModalPolicy
+        visiblePolicy={visiblePolicy}
+        setVisiblePolicy={setVisiblePolicy}
+        policyData={policy}
+      />
       <ImageCustom images={images.map((img) => img.image) || []} />
 
       <ScrollView style={{ padding: 16, margin: 20, height: "auto" }}>

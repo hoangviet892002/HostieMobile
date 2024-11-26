@@ -1,7 +1,7 @@
 import { View, FlatList, ActivityIndicator } from "react-native";
 import React, { useCallback, useState } from "react";
 import { VillaType } from "@/types";
-import VillaCard from "./VillaCard";
+import { VillaCard } from "@/components";
 import { Residence } from "@/types/response/Residences";
 import { useFocusEffect } from "expo-router";
 import { getResidencesByHouseKeeperApi } from "@/apis/residences";
@@ -57,10 +57,15 @@ const Villas = () => {
   };
 
   return (
-    <View>
+    <View className="flex items-center justify-center w-full">
       <FlatList
+        className="w-full flex"
         data={villas}
-        renderItem={({ item }) => <VillaCard villa={item} />}
+        renderItem={({ item }) => (
+          <View className="w-fullflex items-center justify-center">
+            <VillaCard villa={item} />
+          </View>
+        )}
         keyExtractor={(item) => item.residence_id}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}

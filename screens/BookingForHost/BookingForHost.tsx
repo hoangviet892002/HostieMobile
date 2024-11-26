@@ -20,6 +20,7 @@ import { parseStatusBooking } from "@/utils/parseStatusBooking";
 import { getStatusStyle } from "@/constants/getStatusStyle";
 import { useFocusEffect, useNavigation } from "expo-router";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
+import { useTranslation } from "react-i18next";
 
 const BookingForHost = () => {
   const navigation = useNavigation();
@@ -29,6 +30,7 @@ const BookingForHost = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const { t } = useTranslation();
 
   useFocusEffect(
     useCallback(() => {
@@ -122,6 +124,11 @@ const BookingForHost = () => {
             </Text>
           </View>
         </View>
+        {item.reason_reject && (
+          <View className="bg-red-100 p-2 rounded-md mb-4">
+            <Text className="text-red-500">{item.reason_reject}</Text>
+          </View>
+        )}
 
         <View className="mb-4">
           <View className="flex-row items-center mb-2">
@@ -139,16 +146,15 @@ const BookingForHost = () => {
             </Text>
           </View>
 
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="sunny-outline" size={20} color="#4A5568" />
+          {/* seller name and avatar */}
+          <View className="flex-row items-center">
+            <Image
+              source={{ uri: item.seller_avatar }}
+              className="w-8 h-8 rounded-full"
+            />
             <Text className="ml-2 text-gray-700">
-              <Text className="font-medium">Số ngày:</Text> {item.total_day}
-            </Text>
-          </View>
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="moon-outline" size={20} color="#4A5568" />
-            <Text className="ml-2 text-gray-700">
-              <Text className="font-medium">Số đêm:</Text> {item.total_night}
+              <Text className="font-medium">{t("Seller")}: </Text>{" "}
+              {item.seller_name}
             </Text>
           </View>
         </View>
@@ -163,7 +169,7 @@ const BookingForHost = () => {
         {/* Nút hành động */}
         <View className="flex-row justify-end">
           <View className="bg-blue-500 px-4 py-2 rounded-full">
-            <Text className="text-white font-medium">Xem chi tiết</Text>
+            <Text className="text-white font-medium">{t("View Detail")}</Text>
           </View>
         </View>
       </TouchableOpacity>

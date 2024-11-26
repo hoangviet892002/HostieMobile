@@ -9,13 +9,16 @@ import { parseDateDDMMYYYY } from "@/utils/parseDate";
 import { parseStatusHold } from "@/utils/parseStatusHold";
 import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
+
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
   Image,
   Modal,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -34,6 +37,7 @@ const Hold = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [hold, setHold] = useState<HoldType | null>(null);
 
+  const { t } = useTranslation();
   const [price, setPrice] = useState(0);
   const fetchPrice = async () => {
     const data = {
@@ -188,26 +192,49 @@ const Hold = () => {
     );
 
     return (
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+      <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <View
-          className="flex-1 justify-center items-center  bg-opacity-50"
+          className="flex-1 justify-center items-center"
           style={{
             backgroundColor: "rgba(0, 0, 0, 0.5)",
           }}
         >
-          <View className="bg-white p-5 mx-4 rounded-2xl shadow-lg">
-            <Text className="text-2xl font-semibold text-gray-800 mb-4">
-              Điền thông tin
+          <View
+            style={{
+              backgroundColor: "#fff",
+              padding: 20,
+              borderRadius: 20,
+              width: "90%",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 6,
+              elevation: 10,
+            }}
+          >
+            {/* Header */}
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: "bold",
+                color: "#333",
+                marginBottom: 10,
+                textAlign: "center",
+              }}
+            >
+              {t("Fill Information")}
             </Text>
-            <Text className="text-gray-700 mb-4">
-              Điền thông tin để hoàn tất quá trình đặt phòng
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#666",
+                marginBottom: 20,
+                textAlign: "center",
+              }}
+            >
+              {t("Please fill the information below")}
             </Text>
 
-            <Text className="text-lg font-bold">Price</Text>
-            <Text className="text-lg font-bold">{price}</Text>
-
-            <Text className="text-lg font-bold">Residence Name</Text>
-            <Text className="text-lg font-bold">{hold?.residence_name}</Text>
             <Formik
               initialValues={{ guest_phone, guest_name, guest_count, note }}
               onSubmit={() => {
@@ -222,270 +249,314 @@ const Hold = () => {
               validate={() => {
                 const errors: any = {};
                 if (!guest_phone) {
-                  errors.guest_phone = "Required";
+                  errors.guest_phone = t("Required");
                 }
-                // check format phone
                 if (!/^\d{10}$/.test(guest_phone)) {
-                  errors.guest_phone = "Invalid phone number";
+                  errors.guest_phone = t("Invalid phone number");
                 }
                 if (!guest_name) {
-                  errors.guest_name = "Required";
+                  errors.guest_name = t("Required");
                 }
                 if (!guest_count) {
-                  errors.guest_count = "Required";
+                  errors.guest_count = t("Required");
                 }
                 return errors;
               }}
             >
               {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
-                <>
-                  <View>
-                    <View style={{ marginBottom: 15 }}>
+                <ScrollView>
+                  {/* Select Customer */}
+                  <View style={{ marginBottom: 15 }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        color: "#4a4a4a",
+                        marginBottom: 5,
+                      }}
+                    >
+                      {t("Select Customer")}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => setDropdownVisible(!dropdownVisible)}
+                      style={{
+                        backgroundColor: "#f8f9fa",
+                        padding: 15,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: "#ced4da",
+                      }}
+                    >
                       <Text
                         style={{
-                          fontSize: 18,
-                          fontWeight: "600",
-                          color: "#4a4a4a",
-                          marginBottom: 5,
+                          fontSize: 16,
+                          color: guest_name ? "#000" : "#6c757d",
                         }}
                       >
-                        Select Customer
+                        {guest_name
+                          ? `${guest_name} (${guest_phone})`
+                          : t("Select Customer")}
                       </Text>
-                      <TouchableOpacity
-                        onPress={() => setDropdownVisible(!dropdownVisible)}
-                        style={{
-                          backgroundColor: "#fff",
-                          padding: 10,
-                          borderRadius: 8,
-                          borderWidth: 1,
-                          borderColor: Colors.primary,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            color: guest_name ? "#000" : "#6c757d",
-                          }}
-                        >
-                          {guest_name
-                            ? `${guest_name} (${guest_phone})`
-                            : "Select a customer"}
-                        </Text>
-                      </TouchableOpacity>
-
-                      {/* Dropdown Modal */}
-                      <Modal
-                        animationType="fade"
-                        transparent={true}
-                        visible={dropdownVisible}
-                        onRequestClose={() => {
-                          setDropdownVisible(!dropdownVisible);
-                        }}
-                      >
-                        <View
-                          style={{
-                            flex: 1,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            backgroundColor: "rgba(0,0,0,0.5)",
-                          }}
-                        >
-                          <View
-                            style={{
-                              width: "90%",
-                              backgroundColor: "#f8f9fa",
-                              padding: 25,
-                              borderRadius: 15,
-                              shadowColor: "#000",
-                              shadowOffset: { width: 0, height: 4 },
-                              shadowOpacity: 0.3,
-                              shadowRadius: 8,
-                              elevation: 5,
-                            }}
-                          >
-                            {/* Add new customer */}
-
-                            <Formik
-                              initialValues={{ phone: "", name: "" }}
-                              onSubmit={(values) => {
-                                const newCustomer: Customer = {
-                                  phone: values.phone,
-                                  name: values.name,
-                                };
-                                const addCustomer = async () => {
-                                  const response = await postCustomer(
-                                    newCustomer
-                                  );
-                                  if (response.success) {
-                                    setCustomers([...customers, response.data]);
-                                  } else {
-                                    showToast(response);
-                                  }
-                                };
-                                addCustomer();
-                                setDropdownVisible(false);
-                              }}
-                              validate={(values) => {
-                                const errors: any = {};
-                                if (!values.phone) {
-                                  errors.phone = "Required";
-                                }
-                                // check format phone
-                                if (!/^\d{10}$/.test(values.phone)) {
-                                  errors.phone = "Invalid phone number";
-                                }
-                                if (!values.name) {
-                                  errors.name = "Required";
-                                }
-                                return errors;
-                              }}
-                            >
-                              {({
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                values,
-                                errors,
-                              }) => (
-                                <>
-                                  <Text className="text-lg font-bold">
-                                    Phone
-                                  </Text>
-                                  <TextInput
-                                    className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-                                    style={{ borderColor: Colors.primary }}
-                                    value={values.phone}
-                                    placeholder="Phone"
-                                    onChangeText={handleChange("phone")}
-                                  />
-                                  {errors.phone && (
-                                    <Text style={{ color: "red" }}>
-                                      {errors.phone}
-                                    </Text>
-                                  )}
-                                  <Text className="text-lg font-bold">
-                                    Name
-                                  </Text>
-                                  <TextInput
-                                    className="bg-white p-2 rounded-lg border-2 py-2 my-2"
-                                    style={{ borderColor: Colors.primary }}
-                                    value={values.name}
-                                    placeholder="Name"
-                                    onChangeText={handleChange("name")}
-                                  />
-                                  {errors.name && (
-                                    <Text style={{ color: "red" }}>
-                                      {errors.name}
-                                    </Text>
-                                  )}
-                                  <Pressable
-                                    onPress={() => handleSubmit()}
-                                    style={{
-                                      backgroundColor: "#007bff",
-                                      paddingVertical: 10,
-                                      paddingHorizontal: 20,
-                                      borderRadius: 10,
-                                      shadowColor: "#000",
-                                      shadowOffset: { width: 0, height: 2 },
-                                      shadowOpacity: 0.2,
-                                      shadowRadius: 5,
-                                    }}
-                                  >
-                                    <Text
-                                      style={{
-                                        color: "white",
-                                        fontSize: 16,
-                                        fontWeight: "600",
-                                      }}
-                                    >
-                                      Add
-                                    </Text>
-                                  </Pressable>
-                                </>
-                              )}
-                            </Formik>
-                            <FlatList
-                              data={customers}
-                              renderItem={(item) =>
-                                renderCustomerItem({
-                                  item: item.item,
-                                  setSelectedCustomerId,
-                                  setDropdownVisible,
-                                })
-                              }
-                              keyExtractor={(item) => item.id}
-                            />
-                          </View>
-                        </View>
-                      </Modal>
-                    </View>
-                    {/* error */}
+                    </TouchableOpacity>
                     {errors.guest_name && (
-                      <Text style={{ color: "red" }}>{errors.guest_name}</Text>
+                      <Text style={{ color: "red", marginTop: 5 }}>
+                        {errors.guest_name}
+                      </Text>
                     )}
-                    <Text className="text-lg font-bold">Guest Count</Text>
+                  </View>
+                  <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={dropdownVisible}
+                    onRequestClose={() => {
+                      setDropdownVisible(!dropdownVisible);
+                    }}
+                  >
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: "90%",
+                          backgroundColor: "#f8f9fa",
+                          padding: 25,
+                          borderRadius: 15,
+                          shadowColor: "#000",
+                          shadowOffset: { width: 0, height: 4 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 8,
+                          elevation: 5,
+                        }}
+                      >
+                        {/* Add new customer */}
+
+                        <Formik
+                          initialValues={{ phone: "", name: "" }}
+                          onSubmit={(values) => {
+                            const newCustomer: Customer = {
+                              phone: values.phone,
+                              name: values.name,
+                            };
+                            const addCustomer = async () => {
+                              const response = await postCustomer(newCustomer);
+                              if (response.success) {
+                                setCustomers([...customers, response.data]);
+                              } else {
+                                showToast(response);
+                              }
+                            };
+                            addCustomer();
+                            setDropdownVisible(false);
+                          }}
+                          validate={(values) => {
+                            const errors: any = {};
+                            if (!values.phone) {
+                              errors.phone = "Required";
+                            }
+                            // check format phone
+                            if (!/^\d{10}$/.test(values.phone)) {
+                              errors.phone = "Invalid phone number";
+                            }
+                            if (!values.name) {
+                              errors.name = "Required";
+                            }
+                            return errors;
+                          }}
+                        >
+                          {({
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            values,
+                            errors,
+                          }) => (
+                            <>
+                              <Text className="text-lg font-bold">
+                                {t("Phone")}
+                              </Text>
+                              <TextInput
+                                className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+                                style={{ borderColor: Colors.primary }}
+                                value={values.phone}
+                                placeholder={t("Phone")}
+                                onChangeText={handleChange("phone")}
+                              />
+                              {errors.phone && (
+                                <Text style={{ color: "red" }}>
+                                  {errors.phone}
+                                </Text>
+                              )}
+                              <Text className="text-lg font-bold">
+                                {" "}
+                                {t("Name")}
+                              </Text>
+                              <TextInput
+                                className="bg-white p-2 rounded-lg border-2 py-2 my-2"
+                                style={{ borderColor: Colors.primary }}
+                                value={values.name}
+                                placeholder={t("Name")}
+                                onChangeText={handleChange("name")}
+                              />
+                              {errors.name && (
+                                <Text style={{ color: "red" }}>
+                                  {errors.name}
+                                </Text>
+                              )}
+                              <Pressable
+                                onPress={() => handleSubmit()}
+                                className="flex-row justify-center items-center p-4 rounded-3xl m-2"
+                                style={{
+                                  backgroundColor: "#007bff",
+
+                                  shadowColor: "#000",
+                                  shadowOffset: { width: 0, height: 2 },
+                                  shadowOpacity: 0.2,
+                                  shadowRadius: 5,
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: "white",
+                                    fontSize: 16,
+                                    fontWeight: "600",
+                                  }}
+                                >
+                                  {t("Add Customer")}
+                                </Text>
+                              </Pressable>
+                            </>
+                          )}
+                        </Formik>
+                        <FlatList
+                          data={customers}
+                          renderItem={(item) =>
+                            renderCustomerItem({
+                              item: item.item,
+                              setSelectedCustomerId,
+                              setDropdownVisible,
+                            })
+                          }
+                          keyExtractor={(item) => item.id}
+                        />
+                      </View>
+                    </View>
+                  </Modal>
+
+                  {/* Guest Count */}
+                  <View style={{ marginBottom: 15 }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        marginBottom: 5,
+                      }}
+                    >
+                      {t("Guest Count")}
+                    </Text>
                     <TextInput
-                      className="bg-white p-2 rounded-lg border-2 py-2"
-                      style={{ borderColor: Colors.primary }}
+                      style={{
+                        backgroundColor: "#f8f9fa",
+                        padding: 10,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: "#ced4da",
+                      }}
                       value={guest_count.toString()}
-                      placeholder="Guest Count"
+                      placeholder={t("Guest Count")}
                       keyboardType="numeric"
                       onChangeText={(text) => setCount(parseInt(text))}
                     />
+                    {errors.guest_count && (
+                      <Text style={{ color: "red", marginTop: 5 }}>
+                        {errors.guest_count}
+                      </Text>
+                    )}
+                  </View>
 
-                    <Text className="text-lg font-bold"> Note </Text>
-
+                  {/* Note */}
+                  <View style={{ marginBottom: 15 }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        marginBottom: 5,
+                      }}
+                    >
+                      {t("Note")}
+                    </Text>
                     <TextInput
-                      className="bg-white p-2 rounded-lg border-2 py-2"
-                      style={{ borderColor: Colors.primary }}
+                      style={{
+                        backgroundColor: "#f8f9fa",
+                        padding: 10,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: "#ced4da",
+                      }}
                       value={note}
-                      placeholder="Note"
+                      placeholder={t("Note")}
                       onChangeText={(text) => setNote(text)}
                     />
                   </View>
 
                   {/* Buttons */}
-
                   <View
-                    className="flex-col justify-center items-center"
                     style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                       marginTop: 20,
                     }}
                   >
-                    <Pressable
+                    <TouchableOpacity
                       onPress={() => handleSubmit()}
-                      className=" p-4 rounded-3xl w-full flex items-center justify-center my-1"
                       style={{
                         backgroundColor: "#007bff",
+                        paddingVertical: 15,
+                        paddingHorizontal: 30,
+                        borderRadius: 10,
+                        flex: 1,
+                        marginRight: 5,
                       }}
                     >
                       <Text
-                        className="text-white text-lg font-semibold"
                         style={{
                           color: "white",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          textAlign: "center",
                         }}
                       >
-                        Book
+                        {t("Submit")}
                       </Text>
-                    </Pressable>
-                    <Pressable
+                    </TouchableOpacity>
+                    <TouchableOpacity
                       onPress={() => setModalVisible(false)}
-                      className=" p-4 rounded-3xl w-full flex items-center justify-center my-1"
                       style={{
                         backgroundColor: "#dc3545",
+                        paddingVertical: 15,
+                        paddingHorizontal: 30,
+                        borderRadius: 10,
+                        flex: 1,
+                        marginLeft: 5,
                       }}
                     >
                       <Text
-                        className="text-white text-lg font-semibold"
                         style={{
                           color: "white",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          textAlign: "center",
                         }}
                       >
-                        Close
+                        {t("Close")}
                       </Text>
-                    </Pressable>
+                    </TouchableOpacity>
                   </View>
-                </>
+                </ScrollView>
               )}
             </Formik>
           </View>
@@ -552,19 +623,6 @@ const Hold = () => {
               {parseDateDDMMYYYY(item.checkout)}
             </Text>
           </View>
-
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="sunny-outline" size={20} color="#4A5568" />
-            <Text className="ml-2 text-gray-700">
-              <Text className="font-medium">Số ngày:</Text> {item.total_days}
-            </Text>
-          </View>
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="moon-outline" size={20} color="#4A5568" />
-            <Text className="ml-2 text-gray-700">
-              <Text className="font-medium">Số đêm:</Text> {item.total_nights}
-            </Text>
-          </View>
         </View>
 
         {/* Mô tả */}
@@ -584,7 +642,9 @@ const Hold = () => {
                 setModalVisible(true);
               }}
             >
-              <Text className="text-white font-medium">Điền thông tin</Text>
+              <Text className="text-white font-medium">
+                {t("Fill Information")}
+              </Text>
             </TouchableOpacity>
           </View>
         )}

@@ -51,12 +51,10 @@ const VillaManageCard: React.FC<VillaCardProps> = ({ villa }) => {
         <View className="flex flex-row justify-between items-center mt-4">
           <View className="flex flex-col mt-4">
             <View className="flex flex-row justify-between">
-              <Text className="text-xs"> </Text>
-              <Text className="text-xs font-bold">{villa.province}</Text>
-            </View>
-            <View className="flex flex-row">
-              <Text className="text-xs"> </Text>
-              <Text className="text-xs font-bold">{villa.district}</Text>
+              <Text className="text-sm"> {t("House keepper Code")}: </Text>
+              <Text className="text-sm font-bold">
+                {villa.housekeeper_registration_code}
+              </Text>
             </View>
           </View>
         </View>

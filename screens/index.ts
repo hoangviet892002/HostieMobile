@@ -25,7 +25,10 @@ import HoldDetail from "./HoldDetail/";
 import FillFormBooking from "./FillFormBooking";
 import BookSuccessScreen from "./BookSuccessScreen";
 import HoldSuccessScreen from "./HoldSuccessScreen";
-
+import DashBoard from "./DashBoard";
+import HousekeeperManager from "./HousekeeperManager";
+import HouseKeeperRequest from "./HouseKeeperRequest";
+import Report from "./Report";
 export {
   VillaDetail,
   CalendarDetail,
@@ -54,4 +57,8 @@ export {
   FillFormBooking,
   BookSuccessScreen,
   HoldSuccessScreen,
+  DashBoard,
+  HousekeeperManager,
+  HouseKeeperRequest,
+  Report,
 };

@@ -24,6 +24,7 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
   primary: "#117EFF",
+  primaryLight: "#637aff99",
   primaryDark: "#2759ff",
   primaryLite: "#637aff99",
   black: "#000",
@@ -33,6 +34,7 @@ export const Colors = {
   green2: "#039a83",
 
   gray: "#CCCCCC",
+  grayLight: "#F2F2F2",
   red: "#ff2f68",
   lightRed: "#ff4f7e",
   darkRed: "#d9365e",
@@ -66,7 +68,11 @@ export const Colors = {
   bag11Bg: "#c7d3c0",
 
   error: "#EF4444",
+  errorLight: "#F87171",
   success: "#10B981",
+  successLight: "#6EE7B7",
+  warning: "#F59E0B",
+  warningLight: "#FCD34D",
 
   blue: "#3B82F6",
 };

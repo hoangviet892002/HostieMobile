@@ -9,6 +9,9 @@ import * as Animatable from "react-native-animatable";
 import Icon, { Icons } from "../Icons";
 import { useNavigation } from "@react-navigation/native";
 import { Residence } from "@/types/response/Residences";
+import { useSelector } from "react-redux";
+import { selectRole } from "@/redux/slices/authSlice";
+import { Roles } from "@/constants/enums/roles";
 interface VillaCardProps {
   villa: Residence;
 }
@@ -18,6 +21,12 @@ export const VillaCard: React.FC<VillaCardProps> = ({ villa }) => {
   const { t } = useTranslation();
   const randomAnimation =
     Animations[Math.floor(Math.random() * Animations.length)];
+
+  const userRole = useSelector(selectRole);
+
+  const lableButton =
+    userRole === Roles.ROLE_HOUSEKEEPER ? t("View Detail") : t("Book Now");
+
   return (
     <View className="h-auto m-4 rounded-3xl flex justify-between bg-white shadow-2xl shadow-blue-900  overflow-hidden flex-col w-5/6">
       <View className="flex">
@@ -70,7 +79,7 @@ export const VillaCard: React.FC<VillaCardProps> = ({ villa }) => {
             // });
           }}
         >
-          <Text className="text-sm text-white">{t("Book Now")}</Text>
+          <Text className="text-sm text-white">{lableButton}</Text>
         </TouchableOpacity>
       </View>
     </View>

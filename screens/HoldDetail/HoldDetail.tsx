@@ -76,7 +76,9 @@ const HoldDetail = () => {
 
           {/* Title and Status */}
           <View className="flex flex-row justify-between items-center mb-2">
-            <Text className="text-xl font-bold text-gray-800"></Text>
+            <Text className="text-xl font-bold text-gray-800">
+              {item.residence_name}
+            </Text>
             <View className="flex flex-row items-center">
               <Ionicons name={icon} size={20} color={color} />
               <Text className={`ml-1 font-medium ${textColor}`}>
@@ -85,13 +87,18 @@ const HoldDetail = () => {
             </View>
           </View>
 
+          {item.reason_reject && (
+            <View className="bg-red-100 p-2 rounded-md mb-4">
+              <Text className="text-red-500">{item.reason_reject}</Text>
+            </View>
+          )}
+
           {/* Date Information */}
           <View className="flex flex-row justify-between items-center mb-2">
             <View className="flex flex-row items-center">
               <Ionicons name="calendar-outline" size={18} color="#4A5568" />
               <Text className="ml-1 text-gray-700">
-                {moment(item?.checkin).format("DD-MM-YYYY")} -{" "}
-                {moment(item?.checkout).format("DD-MM-YYYY")}
+                {item?.checkin} - {item?.checkout}
               </Text>
             </View>
             <View className="flex flex-row items-center">
@@ -102,25 +109,10 @@ const HoldDetail = () => {
             </View>
           </View>
 
-          {/* Number of nights and days */}
-          <View className="flex flex-row justify-between items-center mb-2">
-            <View className="flex flex-row items-center">
-              <Ionicons name="moon-outline" size={18} color="#4A5568" />
-              <Text className="ml-1 text-gray-700">
-                {item?.total_nights} đêm
-              </Text>
-            </View>
-            <View className="flex flex-row items-center">
-              <Ionicons name="sunny-outline" size={18} color="#4A5568" />
-              <Text className="ml-1 text-gray-700">
-                {item?.total_days} ngày
-              </Text>
-            </View>
-          </View>
           {/* Seller Information */}
           <View className="mb-4">
             <Text className="text-lg font-semibold text-gray-800">
-              Người bán:
+              {t("Seller")}:
             </Text>
             <View className="flex flex-row items-center mt-2">
               <Image

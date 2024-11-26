@@ -9,4 +9,5 @@ export interface Residence {
   ward: string;
   status: string;
   images: { id: string; image: string }[];
+  housekeeper_registration_code?: string;
 }

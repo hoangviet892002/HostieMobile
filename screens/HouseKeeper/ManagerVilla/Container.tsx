@@ -12,12 +12,40 @@ import * as Animatable from "react-native-animatable";
 import { BackButton } from "@/components";
 import { VillaType } from "@/types";
 import Villas from "./Villas";
+import { Colors } from "@/constants/Colors";
+import Icon, { Icons } from "@/components/Icons";
+import { housekeeperAddResidenceApi } from "@/apis/housekeeper";
+import Toast from "react-native-toast-message";
 
 const Container = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [applyForm, setApplyForm] = useState({
-    code: "",
+    housekeeperRegistrationCode: "",
   });
+  const [loading, setLoading] = useState(false);
+
+  const handleApply = async () => {
+    setLoading(true);
+
+    const res = await housekeeperAddResidenceApi(
+      applyForm.housekeeperRegistrationCode
+    );
+    if (res.code === 1000) {
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: res.message,
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: res.message,
+      });
+    }
+    setModalVisible(false);
+    setLoading(false);
+  };
 
   // Render Modal
   const renderModal = () => {
@@ -42,14 +70,20 @@ const Container = () => {
             style={{
               backgroundColor: "#fff",
               width: "80%",
-              padding: 20,
+              padding: 40,
               borderRadius: 10,
             }}
           >
+            <TouchableOpacity
+              style={{ position: "absolute", top: 20, right: 20 }}
+              onPress={() => setModalVisible(false)}
+            >
+              <Icon type={Icons.AntDesign} name="close" size={24} />
+            </TouchableOpacity>
             <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-              Apply Promo Code
+              Apply Manage Residence Code
             </Text>
-            <Text style={{ marginTop: 10 }}>Enter your promo code</Text>
+            <Text style={{ marginTop: 10 }}> Residence Code</Text>
             <TextInput
               style={{
                 borderWidth: 1,
@@ -58,22 +92,27 @@ const Container = () => {
                 padding: 10,
                 marginTop: 10,
               }}
-              value={applyForm.code}
+              value={applyForm.housekeeperRegistrationCode}
               onChangeText={(text) =>
-                setApplyForm({ ...applyForm, code: text })
+                setApplyForm({
+                  ...applyForm,
+                  housekeeperRegistrationCode: text,
+                })
               }
             />
             <TouchableOpacity
               style={{
-                backgroundColor: "#f0f0f0",
+                backgroundColor: Colors.primary,
                 padding: 10,
                 borderRadius: 5,
                 marginTop: 10,
-                borderBlockColor: "#ddd",
               }}
-              onPress={() => setModalVisible(false)}
+              disabled={loading}
+              onPress={handleApply}
             >
-              <Text style={{ textAlign: "center" }}>Apply</Text>
+              <Text style={{ color: "#fff", textAlign: "center" }}>
+                {loading ? "Loading..." : "Apply"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -82,32 +121,22 @@ const Container = () => {
   };
 
   return (
-    <SafeAreaView className="h-full p-5 pb-24">
-      <Animatable.View
-        className="flex items-center justify-between flex-row m-1"
-        delay={120}
-        animation="slideInDown"
-      >
-        <Text className="text-3xl font-bold ">Villas</Text>
-        {/* Add 1 villa manage */}
-        <TouchableOpacity
-          className="bg-gray-200 p-4 rounded-md mt-4 border border-gray-400"
-          style={{
-            backgroundColor: "#f0f0f0",
-            padding: 10,
-            borderRadius: 5,
-            marginTop: 10,
-            borderBlockColor: "#ddd",
-          }}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={{ textAlign: "center" }}>Add Villa</Text>
-        </TouchableOpacity>
-      </Animatable.View>
+    <SafeAreaView className="h-full ">
       {renderModal()}
+      {/* Absulute button add */}
+
       <ScrollView>
         <Villas />
       </ScrollView>
+      <TouchableOpacity
+        className="absolute bottom-4 right-4 bg-white p-2 rounded-lg h-12 w-12 items-center justify-center"
+        style={{ backgroundColor: Colors.primary }}
+        onPress={() => {
+          setModalVisible(true);
+        }}
+      >
+        <Icon type={Icons.Feather} name="plus" size={24} color={Colors.white} />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

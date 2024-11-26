@@ -30,4 +30,7 @@ export interface BookingType {
   commission_rate: number | null;
   guest_count?: number;
   guest_id?: number;
+  seller_name: string;
+  seller_avatar: string;
+  reason_reject: null | string;
 }

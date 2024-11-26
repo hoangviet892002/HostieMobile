@@ -55,6 +55,7 @@ const FillFormBooking = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [price, setPrice] = useState(0);
+  const [commission_rate, setCommissionRate] = useState(0);
   const [loading, setLoading] = useState(false);
   const pickDate = useSelector(selectFilter);
   const [priceBill, setPriceBill] = useState<BillDetail[]>([]);
@@ -105,6 +106,7 @@ const FillFormBooking = () => {
     const response = await getPrice(data);
     if (response.success) {
       setPrice(response.data[0].total_price);
+      setCommissionRate(response.data[0].commission_rate);
       setPriceBill(response.data[0].price_details);
     } else {
       showToast(response);
@@ -184,24 +186,60 @@ const FillFormBooking = () => {
                   className="w-full m-2"
                   data={priceBill}
                   renderItem={({ item, index }) => (
-                    <View
-                      key={index}
-                      className="flex flex-row justify-between items-center border-b border-gray-200 py-3 w-11/12"
-                    >
-                      <View className="flex flex-row items-center">
-                        <Icon
-                          type={Icons.Feather}
-                          name="calendar"
-                          size={20}
-                          color={Colors.primary}
-                        />
-                        <Text className="text-gray-700 text-base">
-                          {parseDateDDMMYYYY(item.date)}
+                    <View>
+                      <View
+                        key={index}
+                        className="flex flex-row justify-between items-center border-b border-gray-200 py-3 w-11/12"
+                      >
+                        <View className="flex flex-row items-center">
+                          <Icon
+                            type={Icons.Feather}
+                            name="calendar"
+                            size={20}
+                            color={Colors.primary}
+                          />
+                          <Text className="text-gray-700 text-base">
+                            {parseDateDDMMYYYY(item.date)}
+                          </Text>
+                        </View>
+                        <Text className="text-gray-700 text-base font-medium">
+                          {item.price} VND
                         </Text>
                       </View>
-                      <Text className="text-gray-700 text-base font-medium">
-                        {item.price} VND
-                      </Text>
+
+                      <View className="flex flex-row justify-between items-center border-b border-gray-200 py-3 w-11/12">
+                        <View className="flex flex-row items-center">
+                          <Icon
+                            type={Icons.Feather}
+                            name="percent"
+                            size={20}
+                            color={Colors.primary}
+                          />
+                          <Text className="text-gray-700 text-base">
+                            {t("Commission Rate")}
+                          </Text>
+                        </View>
+                        <Text className="text-gray-700 text-base font-medium">
+                          {commission_rate}%
+                        </Text>
+                      </View>
+
+                      <View className="flex flex-row justify-between items-center border-b border-gray-200 py-3 w-11/12">
+                        <View className="flex flex-row items-center">
+                          <Icon
+                            type={Icons.Feather}
+                            name="dollar-sign"
+                            size={20}
+                            color={Colors.primary}
+                          />
+                          <Text className="text-gray-700 text-base">
+                            {t("Commission")}
+                          </Text>
+                        </View>
+                        <Text className="text-gray-700 text-base font-medium">
+                          {parsePrice((item.price * commission_rate) / 100)} VND
+                        </Text>
+                      </View>
                     </View>
                   )}
                 />
@@ -295,7 +333,6 @@ const FillFormBooking = () => {
             <Formik
               enableReinitialize
               initialValues={{
-                paid_amount: 0,
                 residence_id: parseInt(itemId),
                 checkin: parseDateDDMMYYYY(pickDate.start_date.toISOString()),
                 checkout: parseDateDDMMYYYY(pickDate.end_date.toISOString()),
@@ -306,7 +343,6 @@ const FillFormBooking = () => {
               onSubmit={(values) => {
                 const solveApi = async () => {
                   const data = {
-                    paid_amount: parseInt(values.paid_amount),
                     residence_id: parseInt(itemId),
                     checkin: parseDateDDMMYYYY(
                       pickDate.start_date.toISOString()
@@ -340,21 +376,7 @@ const FillFormBooking = () => {
                 if (!values.guest_count) {
                   errors.guest_count = t("Required");
                 }
-                if (!values.paid_amount) {
-                  errors.paid_amount = t("Required");
-                }
 
-                // paid amount must be greater than 0
-                if (values.paid_amount < price / 2) {
-                  errors.paid_amount = t("mustBeGreaterThan", {
-                    minAmount: price / 2,
-                  });
-                }
-                if (values.paid_amount > price) {
-                  errors.paid_amount = t("mustBeLessThan", {
-                    maxAmount: price,
-                  });
-                }
                 // guest count must be greater than 0
                 if (values.guest_count <= 0) {
                   errors.guest_count = t("Must be > 0");
@@ -493,48 +515,6 @@ const FillFormBooking = () => {
                         value={values.note}
                         placeholder={t("Note")}
                       />
-                    </View>
-                  </View>
-
-                  {/* Paid Amount */}
-                  <View style={{ marginBottom: 16 }}>
-                    <Text style={{ fontSize: 16 }}>{t("Paid Amount")}</Text>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        borderColor: Colors.primary,
-                        borderWidth: 2,
-                        borderRadius: 25,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        marginVertical: 5,
-                        width: "auto",
-                      }}
-                    >
-                      <Icon
-                        type={Icons.Feather}
-                        name="dollar-sign"
-                        size={20}
-                        color={Colors.primary}
-                      />
-                      <TextInput
-                        style={{
-                          flex: 1,
-                          marginLeft: 10,
-                          color: Colors.black,
-                          paddingVertical: 8,
-                        }}
-                        keyboardType="numeric"
-                        onChangeText={handleChange("paid_amount")}
-                        onBlur={handleBlur("paid_amount")}
-                        value={values.paid_amount}
-                      />
-                      {errors.paid_amount && (
-                        <Text style={{ color: "red" }}>
-                          {errors.paid_amount}
-                        </Text>
-                      )}
                     </View>
                   </View>
 

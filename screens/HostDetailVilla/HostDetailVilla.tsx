@@ -161,7 +161,7 @@ const HostDetailVilla = () => {
 
       <ScrollView style={{ padding: 16, margin: 20, flex: 1 }}>
         <Animatable.View delay={120} animation={"slideInUp"}>
-          <Text className="text-3xl font-bold">{villa.residence_name}</Text>
+          <Text className="text-3xl font-bold ">{villa.residence_name}</Text>
           <Text className="text-sm text-gray-600">
             {villa.residence_address}, {villa.ward}, {villa.district},{" "}
             {villa.province}

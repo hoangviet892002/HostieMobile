@@ -1,7 +1,7 @@
 // src/screens/Notifications.tsx
-import { View, Text, ActivityIndicator, FlatList } from "react-native";
+import { View, Text, ActivityIndicator, FlatList, Image } from "react-native";
 import React, { useCallback, useState } from "react";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { NotificationType } from "@/types";
 import { getNotificationApi } from "@/apis/notification";
 import { Colors } from "@/constants/Colors";
@@ -19,6 +19,9 @@ import {
 } from "@/types/NotificationType";
 import { parseDateDDMMYYYY } from "@/utils/parseDate";
 import { useTranslation } from "react-i18next";
+import { parseLogsEvent } from "@/utils/parseLogsEvent";
+import { useSelector } from "react-redux";
+import { selectUserId } from "@/redux/slices/authSlice";
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
@@ -84,6 +87,8 @@ const Notifications = () => {
     }, [])
   );
 
+  const userId = useSelector(selectUserId);
+
   const renderItem = ({ item }: { item: NotificationType }) => {
     const isBooking = item.entity_type_code === "bookings";
     const eventCode = item.event_code as
@@ -93,154 +98,194 @@ const Notifications = () => {
       | BookDetailNotification
       | HoldDetailNotification;
 
+    const {
+      checkin,
+      checkout,
+      seller_name,
+      seller_avatar,
+      host_name,
+      host_avatar,
+      residence_name,
+    } = details;
+
     const getTitle = () => {
-      if (isBooking) {
-        switch (eventCode) {
-          case EventBookNotification.Created:
-            return t("Booking.Created");
-          case EventBookNotification.Updated:
-            return t("Booking.Updated");
-          case EventBookNotification.Cancelled:
-            return t("Booking.Cancelled");
-          case EventBookNotification.HostAccepted:
-            return t("Booking.HostAccepted");
-          case EventBookNotification.HostRejected:
-            return t("Booking.HostRejected");
-          case EventBookNotification.SellerTransferred:
-            return t("Booking.SellerTransferred");
-          case EventBookNotification.HostReceived:
-            return t("Booking.HostReceived");
-          case EventBookNotification.HostDontReceived:
-            return t("Booking.HostDontReceived");
-          case EventBookNotification.CustomerCheckin:
-            return t("Booking.CustomerCheckin");
-          case EventBookNotification.CustomerCheckout:
-            return t("Booking.CustomerCheckout");
-          default:
-            return t("Booking.Notification");
-        }
+      return parseLogsEvent(eventCode);
+    };
+    const name = () => {
+      if (parseInt(userId) === details.seller_id) {
+        return host_name;
       } else {
-        switch (eventCode) {
-          case EventHoldNotification.Created:
-            return t("Hold.Created");
-          case EventHoldNotification.HostAccepted:
-            return t("Hold.HostAccepted");
-          case EventHoldNotification.HostRejected:
-            return t("Hold.HostRejected");
-          case EventHoldNotification.Cancelled:
-            return t("Hold.Cancelled");
-          default:
-            return t("Hold.Notification");
-        }
+        return seller_name;
       }
     };
 
-    const getDescription = () => {
-      if (isBooking) {
-        const book = details as BookDetailNotification;
-        return `${t("Booking.ID")}: ${book.id}\n${t("Booking.Checkin")}: ${
-          book.checkin
-        }\n${t("Booking.Checkout")}: ${book.checkout}`;
+    const avatar = () => {
+      if (parseInt(userId) === details.seller_id) {
+        return host_avatar;
       } else {
-        const hold = details as HoldDetailNotification;
-        return `${t("Hold.ID")}: ${hold.id}\n${t("Hold.Checkin")}: ${
-          hold.checkin
-        }\n${t("Hold.Checkout")}: ${hold.checkout}`;
+        return seller_avatar;
       }
+    };
+    const getIconBackgroundColor = () => {
+      return Colors.white;
     };
 
     const getIcon = () => {
-      if (isBooking) {
-        switch (eventCode) {
-          case EventBookNotification.Created:
-            return {
-              type: Icons.AntDesign,
-              name: "calendar",
-              color: Colors.primary,
-            };
-          case EventBookNotification.Cancelled:
-            return {
-              type: Icons.AntDesign,
-              name: "closecircle",
-              color: Colors.error,
-            };
-          case EventBookNotification.HostAccepted:
-            return {
-              type: Icons.AntDesign,
-              name: "checkcircle",
-              color: Colors.success,
-            };
-          case EventBookNotification.HostRejected:
-            return {
-              type: Icons.AntDesign,
-              name: "closecircle",
-              color: Colors.error,
-            };
-          // Add more cases as needed
-          default:
-            return {
-              type: Icons.AntDesign,
-              name: "notification",
-              color: Colors.gray,
-            };
+      switch (eventCode) {
+        case EventBookNotification.Created:
+          return {
+            type: Icons.Feather,
+
+            name: "bookmark",
+            color: Colors.primary,
+          };
+        case EventBookNotification.Updated:
+          return {
+            type: Icons.Feather,
+            name: "edit",
+            color: Colors.warning,
+          };
+        case EventBookNotification.Cancelled:
+          return {
+            type: Icons.Feather,
+            name: "x-circle",
+            color: Colors.error,
+          };
+        case EventBookNotification.HostAccepted:
+          return {
+            type: Icons.Feather,
+            name: "check-circle",
+            color: Colors.success,
+          };
+        case EventBookNotification.HostRejected:
+          return {
+            type: Icons.Feather,
+            name: "x-circle",
+            color: Colors.error,
+          };
+        case EventBookNotification.SellerTransferred:
+          return {
+            type: Icons.Feather,
+            name: "dollar-sign",
+            color: Colors.success,
+          };
+        case EventBookNotification.HostReceived:
+          return {
+            type: Icons.Feather,
+            name: "check-circle",
+            color: Colors.success,
+          };
+        case EventBookNotification.HostDontReceived:
+          return {
+            type: Icons.Feather,
+            name: "x-circle",
+            color: Colors.error,
+          };
+        case EventBookNotification.CustomerCheckin:
+          return {
+            type: Icons.Feather,
+            name: "log-in",
+            color: Colors.primary,
+          };
+        case EventBookNotification.CustomerCheckout:
+          return {
+            type: Icons.Feather,
+            name: "log-out",
+            color: Colors.primary,
+          };
+        case EventHoldNotification.Created:
+          return {
+            type: Icons.Feather,
+            name: "bookmark",
+            color: Colors.primary,
+          };
+        case EventHoldNotification.HostAccepted:
+          return {
+            type: Icons.Feather,
+            name: "check-circle",
+            color: Colors.success,
+          };
+        case EventHoldNotification.HostRejected:
+          return {
+            type: Icons.Feather,
+            name: "x-circle",
+            color: Colors.error,
+          };
+        case EventHoldNotification.Cancelled:
+          return {
+            type: Icons.Feather,
+            name: "x-circle",
+            color: Colors.error,
+          };
+        default:
+          return {
+            type: Icons.Feather,
+            name: "bell",
+            color: Colors.gray,
+          };
+      }
+    };
+    const isBoooking = item.entity_type_code === "bookings";
+    const isHold = item.entity_type_code === "hold";
+    const handleNavigate = () => {
+      if (isBoooking) {
+        router.push(`/BookingDetail?id=${details.id}`);
+      }
+      if (isHold) {
+        if (
+          eventCode === EventHoldNotification.HostAccepted ||
+          eventCode === EventHoldNotification.HostRejected
+        ) {
+          router.push(`/dashboard/tab5`);
+          return;
         }
-      } else {
-        switch (eventCode) {
-          case EventHoldNotification.Created:
-            return {
-              type: Icons.AntDesign,
-              name: "book",
-              color: Colors.primary,
-            };
-          case EventHoldNotification.Cancelled:
-            return {
-              type: Icons.AntDesign,
-              name: "closecircle",
-              color: Colors.error,
-            };
-          case EventHoldNotification.HostAccepted:
-            return {
-              type: Icons.AntDesign,
-              name: "checkcircle",
-              color: Colors.success,
-            };
-          case EventHoldNotification.HostRejected:
-            return {
-              type: Icons.AntDesign,
-              name: "closecircle",
-              color: Colors.error,
-            };
-          // Add more cases as needed
-          default:
-            return {
-              type: Icons.AntDesign,
-              name: "notification",
-              color: Colors.gray,
-            };
-        }
+        router.push(`/HoldDetail?id=${details.id}`);
       }
     };
 
     return (
-      <TouchableOpacity className="flex-row items-start p-4 border-b border-gray-200 bg-white">
-        <Icon
-          type={getIcon().type}
-          name={getIcon().name}
-          size={24}
-          color={getIcon().color}
-        />
-        <View className="flex-1">
-          <Text className="text-lg font-semibold text-gray-800">
-            {getTitle()}
-          </Text>
-          <Text className="text-sm text-gray-600 mt-1">{getDescription()}</Text>
-          <Text className="text-xs text-gray-400 mt-2">
-            {moment(item.created_at).fromNow()}
-          </Text>
-          {!item.is_read && (
-            <View className="absolute top-4 right-4 w-3 h-3 bg-blue-500 rounded-full" />
-          )}
+      <TouchableOpacity
+        className="flex-row items-center p-4 border-b border-gray-200"
+        style={{
+          backgroundColor: item.is_read ? "#fff" : "#e6f7ff",
+        }}
+        onPress={handleNavigate}
+      >
+        <View>
+          <Image
+            source={{ uri: avatar() }}
+            className="w-20 h-20 rounded-full"
+          />
+          {/* absolute icon */}
+          <View
+            className="absolute bottom-0 right-0 rounded-full p-2"
+            style={{
+              backgroundColor: getIconBackgroundColor(),
+
+              borderColor: getIcon().color,
+              borderWidth: 1,
+            }}
+          >
+            <Icon {...getIcon()} />
+          </View>
         </View>
+        <View className="flex-1 ml-4">
+          <Text className="text-base font-semibold">
+            {name()}: {t(getTitle())}
+          </Text>
+          <Text className="text-sm text-gray-500">
+            {isBooking
+              ? `${parseDateDDMMYYYY(checkin)} - ${parseDateDDMMYYYY(checkout)}`
+              : `${parseDateDDMMYYYY(checkin)} - ${parseDateDDMMYYYY(
+                  checkout
+                )}`}
+          </Text>
+          <Text className="text-sm text-gray-500">{`${residence_name}`}</Text>
+        </View>
+
+        <Text className="text-xs text-gray-500">
+          {moment(item.created_at).fromNow()}
+        </Text>
       </TouchableOpacity>
     );
   };

@@ -7,6 +7,7 @@ export enum StatusBooking {
   REJECT = "Reject",
   CHECKOUT = "Checkout",
   CHECKIN = "Checkin",
+  BOOKING_SYSTEM_CANCELLED = "Booking System Cancelled",
 }
 export enum ActionStatusBooking {
   REJECT = "Reject",
@@ -21,4 +22,5 @@ export enum ActionStatusBooking {
   OPENTRACKING = "Open Tracking",
   OPENDETAIL = "Open Detail",
   UPDATE = "Update",
+  OPENPOLICY = "Policy",
 }
